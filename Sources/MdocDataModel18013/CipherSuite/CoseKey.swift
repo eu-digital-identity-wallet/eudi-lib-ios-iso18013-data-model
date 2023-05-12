@@ -12,7 +12,8 @@ import Foundation
 import SwiftCBOR
 
 protocol CBORDecodable {
-    init?(cbor: [UInt8])
+    init?(data: [UInt8])
+    init?(cbor: CBOR)
 }
 
 enum ECCurveType: UInt64 {
@@ -29,8 +30,8 @@ struct CoseKey {
 }
 
 struct CoseKeyPrivate  {
-   let key: CoseKey
-   let d: Data
+    let key: CoseKey
+    let d: [UInt8]
 }
 
 extension CBOREncodable {
@@ -39,28 +40,54 @@ extension CBOREncodable {
     }
 }
 
+extension CBORDecodable {
+    init?(data: [UInt8]) {
+        guard let obj = try? CBOR.decode(data) else { return nil }
+        self.init(cbor: obj)
+    }
+}
+
 extension CoseKey: CBOREncodable {
     func toCBOR(options: CBOROptions) -> CBOR {
-        let key: CBOR = [
-      -1: .unsignedInt(crv.rawValue), 1: .unsignedInt(kty),
-      -2: .byteString(x), -3: .byteString(y),
-    ]
-    return key
+        let cbor: CBOR = [
+            -1: .unsignedInt(crv.rawValue), 1: .unsignedInt(kty),
+             -2: .byteString(x), -3: .byteString(y),
+        ]
+        return cbor
     }
 }
 
 extension CoseKey: CBORDecodable {
-    init?(cbor: [UInt8]) {
-        guard let obj = try? CBOR.decode(cbor) else { return nil }
+    init?(cbor obj: CBOR) {
         guard let calg = obj[-1], case let CBOR.unsignedInt(ralg) = calg, let alg = ECCurveType(rawValue: ralg)  else { return nil }
         crv = alg
-        guard let ckty = obj[1], case let CBOR.unsignedInt(rkty) = ckty  else { return nil }
+        guard let ckty = obj[1], case let CBOR.unsignedInt(rkty) = ckty else { return nil }
         kty = rkty
-        guard let cx = obj[-2], case let CBOR.byteString(rx) = cx  else { return nil }
+        guard let cx = obj[-2], case let CBOR.byteString(rx) = cx else { return nil }
         x = rx
-        guard let cy = obj[-3], case let CBOR.byteString(ry) = cy  else { return nil }
+        guard let cy = obj[-3], case let CBOR.byteString(ry) = cy else { return nil }
         y = ry
     }
+}
 
+extension CoseKeyPrivate: CBOREncodable {
+    func toCBOR(options: CBOROptions) -> CBOR {
+        var cbor = key.toCBOR(options: options)
+        cbor[-4] = .byteString(d)
+        return cbor
+    }
+}
 
+extension CoseKeyPrivate: CBORDecodable {
+    init?(cbor obj: SwiftCBOR.CBOR) {
+        guard let key = CoseKey(cbor: obj)  else { return nil }
+        self.key = key
+        guard let cd = obj[-4], case let CBOR.byteString(rd) = cd else { return nil }
+        d = rd
+    }
+    
+    init?(data: [UInt8]) {
+        guard let obj = try? CBOR.decode(data) else { return nil }
+        self.init(cbor: obj)
+    }
 }
