@@ -1,0 +1,66 @@
+//COSE_Key as defined in RFC 8152;
+//In accordance with RFC 8152, the CDDL grammar describing a COSE_Key as used in the device retrieval security mechanisms is:
+//COSE_Key = {
+//1 => int, ; kty: key type
+//-1 => int, ; crv: EC identifier - Taken from the "COSE Elliptic Curves" registry
+//-2 => bstr, ; x: value of x-coordinate
+//? -3 => bstr / bool ; y: value or sign bit of y-coordinate; only applicable for EC2 key types
+//}
+
+import CryptoKit
+import Foundation
+import SwiftCBOR
+
+protocol CBORDecodable {
+    init?(cbor: [UInt8])
+}
+
+enum ECCurveType: UInt64 {
+    case p256 = 1
+    case p384 = 2
+    case p521 = 3
+}
+
+struct CoseKey {
+    let crv: ECCurveType
+    var kty: UInt64 = 2
+    let x: [UInt8]
+    let y: [UInt8]
+}
+
+struct CoseKeyPrivate  {
+   let key: CoseKey
+   let d: Data
+}
+
+extension CBOREncodable {
+    func encode(options: SwiftCBOR.CBOROptions) -> [UInt8] {
+        toCBOR(options: CBOROptions()).encode()
+    }
+}
+
+extension CoseKey: CBOREncodable {
+    func toCBOR(options: CBOROptions) -> CBOR {
+        let key: CBOR = [
+      -1: .unsignedInt(crv.rawValue), 1: .unsignedInt(kty),
+      -2: .byteString(x), -3: .byteString(y),
+    ]
+    return key
+    }
+}
+
+extension CoseKey: CBORDecodable {
+    init?(cbor: [UInt8]) {
+        guard let obj = try? CBOR.decode(cbor) else { return nil }
+        guard let calg = obj[-1], case let CBOR.unsignedInt(ralg) = calg, let alg = ECCurveType(rawValue: ralg)  else { return nil }
+        crv = alg
+        guard let ckty = obj[1], case let CBOR.unsignedInt(rkty) = ckty  else { return nil }
+        kty = rkty
+        guard let cx = obj[-2], case let CBOR.byteString(rx) = cx  else { return nil }
+        x = rx
+        guard let cy = obj[-3], case let CBOR.byteString(ry) = cy  else { return nil }
+        y = ry
+    }
+
+
+}
