@@ -6,7 +6,7 @@
 import Foundation
 import SwiftCBOR
 
-enum DeviceRetrievalMethod {
+enum DeviceRetrievalMethod: Equatable {
     static var version: UInt64 { 1 }
     
     case qr

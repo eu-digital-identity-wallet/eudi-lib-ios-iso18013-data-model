@@ -22,7 +22,7 @@ enum ECCurveType: UInt64 {
     case p521 = 3
 }
 
-struct CoseKey {
+struct CoseKey: Equatable {
     let crv: ECCurveType
     var kty: UInt64 = 2
     let x: [UInt8]

@@ -34,15 +34,21 @@ extension String {
         return res
     }
 }
+
+extension Data {
+  public var bytes: Array<UInt8> {
+    Array(self)
+  }
+}
  
 extension Array where Element == UInt8 {
-    public var hex: String {
+    var hex: String {
            var str = ""
            for byte in self {
-               str = str.appendingFormat("%02x", UInt(byte))
+               str = str.appendingFormat("%02X", UInt(byte))
            }
            return str
-       }
+    }
 }
 
 extension CBOREncodable {

@@ -5,7 +5,7 @@
 import Foundation
 import SwiftCBOR
 
-struct ServerRetrievalOptions  {
+struct ServerRetrievalOptions: Equatable  {
     var webAPI: ServerRetrievalOption?
     var oIDC: ServerRetrievalOption?
     var isEmpty:Bool { webAPI == nil && oIDC == nil }
@@ -30,5 +30,6 @@ extension ServerRetrievalOptions: CBORDecodable {
         guard case let .map(map) = cbor else { return nil }
         if let cborW = map[.utf8String(Keys.webApi.rawValue)] { webAPI = ServerRetrievalOption(cbor: cborW) }
         if let cborO = map[.utf8String(Keys.oidc.rawValue)] { oIDC = ServerRetrievalOption(cbor: cborO) }
+        if isEmpty { return nil }
     }
 }
