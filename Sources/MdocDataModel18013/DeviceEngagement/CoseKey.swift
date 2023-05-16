@@ -1,12 +1,3 @@
-//COSE_Key as defined in RFC 8152;
-//In accordance with RFC 8152, the CDDL grammar describing a COSE_Key as used in the device retrieval security mechanisms is:
-//COSE_Key = {
-//1 => int, ; kty: key type
-//-1 => int, ; crv: EC identifier - Taken from the "COSE Elliptic Curves" registry
-//-2 => bstr, ; x: value of x-coordinate
-//? -3 => bstr / bool ; y: value or sign bit of y-coordinate; only applicable for EC2 key types
-//}
-
 import CryptoKit
 import Foundation
 import SwiftCBOR
@@ -16,19 +7,26 @@ protocol CBORDecodable {
     init?(cbor: CBOR)
 }
 
+/// crv: EC identifier - Taken from the "COSE Elliptic Curves" registry
 enum ECCurveType: UInt64 {
     case p256 = 1
     case p384 = 2
     case p521 = 3
 }
 
+/// COSE_Key as defined in RFC 8152
 struct CoseKey: Equatable {
+    /// EC identifier
     let crv: ECCurveType
+    /// key type
     var kty: UInt64 = 2
+    /// value of x-coordinate
     let x: [UInt8]
+    /// value of y-coordinate
     let y: [UInt8]
 }
 
+/// COSE_Key + private key
 struct CoseKeyPrivate  {
     let key: CoseKey
     let d: [UInt8]

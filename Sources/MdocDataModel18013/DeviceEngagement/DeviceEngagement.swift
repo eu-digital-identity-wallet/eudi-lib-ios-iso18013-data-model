@@ -8,6 +8,7 @@
 import Foundation
 import SwiftCBOR
 
+/// Device engagement information
 struct DeviceEngagement: Equatable {
     static let versionImpl: String = "1.0"
     var version: String = Self.versionImpl

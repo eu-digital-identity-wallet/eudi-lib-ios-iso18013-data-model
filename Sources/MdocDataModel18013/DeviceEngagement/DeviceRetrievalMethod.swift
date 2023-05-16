@@ -6,6 +6,8 @@
 import Foundation
 import SwiftCBOR
 
+/// A `DeviceRetrievalMethod` holds two mandatory values (type and version). The first element defines the type and the second element the version for the transfer method.
+/// Additionally, may contain extra info for each connection.
 enum DeviceRetrievalMethod: Equatable {
     static var version: UInt64 { 1 }
     

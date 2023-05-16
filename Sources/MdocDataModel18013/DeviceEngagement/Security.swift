@@ -8,6 +8,7 @@
 import Foundation
 import SwiftCBOR
 
+/// Security = [int, EDeviceKeyBytes ]
 struct Security: Equatable {
     static let cipherSuiteIdentifier: UInt64 = 1
     /// security struct. of the holder transfered (only the public key of the mDL is encoded)

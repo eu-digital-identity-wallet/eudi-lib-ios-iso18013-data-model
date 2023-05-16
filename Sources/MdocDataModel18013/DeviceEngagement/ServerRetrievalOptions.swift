@@ -5,6 +5,7 @@
 import Foundation
 import SwiftCBOR
 
+/// Optional information on the server retrieval methods supported by the mdoc
 struct ServerRetrievalOptions: Equatable  {
     var webAPI: ServerRetrievalOption?
     var oIDC: ServerRetrievalOption?
