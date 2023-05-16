@@ -9,48 +9,43 @@ import Foundation
 import SwiftCBOR
 
 struct DeviceEngagement {
+    static let version: String = "1.0"
+    let security: Security
+    let deviceRetrievalMethods: [DeviceRetrievalMethod]?
+    let serverRetrievalOptions: ServerRetrievalOptions?
 }
 
-enum DeviceRetrievalMethod {
-    static var version: UInt64 { 1 }
-    
-    case qr
-    case nfc(maxLenCommand: UInt64, maxLenResponse: UInt64)
-    case ble(isBleServer: Bool, uuid: String)
-    //  case wifiaware // not supported in ios
-}
-
-
-
-
-
-struct Security {
-    
-}
-
-
-
-
-
-extension DeviceRetrievalMethod: CBOREncodable {
-    static func appendTypeAndVersion(_ cborArr: inout [CBOR], type: UInt64) {
-        cborArr.append(.unsignedInt(type)); cborArr.append(.unsignedInt(version))
-    }
-    func toCBOR(options: CBOROptions) -> CBOR {
-        var cborArr = [CBOR]()
-        switch self {
-        case .qr:
-            Self.appendTypeAndVersion(&cborArr, type: 0)
-        case .nfc(let maxLenCommand, let maxLenResponse):
-            Self.appendTypeAndVersion(&cborArr, type: 1)
-            let options: CBOR = [0: .unsignedInt(maxLenCommand), 1: .unsignedInt(maxLenResponse)]
-            cborArr.append(options)
-        case .ble(let isBleServer, let uuid):
-            Self.appendTypeAndVersion(&cborArr, type: 2)
-            let options: CBOR = [0: .boolean(isBleServer), 1: .boolean(!isBleServer), .unsignedInt(isBleServer ? 10 : 11): .byteString(uuid.byteArray)]
-            cborArr.append(options)
-        }
-        return .array(cborArr)
+extension DeviceEngagement: CBOREncodable {
+    func toCBOR(options: SwiftCBOR.CBOROptions) -> SwiftCBOR.CBOR {
+        var res = CBOR.map([0: .utf8String(Self.version), 1: security.toCBOR(options: options)])
+        if let drms = deviceRetrievalMethods { res[2] = .array(drms.map { $0.toCBOR(options: options)}) }
+        if let sro = serverRetrievalOptions { res[3] = sro.toCBOR(options: options) }
+        return res
     }
 }
+
+extension DeviceEngagement: CBORDecodable {
+    init?(cbor: CBOR) {
+        guard case let .map(map) = cbor else { return nil }
+        guard let cv = map[0], case let .utf8String(v) = cv, v.prefix(2) == "1." else { return nil }
+        guard let cs = map[1], let s = Security(cbor: cs) else { return nil }
+        guard let cdrms = map[2], case let .array(drms) = cdrms, drms.count > 0 else { return nil }
+        guard let csro = map[3], let sro = ServerRetrievalOptions.init(cbor: csro) else { return nil }
+        security = s; deviceRetrievalMethods = drms.compactMap(DeviceRetrievalMethod.init(cbor:))
+        serverRetrievalOptions = sro
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 

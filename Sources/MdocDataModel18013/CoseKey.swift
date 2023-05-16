@@ -34,19 +34,6 @@ struct CoseKeyPrivate  {
     let d: [UInt8]
 }
 
-extension CBOREncodable {
-    func encode(options: SwiftCBOR.CBOROptions) -> [UInt8] {
-        toCBOR(options: CBOROptions()).encode()
-    }
-}
-
-extension CBORDecodable {
-    init?(data: [UInt8]) {
-        guard let obj = try? CBOR.decode(data) else { return nil }
-        self.init(cbor: obj)
-    }
-}
-
 extension CoseKey: CBOREncodable {
     func toCBOR(options: CBOROptions) -> CBOR {
         let cbor: CBOR = [
