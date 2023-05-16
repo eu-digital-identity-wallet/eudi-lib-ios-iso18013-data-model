@@ -59,7 +59,7 @@ extension CoseKey: CBOREncodable {
 
 extension CoseKey: CBORDecodable {
     init?(cbor obj: CBOR) {
-        guard let calg = obj[-1], case let CBOR.unsignedInt(ralg) = calg, let alg = ECCurveType(rawValue: ralg)  else { return nil }
+        guard let calg = obj[-1], case let CBOR.unsignedInt(ralg) = calg, let alg = ECCurveType(rawValue: ralg) else { return nil }
         crv = alg
         guard let ckty = obj[1], case let CBOR.unsignedInt(rkty) = ckty else { return nil }
         kty = rkty

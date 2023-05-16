@@ -20,41 +20,17 @@ enum DeviceRetrievalMethod {
     //  case wifiaware // not supported in ios
 }
 
-struct ServerRetrievalOption {
-    static var version: UInt64 { 1 }
-    public var url: String
-    public var token: String
-}
 
-struct ServerRetrievalOptions  {
-    var webAPI: ServerRetrievalOption?
-    var oIDC: ServerRetrievalOption?
-    var isEmpty:Bool { webAPI == nil && oIDC == nil }
-    
-    enum Keys : String {
-        case webApi
-        case oidc
-    }
-}
+
+
 
 struct Security {
     
 }
 
-extension ServerRetrievalOption: CBOREncodable {
-    func toCBOR(options: CBOROptions) -> CBOR {
-        .array([.unsignedInt(Self.version), .utf8String(url), .utf8String(token) ])
-    }
-}
 
-extension ServerRetrievalOptions: CBOREncodable {
-    func toCBOR(options: CBOROptions) -> CBOR {
-        var cborMap = [CBOR: CBOR]()
-        if let webAPI { cborMap[.utf8String(Keys.webApi.rawValue)] = webAPI.toCBOR(options: options) }
-        if let oIDC { cborMap[.utf8String(Keys.oidc.rawValue)] = oIDC.toCBOR(options: options) }
-        return .map(cborMap)
-    }
-}
+
+
 
 extension DeviceRetrievalMethod: CBOREncodable {
     static func appendTypeAndVersion(_ cborArr: inout [CBOR], type: UInt64) {
@@ -77,3 +53,4 @@ extension DeviceRetrievalMethod: CBOREncodable {
         return .array(cborArr)
     }
 }
+
