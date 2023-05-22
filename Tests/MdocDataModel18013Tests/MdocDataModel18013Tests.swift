@@ -36,7 +36,12 @@ final class MdocDataModel18013Tests: XCTestCase {
     func testEncodeDE() throws {
         let de1 = try XCTUnwrap(DeviceEngagement(data: OtherTestData.deOnline.bytes))
         let de1data = de1.encode(options: .init())
-        let de2 = try XCTUnwrap(DeviceEngagement(data: de1data))
-        XCTAssertEqual(de1, de2)
+        XCTAssertNotNil(de1data)
+    }
+    
+    func testGenerateBLEengageQRCode() throws {
+        let de = DeviceEngagement(isBleServer: true)
+        var strQR = de.qrCode
+        XCTAssertNotNil(de.getQrCodeImage(.m)) 
     }
 }

@@ -9,25 +9,39 @@ import Foundation
 import SwiftCBOR
 
 /// Device engagement information
-struct DeviceEngagement: Equatable {
+public struct DeviceEngagement {
     static let versionImpl: String = "1.0"
     var version: String = Self.versionImpl
     let security: Security
     var deviceRetrievalMethods: [DeviceRetrievalMethod]? = nil
     var serverRetrievalOptions: ServerRetrievalOptions? = nil
+    public init(isBleServer: Bool?, crv: ECCurveType = .p256) {
+        let pk = CoseKeyPrivate(crv: crv)
+        security = Security(d: pk.d, deviceKey: pk.key)
+        if let isBleServer {
+            deviceRetrievalMethods = [.ble(isBleServer: isBleServer, uuid: DeviceRetrievalMethod.getRandomBleUuid())]
+        }
+    }
+    
+    public init?(data: [UInt8]) {
+        guard let obj = try? CBOR.decode(data) else { return nil }
+        self.init(cbor: obj)
+    }
 }
 
 extension DeviceEngagement: CBOREncodable {
-    func toCBOR(options: SwiftCBOR.CBOROptions) -> SwiftCBOR.CBOR {
+    public func toCBOR(options: SwiftCBOR.CBOROptions) -> SwiftCBOR.CBOR {
         var res = CBOR.map([0: .utf8String(version), 1: security.toCBOR(options: options)])
         if let drms = deviceRetrievalMethods { res[2] = .array(drms.map { $0.toCBOR(options: options)}) }
         if let sro = serverRetrievalOptions { res[3] = sro.toCBOR(options: options) }
         return res
     }
+    public func encode(options: CBOROptions) -> [UInt8] { toCBOR(options: options).encode(options: options) }
 }
 
+
 extension DeviceEngagement: CBORDecodable {
-    init?(cbor: CBOR) {
+    public init?(cbor: CBOR) {
         guard case let .map(map) = cbor else { return nil }
         guard let cv = map[0], case let .utf8String(v) = cv, v.prefix(2) == "1." else { return nil }
         guard let cs = map[1], let s = Security(cbor: cs) else { return nil }

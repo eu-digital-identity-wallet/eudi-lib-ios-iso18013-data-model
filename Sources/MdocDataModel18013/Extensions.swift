@@ -40,6 +40,7 @@ extension Data {
     Array(self)
   }
 }
+
  
 extension Array where Element == UInt8 {
     var hex: String {

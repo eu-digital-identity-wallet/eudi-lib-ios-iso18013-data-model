@@ -15,6 +15,13 @@ enum DeviceRetrievalMethod: Equatable {
     case nfc(maxLenCommand: UInt64, maxLenResponse: UInt64)
     case ble(isBleServer: Bool, uuid: String)
     //  case wifiaware // not supported in ios
+    static let BASE_UUID_SUFFIX_SERVICE = "-0000-1000-8000-00805F9B34FB".replacingOccurrences(of: "-", with: "")
+    static func getRandomBleUuid() -> String {
+        let uuidFull = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+        let index = uuidFull.index(uuidFull.startIndex, offsetBy: 4)
+        let uuid = String(uuidFull[index...].prefix(4))
+        return "0000\(uuid)\(BASE_UUID_SUFFIX_SERVICE)"
+    }
 }
 
 extension DeviceRetrievalMethod: CBOREncodable {
@@ -40,7 +47,7 @@ extension DeviceRetrievalMethod: CBOREncodable {
 }
 
 extension DeviceRetrievalMethod: CBORDecodable {
-    init?(cbor: CBOR) {
+    public init?(cbor: CBOR) {
         guard case let .array(arr) = cbor, arr.count >= 2 else { return nil }
         guard case let .unsignedInt(type) = arr[0] else { return nil }
         guard case let .unsignedInt(v) = arr[1], v == Self.version else { return nil }
