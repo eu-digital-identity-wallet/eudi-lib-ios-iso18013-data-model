@@ -15,4 +15,4 @@ let qrCodeImage = de.getQrCodeImage()
 // to use in SwiftUI, use the Image(uiImage:) initializer
 ...
 ```
-![Device engagement first demo](Sources/MdocDataModel18013/MdocDataModel18013.docc/Simulator Screenshot - DE.png)
+![Device engagement first demo](Sources/MdocDataModel18013/MdocDataModel18013.docc/Screenshots/Simulator Screenshot - DE.png)
