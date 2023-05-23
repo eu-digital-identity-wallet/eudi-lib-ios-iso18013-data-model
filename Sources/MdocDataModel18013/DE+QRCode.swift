@@ -13,6 +13,9 @@ import CoreImage
 #if canImport(UIKit)
 import UIKit
 #endif
+#if canImport(SwiftUI)
+import SwiftUI
+#endif
 
 public enum InputCorrectionLevel: Int {
     /// L 7%.
