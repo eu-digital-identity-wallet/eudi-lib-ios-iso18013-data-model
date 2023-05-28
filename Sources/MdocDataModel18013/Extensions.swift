@@ -1,9 +1,6 @@
 //
-//  File.swift
-//  
-//
-//  Created by ffeli on 14/05/2023.
-//
+//  Extensions.swift
+
 
 import Foundation
 import SwiftCBOR

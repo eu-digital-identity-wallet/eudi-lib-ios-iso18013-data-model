@@ -1,9 +1,5 @@
 //
-//  File.swift
-//  
-//
-//  Created by ffeli on 16/05/2023.
-//
+//  Security.swift
 
 import Foundation
 import SwiftCBOR

@@ -1,6 +1,6 @@
 //
 //  ServerRetrievalOptions.swift
-//  Created by ffeli on 16/05/2023.
+//  Created on 16/05/2023.
 
 import Foundation
 import SwiftCBOR

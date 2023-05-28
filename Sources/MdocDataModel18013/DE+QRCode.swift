@@ -1,9 +1,5 @@
 //
-//  File.swift
-//  
-//
-//  Created by ffeli on 22/05/2023.
-//
+//  DE+QRCode.swift
 
 import Foundation
 import SwiftCBOR
@@ -32,19 +28,12 @@ extension DeviceEngagement {
     var qrCode: String { "mdoc:" + Data(encode(options: .init())).base64URLEncodedString() }
 }
 
-#if canImport(CoreImage)
+#if os(iOS)
 extension DeviceEngagement {
     /// Create QR CIImage
     public func getQrCodeImage(_ inputCorrectionLevel: InputCorrectionLevel = .m) -> UIImage? {
         guard let stringData = qrCode.data(using: .utf8) else { return nil}
         let correctionLevel = ["L", "M", "Q", "H"][inputCorrectionLevel.rawValue]
-        
-        //if #available(iOS 13.0, tvOS 13.0, macOS 10.15, watchOS 6.2, *) {
-        //    let qrFilter = CIFilter.qrCodeGenerator()
-        //    qrFilter.message = stringData
-        //    qrFilter.correctionLevel = correctionLevel
-        //    return qrFilter.outputImage
-        //} else {
         guard let qrFilter = CIFilter(name: "CIQRCodeGenerator") else { return nil }
         qrFilter.setDefaults()
         qrFilter.setValue(stringData, forKey: "inputMessage")
@@ -57,7 +46,6 @@ extension DeviceEngagement {
         // convert that to a UIImage
         let uiImage = UIImage(cgImage: cgimg)
         return uiImage
-        //}
     }
 }
 #endif

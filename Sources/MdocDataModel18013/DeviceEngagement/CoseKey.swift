@@ -77,26 +77,4 @@ extension CoseKey: CBORDecodable {
     }
 }
 
-/*
- extension CoseKeyPrivate: CBOREncodable {
- func toCBOR(options: CBOROptions) -> CBOR {
- var cbor = key.toCBOR(options: options)
- cbor[-4] = .byteString(d)
- return cbor
- }
- }
- 
- extension CoseKeyPrivate: CBORDecodable {
- init?(cbor obj: SwiftCBOR.CBOR) {
- guard let key = CoseKey(cbor: obj)  else { return nil }
- self.key = key
- guard let cd = obj[-4], case let CBOR.byteString(rd) = cd else { return nil }
- d = rd
- }
- 
- init?(data: [UInt8]) {
- guard let obj = try? CBOR.decode(data) else { return nil }
- self.init(cbor: obj)
- }
- }
- */
+

@@ -39,9 +39,11 @@ final class MdocDataModel18013Tests: XCTestCase {
         XCTAssertNotNil(de1data)
     }
     
+  #if os(iOS)
     func testGenerateBLEengageQRCode() throws {
         let de = DeviceEngagement(isBleServer: true)
         var strQR = de.qrCode
         XCTAssertNotNil(de.getQrCodeImage(.m)) 
     }
+  #endif
 }
