@@ -1,4 +1,4 @@
-# MdocDataModel18013
+# eudi-lib-ios-iso18013-data-model
 Implementation of the mDoc data model according to [ISO/IEC 18013-5](https://www.iso.org/standard/69084.html) standard
 (0.1: Device engagement implemented )
 
@@ -16,4 +16,4 @@ let qrCodeImage = de.getQrCodeImage()
 // to use in SwiftUI, use the Image(uiImage:) initializer
 ...
 ```
-![Device engagement first demo](Sources/MdocDataModel18013/MdocDataModel18013.docc/Screenshots/Simulator Screenshot - DE.png)
+![Device engagement first demo](Sources/MdocDataModel18013/MdocDataModel18013.docc/Screenshots/SimulatorScreenshotDE.png)
