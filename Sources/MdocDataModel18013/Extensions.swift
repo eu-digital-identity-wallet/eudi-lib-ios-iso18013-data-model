@@ -30,6 +30,9 @@ extension String {
         }
         return res
     }
+    var fullDateEncoded: CBOR {
+        CBOR.tagged(CBOR.Tag(rawValue: 1004), .utf8String(self))
+    }
 }
 
 extension Data {
@@ -69,5 +72,10 @@ extension CBOR {
     func decodeTagged<T: CBORDecodable>(_ t: T.Type = T.self) -> T? {
         guard case let CBOR.tagged(tag, cborEncoded) = self, tag.rawValue == 24, case let .byteString(bytes) = cborEncoded else {  return nil }
         return .init(data: bytes)
+    }
+    
+    func decodeFullDate() -> String? {
+        guard case let CBOR.tagged(tag, cborEncoded) = self, tag.rawValue == 1004, case let .utf8String(s) = cborEncoded else { return nil }
+        return s
     }
 }
