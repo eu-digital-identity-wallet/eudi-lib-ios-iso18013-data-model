@@ -46,13 +46,13 @@ final class MdocDataModel18013Tests: XCTestCase {
         //test decoding according to test data
         let dps = try XCTUnwrap(DrivingPrivileges(data: AnnexdTestData.d21.bytes))
         print(dps)
-        XCTAssertEqual(dps.drivingPrivileges[0].vehicleCategoryCode, "A");  XCTAssertEqual(dps.drivingPrivileges[0].issueDate, "2018-08-09");  XCTAssertEqual(dps.drivingPrivileges[0].expiryDate, "2024-10-20")
-        XCTAssertEqual(dps.drivingPrivileges[1].vehicleCategoryCode, "B");  XCTAssertEqual(dps.drivingPrivileges[1].issueDate, "2017-02-23");  XCTAssertEqual(dps.drivingPrivileges[1].expiryDate, "2024-10-20")
+        XCTAssertEqual(dps[0].vehicleCategoryCode, "A");  XCTAssertEqual(dps[0].issueDate, "2018-08-09");  XCTAssertEqual(dps[0].expiryDate, "2024-10-20")
+        XCTAssertEqual(dps[1].vehicleCategoryCode, "B");  XCTAssertEqual(dps[1].issueDate, "2017-02-23");  XCTAssertEqual(dps[1].expiryDate, "2024-10-20")
         // test encoding
         let cborDps = dps.toCBOR(options: CBOROptions())
         let dps2 = try XCTUnwrap(DrivingPrivileges(cbor: cborDps))
-        XCTAssertEqual(dps2.drivingPrivileges[0].vehicleCategoryCode, "A");  XCTAssertEqual(dps2.drivingPrivileges[0].issueDate, "2018-08-09");  XCTAssertEqual(dps2.drivingPrivileges[0].expiryDate, "2024-10-20")
-        XCTAssertEqual(dps2.drivingPrivileges[1].vehicleCategoryCode, "B");  XCTAssertEqual(dps2.drivingPrivileges[1].issueDate, "2017-02-23");  XCTAssertEqual(dps2.drivingPrivileges[1].expiryDate, "2024-10-20")
+        XCTAssertEqual(dps2[0].vehicleCategoryCode, "A");  XCTAssertEqual(dps2[0].issueDate, "2018-08-09");  XCTAssertEqual(dps2[0].expiryDate, "2024-10-20")
+        XCTAssertEqual(dps2[1].vehicleCategoryCode, "B");  XCTAssertEqual(dps2[1].issueDate, "2017-02-23");  XCTAssertEqual(dps2[1].expiryDate, "2024-10-20")
     }
     
   #if os(iOS)

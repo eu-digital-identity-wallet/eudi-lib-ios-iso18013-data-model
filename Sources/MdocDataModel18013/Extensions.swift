@@ -79,3 +79,9 @@ extension CBOR {
         return s
     }
 }
+
+typealias DocType = String
+typealias NameSpace = String
+typealias DataElementIdentifier = String // Data element identifier
+typealias DataElementValue = Any
+typealias ErrorCode = UInt64
