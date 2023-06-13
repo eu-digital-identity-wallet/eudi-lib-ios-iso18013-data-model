@@ -1,10 +1,13 @@
 import XCTest
+import SwiftCBOR
 @testable import MdocDataModel18013
 
 final class MdocDataModel18013Tests: XCTestCase {
 
     // ANNEX-D Test Data
     enum AnnexdTestData {
+        /// D.2.1 Driving privileges
+        static let d21 = Data(base64Encoded: "gqN1dmVoaWNsZV9jYXRlZ29yeV9jb2RlYUFqaXNzdWVfZGF0ZdkD7GoyMDE4LTA4LTA5a2V4cGlyeV9kYXRl2QPsajIwMjQtMTAtMjCjdXZlaGljbGVfY2F0ZWdvcnlfY29kZWFCamlzc3VlX2RhdGXZA+xqMjAxNy0wMi0yM2tleHBpcnlfZGF0ZdkD7GoyMDI0LTEwLTIw")!
         //// D.3.1  Device engagement structure QR device engagement
         static let d31 = Data(base64Encoded: "owBjMS4wAYIB2BhYS6QBAiABIVggWojRgrzl9C76WZQ/MzWdLoqWj/KJ2T5fpES2JDQxZ/4iWCCxboz4WN3HaQQHumHUwzgjeoz8895qpnL8YKVXqjL8ZwKBgwIBowD0AfULUEXv73QrLEg3qaOw4dBaaRc=")!
     }
@@ -37,6 +40,19 @@ final class MdocDataModel18013Tests: XCTestCase {
         let de1 = try XCTUnwrap(DeviceEngagement(data: OtherTestData.deOnline.bytes))
         let de1data = de1.encode(options: .init())
         XCTAssertNotNil(de1data)
+    }
+    
+    func testDecodeDrivingPrivileges() throws {
+        //test decoding according to test data
+        let dps = try XCTUnwrap(DrivingPrivileges(data: AnnexdTestData.d21.bytes))
+        print(dps)
+        XCTAssertEqual(dps.drivingPrivileges[0].vehicleCategoryCode, "A");  XCTAssertEqual(dps.drivingPrivileges[0].issueDate, "2018-08-09");  XCTAssertEqual(dps.drivingPrivileges[0].expiryDate, "2024-10-20")
+        XCTAssertEqual(dps.drivingPrivileges[1].vehicleCategoryCode, "B");  XCTAssertEqual(dps.drivingPrivileges[1].issueDate, "2017-02-23");  XCTAssertEqual(dps.drivingPrivileges[1].expiryDate, "2024-10-20")
+        // test encoding
+        let cborDps = dps.toCBOR(options: CBOROptions())
+        let dps2 = try XCTUnwrap(DrivingPrivileges(cbor: cborDps))
+        XCTAssertEqual(dps2.drivingPrivileges[0].vehicleCategoryCode, "A");  XCTAssertEqual(dps2.drivingPrivileges[0].issueDate, "2018-08-09");  XCTAssertEqual(dps2.drivingPrivileges[0].expiryDate, "2024-10-20")
+        XCTAssertEqual(dps2.drivingPrivileges[1].vehicleCategoryCode, "B");  XCTAssertEqual(dps2.drivingPrivileges[1].issueDate, "2017-02-23");  XCTAssertEqual(dps2.drivingPrivileges[1].expiryDate, "2024-10-20")
     }
     
   #if os(iOS)
