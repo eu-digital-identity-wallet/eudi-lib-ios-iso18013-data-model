@@ -5,6 +5,7 @@ import Foundation
 import SwiftCBOR
 
 typealias ErrorItems = [DataElementIdentifier: ErrorCode]
+typealias DocumentError = [DocType: ErrorCode]
 
 /// Error codes for each namespace
 struct Errors {
