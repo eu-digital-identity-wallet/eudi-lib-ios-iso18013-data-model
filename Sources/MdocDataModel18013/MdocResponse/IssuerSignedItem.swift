@@ -1,0 +1,4 @@
+//
+//  DocumentError.swift
+
+import Foundation
