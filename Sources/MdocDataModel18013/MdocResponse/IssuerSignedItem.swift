@@ -48,13 +48,14 @@ extension IssuerSignedItem: CBORDecodable {
     }
 
     init?(cbor: CBOR) {
-        guard case .unsignedInt(let did) = cbor[.utf8String(Keys.digestID.rawValue)] else { return nil }
+		guard case .map(let cd) = cbor else { return nil }
+        guard case .unsignedInt(let did) = cd[Keys.digestID] else { return nil }
         digestID = did
-        guard case .byteString(let r) = cbor[.utf8String(Keys.random.rawValue)] else { return nil }
+        guard case .byteString(let r) = cd[Keys.random] else { return nil }
         random = r
-        guard case .utf8String(let ei) = cbor[.utf8String(Keys.elementIdentifier.rawValue)] else { return nil }
+        guard case .utf8String(let ei) = cd[Keys.elementIdentifier] else { return nil }
         elementIdentifier = ei
-        guard let ev = cbor[.utf8String(Keys.elementValue.rawValue)] else { return nil }
+        guard let ev = cd[Keys.elementValue] else { return nil }
         elementValue = ev
     }
 }
