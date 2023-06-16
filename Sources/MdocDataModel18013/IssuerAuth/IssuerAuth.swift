@@ -9,9 +9,9 @@ struct IssuerAuth {
 	let iaca: SecCertificate
 }
 
-extension IssuerAuth {
-	init?(data: [UInt8]) {
-		guard let cose = Cose(from: Data(data)) else { return nil}
+extension IssuerAuth: CBORDecodable {
+	init?(cbor: CBOR) {
+		guard let cose = Cose(cbor: cbor) else { return nil}
 		guard case let .byteString(bs) = cose.payload, let m = MobileSecurityObject(data: bs) else { return nil}
 		//guard let m = MobileSecurityObject(cbor: cose.payload) else { return nil}
 		mso = m

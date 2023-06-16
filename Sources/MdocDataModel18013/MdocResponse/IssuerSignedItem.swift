@@ -40,9 +40,7 @@ extension IssuerSignedItem: CustomStringConvertible {
 
 extension IssuerSignedItem: CBORDecodable {
     init?(data: [UInt8]) {
-        guard let obj = try? CBOR.decode(data) else { return nil }
-        guard case let CBOR.tagged(tag, cborEncoded) = obj, tag.rawValue == 24, case let .byteString(bytes) = cborEncoded else { return nil }
-        guard let cbor = try? CBOR.decode(bytes) else { return nil }
+        guard let cbor = try? CBOR.decode(data) else { return nil }
         self.init(cbor: cbor)
         rawData = data
     }

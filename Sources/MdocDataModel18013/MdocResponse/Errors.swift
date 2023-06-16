@@ -5,7 +5,6 @@ import Foundation
 import SwiftCBOR
 
 typealias ErrorItems = [DataElementIdentifier: ErrorCode]
-typealias DocumentError = [DocType: ErrorCode]
 
 /// Error codes for each namespace
 struct Errors {
@@ -47,3 +46,30 @@ extension Errors: CBOREncodable {
     }
 }
 
+struct DocumentError {
+	let docErrors: [DocType: ErrorCode]
+	subscript(dt: DocType) -> ErrorCode? { docErrors[dt] }
+}
+
+extension DocumentError: CBORDecodable {
+	init?(cbor: CBOR) {
+		guard case let .map(e) = cbor else { return nil }
+		let dePairs = e.compactMap { (k: CBOR, v: CBOR) -> (DocType, ErrorCode)?  in
+			guard case .utf8String(let dt) = k else { return nil }
+			guard case .unsignedInt(let ec) = v else { return nil }
+			return (dt,ec)
+		}
+		let de = Dictionary(dePairs, uniquingKeysWith: { (first, _) in first })
+		if de.count == 0 { return nil }
+		docErrors = de
+	}
+}
+
+extension DocumentError: CBOREncodable {
+	func toCBOR(options: CBOROptions) -> CBOR {
+		let m = docErrors.map { (dt: DocType, ec: ErrorCode) -> (CBOR, CBOR) in
+			(.utf8String(dt), .unsignedInt(ec))
+		}
+		return .map(Dictionary(m, uniquingKeysWith: { (d, _) in d }))
+	}
+}

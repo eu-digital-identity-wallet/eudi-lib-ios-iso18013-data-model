@@ -221,22 +221,9 @@ extension Dictionary where Key == CBOR {
     }
 }
 
-// MARK: - CBOR Type
-
-enum CborType: UInt8 {
-    case tag = 210
-    case list = 132
-    case cwt = 216
-    case unknown
-    
-    static func from(data: Data) -> CborType {
-        switch data.bytes[0] {
-        case self.tag.rawValue: return tag
-        case list.rawValue: return list
-        case cwt.rawValue: return cwt
-        default: return unknown
-        }
-    }
+public protocol CBORDecodable {
+	init?(data: [UInt8])
+	init?(cbor: CBOR)
 }
 
 typealias DocType = String
