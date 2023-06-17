@@ -55,6 +55,8 @@ extension Cose {
 			case keyId = 4
 			case algorithm = 1
 		}
+		
+		
 		let rawHeader : CBOR?
 		let keyId : [UInt8]?
 		let algorithm : UInt64?

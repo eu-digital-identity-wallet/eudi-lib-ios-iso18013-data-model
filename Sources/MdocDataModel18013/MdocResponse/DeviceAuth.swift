@@ -23,3 +23,5 @@ extension DeviceAuth: CBORDecodable {
 		} else { return nil }
 	}
 }
+//  MacAlgorithm.swift
+
