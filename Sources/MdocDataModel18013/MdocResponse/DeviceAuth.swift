@@ -1,0 +1,4 @@
+//
+//  MacAlgorithm.swift
+
+import Foundation
