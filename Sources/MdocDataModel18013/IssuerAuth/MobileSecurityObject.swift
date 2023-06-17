@@ -4,11 +4,16 @@
 import Foundation
 import SwiftCBOR
 
+//Mobile security object (MSO)
 struct MobileSecurityObject {
 	let version: String
+	/// Message digest algorithm used
 	let digestAlgorithm: String
+	/// Value digests
 	let valueDigests: ValueDigests
+	/// device key info
 	let deviceKeyInfo: DeviceKeyInfo
+	/// docType  as used in Documents
 	let docType: DocType
 	let validityInfo: ValidityInfo
 	

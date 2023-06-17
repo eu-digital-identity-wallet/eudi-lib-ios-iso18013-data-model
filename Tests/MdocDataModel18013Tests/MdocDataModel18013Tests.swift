@@ -67,13 +67,31 @@ final class MdocDataModel18013Tests: XCTestCase {
 		XCTAssertEqual(ia.mso.validityInfo.signed, "2020-10-01T13:30:02Z")
 	}
 	
+	// test based on D.4.1.2 mdoc response section of the ISO/IEC FDIS 18013-5 document
 	func testDecodeDeviceResponse() throws {
 		let dr = try XCTUnwrap(DeviceResponse(data: AnnexdTestData.d412.bytes))
 		XCTAssertEqual(dr.version, "1.0")
 		let docs = try XCTUnwrap(dr.documents)
 		let doc = try XCTUnwrap(docs.first)
+		XCTAssertEqual(doc.docType, "org.iso.18013.5.1.mDL")
 		let isoNS = try XCTUnwrap(doc.issuerSigned.nameSpaces?["org.iso.18013.5.1"])
+		let fnItem = try XCTUnwrap(isoNS.findItem(name: "family_name"))
+		XCTAssertEqual(fnItem.elementValue.asString()!, "Doe")
+		XCTAssertEqual(fnItem.digestID, 0)
+		XCTAssertEqual(fnItem.random.toHexString().localizedUppercase, "8798645B20EA200E19FFABAC92624BEE6AEC63ACEEDECFB1B80077D22BFC20E9")
+		let issuerAuth = doc.issuerSigned.issuerAuth
+		XCTAssertEqual(issuerAuth.mso.deviceKeyInfo.deviceKey.x.toHexString().uppercased(), "96313D6C63E24E3372742BFDB1A33BA2C897DCD68AB8C753E4FBD48DCA6B7F9A")
+		XCTAssertEqual(issuerAuth.mso.docType, "org.iso.18013.5.1.mDL")
+		XCTAssertEqual(issuerAuth.mso.validityInfo.validUntil, "2021-10-01T13:30:02Z")
+		let valueDigests1 = try XCTUnwrap(issuerAuth.mso.valueDigests["org.iso.18013.5.1"])
+		let valueDigests2 = try XCTUnwrap(issuerAuth.mso.valueDigests["org.iso.18013.5.1.US"])
+		XCTAssertEqual(valueDigests1.digestIDs.count, 13)
+		XCTAssertEqual(valueDigests1[0]!.toHexString().localizedUppercase, "75167333B47B6C2BFB86ECCC1F438CF57AF055371AC55E1E359E20F254ADCEBF")
+		XCTAssertEqual(valueDigests2.digestIDs.count, 4)
 		XCTAssert(isoNS.count > 0)
+		XCTAssertEqual(doc.deviceSigned.nsRawBytes.count, 1); XCTAssertEqual(doc.deviceSigned.nsRawBytes[0], 160) // {} A0 empty dic
+		XCTAssertEqual(doc.deviceSigned.deviceAuth.coseMacOrSignature.macAlgorithm, Cose.MacAlgorithm.hmac256)
+		XCTAssertEqual(doc.deviceSigned.deviceAuth.coseMacOrSignature.signature.bytes.toHexString().uppercased(), "E99521A85AD7891B806A07F8B5388A332D92C189A7BF293EE1F543405AE6824D")
 	}
     
   #if os(iOS)

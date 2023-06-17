@@ -41,6 +41,15 @@ extension Data {
   }
 }
 
+extension Array where Element == UInt8 {
+  public func toHexString() -> String {
+	`lazy`.reduce(into: "") {
+	  var s = String($1, radix: 16)
+	  if s.count == 1 {s = "0" + s }
+	  $0 += s
+	}
+  }
+}
  
 extension Array where Element == UInt8 {
     var hex: String {
@@ -205,8 +214,8 @@ extension CBOR {
 extension CBOR.Tag {
     /// Tagged COSE Sign1 Structure
     public static let coseSign1Item = CBOR.Tag(rawValue: 18)
-    /// Tagged COSE Sign Structure
-    public static let coseSignItem = CBOR.Tag(rawValue: 98)
+	/// Tagged COSE Mac0 Structure
+	public static let coseMac0Item = CBOR.Tag(rawValue: 17)
 }
 
 // MARK: - Dictionary subscript extensions

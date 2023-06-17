@@ -4,10 +4,12 @@
 import Foundation
 import SwiftCBOR
 
+/// Contains a returned cocument. The document type of the returned document is indicated by the docType element.
 struct Document {
 	let docType: DocType
 	let issuerSigned: IssuerSigned
 	let deviceSigned: DeviceSigned
+	/// error codes for data elements that are not returned
 	let errors: Errors?
 	
 	enum Keys:String {

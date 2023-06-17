@@ -4,6 +4,7 @@
 import Foundation
 import SwiftCBOR
 
+/// Digests of all data elements per namespace
 struct ValueDigests {
 	let valueDigests: [NameSpace: DigestIDs]
 	subscript(ns: NameSpace) -> DigestIDs? {valueDigests[ns] }

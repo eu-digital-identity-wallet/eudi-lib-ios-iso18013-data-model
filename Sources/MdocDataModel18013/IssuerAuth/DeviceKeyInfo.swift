@@ -8,6 +8,7 @@ typealias AuthorizedNameSpaces = [NameSpace]
 typealias DataElementsArray = [DataElementIdentifier]
 typealias AuthorizedDataElements = [NameSpace: DataElementsArray]
 
+/// mdoc authentication public key and information related to this key.
 struct DeviceKeyInfo {
 	let deviceKey: CoseKey
 	let keyAuthorizations: KeyAuthorizations?
@@ -30,6 +31,7 @@ extension DeviceKeyInfo: CBORDecodable {
 	}
 }
 
+/// Contains the elements the key may sign or MAC
 struct KeyAuthorizations {
 	let nameSpaces: AuthorizedNameSpaces?
 	let dataElements: AuthorizedDataElements?

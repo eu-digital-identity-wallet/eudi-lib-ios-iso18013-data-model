@@ -6,7 +6,7 @@ import SwiftCBOR
 
 typealias ErrorItems = [DataElementIdentifier: ErrorCode]
 
-/// Error codes for each namespace
+/// Error codes for each namespace for items that are not returned
 struct Errors {
     let errors: [NameSpace: ErrorItems]
     subscript(ns: String) -> ErrorItems? { errors[ns] }
@@ -46,6 +46,7 @@ extension Errors: CBOREncodable {
     }
 }
 
+/// Error codes for documents that are not returned
 struct DocumentError {
 	let docErrors: [DocType: ErrorCode]
 	subscript(dt: DocType) -> ErrorCode? { docErrors[dt] }

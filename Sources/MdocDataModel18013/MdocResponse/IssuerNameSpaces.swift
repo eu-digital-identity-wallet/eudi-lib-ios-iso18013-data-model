@@ -4,6 +4,7 @@
 import Foundation
 import SwiftCBOR
 
+/// Returned data elements for each namespace
 struct IssuerNameSpaces {
 	let issuerNameSpaces: [NameSpace: [IssuerSignedItem]]
 	subscript(ns: String) -> [IssuerSignedItem]? { issuerNameSpaces[ns] }
@@ -24,4 +25,8 @@ extension IssuerNameSpaces: CBORDecodable {
 		guard temp.count > 0 else { return nil }
 		issuerNameSpaces = temp
 	}
+}
+
+extension Array where Element == IssuerSignedItem {
+	func findItem(name: String) -> IssuerSignedItem? { first(where: { $0.elementIdentifier == name} ) }
 }

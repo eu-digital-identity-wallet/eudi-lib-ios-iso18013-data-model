@@ -4,9 +4,12 @@
 import Foundation
 import SwiftCBOR
 
+/// device retrieval mdoc response. It is CBOR encoded
 struct DeviceResponse {
 	let version: String
+	/// An array of all returned documents
 	let documents: [Document]?
+	/// An array of all returned document errors
 	let documentErrors: [DocumentError]?
 	let status: UInt64
 	
@@ -17,6 +20,7 @@ struct DeviceResponse {
 		case status
 	}
 }
+
 extension DeviceResponse: CBORDecodable {
 	init?(cbor: CBOR) {
 		guard case .map(let cd) = cbor else { return nil }
