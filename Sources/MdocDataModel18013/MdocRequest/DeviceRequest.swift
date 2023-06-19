@@ -11,3 +11,23 @@ struct DeviceRequest {
     }
 }
 
+extension DeviceRequest: CBORDecodable {
+    init?(cbor: CBOR) {
+        guard case let .map(m) = cbor else { return nil }
+        guard case let .utf8String(v) = m[Keys.version] else { return nil }
+        version = v
+        guard case let .array(cdrs) = m[Keys.docRequests] else { return nil }
+        let drs = cdrs.compactMap { DocRequest(cbor: $0) } 
+        guard drs.count > 0 else { return nil }
+        docRequests = drs
+    }
+}
+
+extension DeviceRequest: CBOREncodable {
+	func toCBOR(options: CBOROptions) -> CBOR {
+		var m = [CBOR: CBOR]()
+        m[.utf8String(Keys.version.rawValue)] = .utf8String(version)
+        m[.utf8String(Keys.docRequests.rawValue)] = .array(docRequests.map { $0.toCBOR(options: options) })
+		return .map(m)
+	}
+}
