@@ -2,11 +2,6 @@ import CryptoKit
 import Foundation
 import SwiftCBOR
 
-public protocol CBORDecodable {
-    init?(data: [UInt8])
-    init?(cbor: CBOR)
-}
-
 /// crv: EC identifier - Taken from the "COSE Elliptic Curves" registry
 public enum ECCurveType: UInt64 {
     case p256 = 1
