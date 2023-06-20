@@ -72,10 +72,23 @@ final class MdocDataModel18013Tests: XCTestCase {
     // test based on D.4.1.1 mdoc request section of the ISO/IEC FDIS 18013-5 document
 	func testDecodeDeviceRequest() throws {
 		let dr = try XCTUnwrap(DeviceRequest(data: AnnexdTestData.d411.bytes))
+		let testItems = ["family_name", "document_number", "driving_privileges", "issue_date", "expiry_date", "portrait"].sorted()
         XCTAssertEqual(dr.version, "1.0")
-        XCTAssertEqual(dr.docRequests.first?.itemsRequest.nameSpaces["org.iso.18013.5.1"]?.elementIdentifiers.sorted(), 
-        ["family_name", "document_number", "driving_privileges", "issue_date", "expiry_date", "portrait"].sorted())
+        XCTAssertEqual(dr.docRequests.first?.itemsRequest.nameSpaces["org.iso.18013.5.1"]?.elementIdentifiers.sorted(), testItems)
+		// test encode
+		let cborDr = dr.toCBOR(options: CBOROptions())
+		// test if successfully encoded
+		let dr2 = try XCTUnwrap(DeviceRequest(cbor: cborDr))
+		XCTAssertEqual(dr2.docRequests.first?.itemsRequest.nameSpaces["org.iso.18013.5.1"]?.elementIdentifiers.sorted(), testItems)
+		// test iso make request
+		let isoKeys: [IsoMdlModel.CodingKeys] = [.familyName, .documentNumber, .drivingPrivileges, .issueDate, .expiryDate, .portrait]
+		let dr3 = DeviceRequest(mdl: isoKeys, agesOver: [], intentToRetain: true)
+		XCTAssertEqual(dr3.docRequests.first?.itemsRequest.nameSpaces[IsoMdlModel.namespace]?.elementIdentifiers.sorted(), testItems)
     }
+	
+	func testMakeIsoMdlRequest() throws {
+		
+	}
 
 	// test based on D.4.1.2 mdoc response section of the ISO/IEC FDIS 18013-5 document
 	func testDecodeDeviceResponse() throws {

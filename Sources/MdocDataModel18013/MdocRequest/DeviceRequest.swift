@@ -31,3 +31,13 @@ extension DeviceRequest: CBOREncodable {
 		return .map(m)
 	}
 }
+
+extension DeviceRequest {
+	init(mdl items: [IsoMdlModel.CodingKeys], agesOver: [Int], intentToRetain: IntentToRetain = true) {
+		var isoDataElements: [DataElementIdentifier : IntentToRetain] = Dictionary(grouping: items, by: {$0.rawValue}).mapValues {_ in intentToRetain}
+		for ao in agesOver { isoDataElements["age_over_\(ao)"] = intentToRetain }
+		let isoReqElements = RequestDataElements(dataElements: isoDataElements )
+		let itemsReq = ItemsRequest(docType: IsoMdlModel.docType, nameSpaces: RequestNameSpaces(nameSpaces: [IsoMdlModel.namespace: isoReqElements]), requestInfo: nil)
+		self.init(version: "1.0", docRequests: [DocRequest(itemsRequest: itemsReq, readerAuth: nil)])
+	}
+}

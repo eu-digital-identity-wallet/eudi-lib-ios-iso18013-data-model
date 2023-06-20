@@ -24,7 +24,7 @@ extension DocRequest: CBORDecodable {
 extension DocRequest: CBOREncodable {
 	func toCBOR(options: CBOROptions) -> CBOR {
         var m = [CBOR: CBOR]()
-        m[.utf8String(Keys.itemsRequest.rawValue)] = itemsRequest.toCBOR(options: options)
+		m[.utf8String(Keys.itemsRequest.rawValue)] = itemsRequest.toCBOR(options: options).taggedEncoded
         if let readerAuth { m[.utf8String(Keys.readerAuth.rawValue)] = readerAuth.toCBOR(options: options) }
         return .map(m)
     }

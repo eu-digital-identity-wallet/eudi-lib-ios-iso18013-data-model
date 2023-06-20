@@ -36,3 +36,7 @@ extension Document: CBORDecodable {
 extension Array where Element == Document {
 	func findDoc(name: String) -> Document? { first(where: { $0.docType == name} ) }
 }
+
+extension Array where Element == ItemsRequest {
+	func findDoc(name: String) -> ItemsRequest? { first(where: { $0.docType == name} ) }
+}
