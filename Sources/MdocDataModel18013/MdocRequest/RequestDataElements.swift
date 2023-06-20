@@ -3,7 +3,9 @@ import SwiftCBOR
 
 typealias IntentToRetain = Bool
 
+/// Requested data elements identified by their data element identifier.
 struct RequestDataElements {
+	/// IntentToRetain indicates whether the mdoc verifier intends to retain the received data element
     let dataElements: [DataElementIdentifier: IntentToRetain]
     var elementIdentifiers: [DataElementIdentifier] { Array(dataElements.keys) }
 }

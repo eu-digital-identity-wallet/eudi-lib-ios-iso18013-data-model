@@ -1,6 +1,7 @@
 import Foundation
 import SwiftCBOR
 
+/// contains the requested data elements and the namespace they belong to.
 struct RequestNameSpaces {
     let nameSpaces: [NameSpace: RequestDataElements]
     subscript(ns: String)-> RequestDataElements? { nameSpaces[ns] }

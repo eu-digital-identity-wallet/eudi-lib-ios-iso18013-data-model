@@ -2,8 +2,11 @@ import Foundation
 import SwiftCBOR
 
 struct ItemsRequest {
+	/// Requested document type.
     let docType: DocType
+	/// Requested data elements for each NameSpace
     let nameSpaces: RequestNameSpaces
+	/// May be used by the mdoc reader to provide additional information
     let requestInfo: CBOR?
 
     enum Keys: String {

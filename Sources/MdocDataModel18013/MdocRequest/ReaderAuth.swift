@@ -1,8 +1,11 @@
 import Foundation
 import SwiftCBOR
 
+/// Reader authentication structure encoded as Cose Sign1
 struct ReaderAuth {
+	/// encoded data
     let coseSign1: Cose
+	/// IACA certificate
 	let iaca: SecCertificate
 }
 

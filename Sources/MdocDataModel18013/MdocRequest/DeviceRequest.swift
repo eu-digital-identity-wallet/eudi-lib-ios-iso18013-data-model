@@ -2,7 +2,11 @@ import Foundation
 import SwiftCBOR
 
 struct DeviceRequest {
+	/// The current version
+	static let currentVersion = "1.0"
+	/// The version requested
     let version: String
+	/// An array of all requested documents.
     let docRequests: [DocRequest]
 
     enum Keys: String {
@@ -16,6 +20,7 @@ extension DeviceRequest: CBORDecodable {
         guard case let .map(m) = cbor else { return nil }
         guard case let .utf8String(v) = m[Keys.version] else { return nil }
         version = v
+		if v.count == 0 || v.prefix(1) != "1" { return nil }
         guard case let .array(cdrs) = m[Keys.docRequests] else { return nil }
         let drs = cdrs.compactMap { DocRequest(cbor: $0) } 
         guard drs.count > 0 else { return nil }

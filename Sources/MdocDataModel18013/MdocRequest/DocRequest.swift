@@ -3,6 +3,7 @@ import SwiftCBOR
 
 struct DocRequest {
     let itemsRequest: ItemsRequest
+	/// Used for mdoc reader authentication
     let readerAuth: ReaderAuth?
 
     enum Keys: String {
