@@ -32,3 +32,11 @@ extension Document: CBORDecodable {
 		if let ce = cd[Keys.errors], let e = Errors(cbor: ce) { errors = e} else { errors = nil }
 	}
 }
+
+extension Array where Element == Document {
+	func findDoc(name: String) -> Document? { first(where: { $0.docType == name} ) }
+}
+
+extension Array where Element == ItemsRequest {
+	func findDoc(name: String) -> ItemsRequest? { first(where: { $0.docType == name} ) }
+}

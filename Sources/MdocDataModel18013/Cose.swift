@@ -132,3 +132,9 @@ extension Cose {
 	}
 }
 
+
+extension Cose: CBOREncodable {
+	func toCBOR(options: CBOROptions) -> CBOR {
+        .array([protectedHeader.rawHeader ?? .map([:]), unprotectedHeader?.rawHeader ?? .map([:]), payload, .byteString(signature.bytes)])
+    }
+}
