@@ -102,6 +102,8 @@ final class MdocDataModel18013Tests: XCTestCase {
 		XCTAssertEqual(doc.deviceSigned.nsRawBytes.count, 1); XCTAssertEqual(doc.deviceSigned.nsRawBytes[0], 160) // {} A0 empty dic
 		XCTAssertEqual(doc.deviceSigned.deviceAuth.coseMacOrSignature.macAlgorithm, Cose.MacAlgorithm.hmac256)
 		XCTAssertEqual(doc.deviceSigned.deviceAuth.coseMacOrSignature.signature.bytes.toHexString().uppercased(), "E99521A85AD7891B806A07F8B5388A332D92C189A7BF293EE1F543405AE6824D")
+		let model = try XCTUnwrap(IsoMdlModel(response: dr))
+		XCTAssertEqual(model.familyName, "Doe")
 	}
     
   #if os(iOS)

@@ -4,8 +4,8 @@
 import Foundation
 
 public struct IsoMdlModel: Decodable, AgeAttest {
-	let exp: Int?
-	let iat: Int?
+	let exp: UInt64?
+	let iat: UInt64?
 	public let familyName: String?
 	public let givenName: String?
 	public let birthDate: String?
@@ -16,28 +16,28 @@ public struct IsoMdlModel: Decodable, AgeAttest {
 	public let issuingAuthority: String?
 	public let documentNumber: String?
 	public let administrativeNumber: String?
-	let drivingPrivileges: [DrivingPrivileges]?
+	let drivingPrivileges: DrivingPrivileges?
 	public let nationality: String?
 	public let eyeColour: String?
 	public let hairColour: String?
-	public var height: Int?
-	public var weight: Int?
-	public var sex: Int?
+	public let height: UInt64?
+	public let weight: UInt64?
+	public let sex: UInt64?
 	public let residentAddress: String?
 	public let residentCountry: String?
 	public let residentCity: String?
 	public let residentState: String?
 	public let residentPostalCode: String?
-	public var ageInYears: Int?
+	public let ageInYears: UInt64?
 	public var ageOverXX = [Int: Bool]()
-	public let ageBirthYear: Int?
-	public let portrait: String?
+	public let ageBirthYear: UInt64?
+	public let portrait: [UInt8]?
 	public let unDistinguishingSign: String?
 	public let issuingJurisdiction: String?
-	let portraitCaptureDate: String?
+	public let portraitCaptureDate: String?
 	public let familyNameNationalCharacter: String?
 	public let givenNameNationalCharacter: String?
-	public let signatureUsualMark: String?
+	public let signatureUsualMark: [UInt8]?
 	public let biometricTemplateFace: String?
 	public let biometricTemplateSignatureSign: String?
 	let webapiInfo: ServerRetrievalOption?
@@ -84,11 +84,77 @@ public struct IsoMdlModel: Decodable, AgeAttest {
 	}
 	
 	public static var namespace: String { "org.iso.18013.5.1" }
+	public static var docType: String { "org.iso.18013.5.1.mDL" }
 	
 	public static var mandatoryKeys: [String] {
 		Self.isoMandatoryKeys.map { $0.rawValue }
 	}
 	public static var isoMandatoryKeys: [CodingKeys] {
 		[.familyName, .givenName, .birthDate, .issueDate, .expiryDate, .issuingCountry, .issuingAuthority, .documentNumber, .portrait, .drivingPrivileges, .unDistinguishingSign ]
+	}
+}
+
+extension IssuerSignedItem {
+	func getValue<T>() -> T? {
+		if T.self == ServerRetrievalOption.self { return ServerRetrievalOption(cbor: elementValue) as? T }
+		else if T.self == DrivingPrivileges.self { return DrivingPrivileges(cbor: elementValue) as? T }
+		else if case let .tagged(_, cbor) = elementValue { return cbor.unwrap() as? T }
+		return elementValue.unwrap() as? T 
+	}
+}
+
+extension IsoMdlModel {
+	init?(response: DeviceResponse) {
+		guard let items = response.documents?.findDoc(name: Self.docType)?.issuerSigned.nameSpaces?[Self.namespace] else { return nil }
+		let dict = Dictionary(grouping: items, by: { $0.elementIdentifier })
+		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { getValue(string: key.rawValue) }
+		func getValue<T>(string s: String) -> T? {
+			guard let item = dict[s]?.first else { return nil }
+			return item.getValue()
+		}
+		exp = getValue(key: .exp)
+		iat = getValue(key: .iat)
+		familyName = getValue(key: .familyName)
+		givenName = getValue(key: .givenName)
+		birthDate = getValue(key: .birthDate)
+		birthPlace = getValue(key: .birthPlace)
+		issueDate = getValue(key: .issueDate)
+		expiryDate = getValue(key: .expiryDate)
+		issuingCountry = getValue(key: .issuingCountry)
+		issuingAuthority = getValue(key: .issuingAuthority)
+		documentNumber = getValue(key: .documentNumber)
+		administrativeNumber = getValue(key: .administrativeNumber)
+		drivingPrivileges = getValue(key: .drivingPrivileges)
+		nationality = getValue(key: .nationality)
+		eyeColour = getValue(key: .eyeColour)
+		hairColour = getValue(key: .hairColour)
+		height = getValue(key: .height)
+		weight = getValue(key: .weight)
+		sex = getValue(key: .sex)
+		residentAddress = getValue(key: .residentAddress)
+		residentCountry = getValue(key: .residentCountry)
+		residentCity = getValue(key: .residentCity)
+		residentState = getValue(key: .residentState)
+		residentPostalCode = getValue(key: .residentPostalCode)
+		ageInYears = getValue(key: .ageInYears)
+		ageBirthYear = getValue(key: .ageBirthYear)
+		portrait = getValue(key: .portrait)
+		unDistinguishingSign = getValue(key: .unDistinguishingSign)
+		issuingJurisdiction = getValue(key: .issuingJurisdiction)
+		portraitCaptureDate = getValue(key: .portraitCaptureDate)
+		familyNameNationalCharacter = getValue(key: .familyNameNationalCharacter)
+		givenNameNationalCharacter = getValue(key: .givenNameNationalCharacter)
+		signatureUsualMark = getValue(key: .signatureUsualMark)
+		biometricTemplateFace = getValue(key: .biometricTemplateFace)
+		biometricTemplateSignatureSign = getValue(key: .biometricTemplateSignatureSign)
+		webapiInfo = getValue(key: .webapiInfo)
+		oidcInfo = getValue(key: .oidcInfo)
+		let ageOverKeys = dict.keys.filter { $0.hasPrefix("age_over_")}
+		for k in ageOverKeys {
+			if let age = Int(k.suffix(k.count - 9)) {
+				let b: Bool? = getValue(string: k)
+				if let b { ageOverXX[age] = b }
+			}
+		}
 	}
 }
