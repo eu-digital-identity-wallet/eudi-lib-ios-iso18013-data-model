@@ -1,6 +1,18 @@
 import Foundation
 import SwiftCBOR
 
+/// Device retrieval mdoc request structure
+
+/// In mDoc holder initialize a ``DeviceRequest`` with incoming CBOR bytes (decoding)
+/// ```swift
+/// let dr = DeviceRequest(data: bytes)
+/// ```
+
+/// In mdoc reader initialize a ``DeviceRequest`` with desired elements to read 
+/// ```swift
+/// let isoKeys: [IsoMdlModel.CodingKeys] = [.familyName, .documentNumber, .drivingPrivileges, .issueDate, .expiryDate, .portrait]
+///	let dr3 = DeviceRequest(mdl: isoKeys, agesOver: [18,21], intentToRetain: true)
+/// ```
 struct DeviceRequest {
 	/// The current version
 	static let currentVersion = "1.0"
@@ -38,6 +50,11 @@ extension DeviceRequest: CBOREncodable {
 }
 
 extension DeviceRequest {
+    /// Initialize mDoc request
+    /// - Parameters:
+    ///   - items: Iso specified elements to request
+    ///   - agesOver: Ages to request if equal or above
+    ///   - intentToRetain: Specify intent to retain (after retrieval)    
 	init(mdl items: [IsoMdlModel.CodingKeys], agesOver: [Int], intentToRetain: IntentToRetain = true) {
 		var isoDataElements: [DataElementIdentifier : IntentToRetain] = Dictionary(grouping: items, by: {$0.rawValue}).mapValues {_ in intentToRetain}
 		for ao in agesOver { isoDataElements["age_over_\(ao)"] = intentToRetain }

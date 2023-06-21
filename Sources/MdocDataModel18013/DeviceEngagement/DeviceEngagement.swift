@@ -9,12 +9,28 @@ import Foundation
 import SwiftCBOR
 
 /// Device engagement information
+///
+/// in mdoc holder generate an mdoc ephemeral private key
+/// ```swift
+/// let de = DeviceEngagement(isBleServer: isBleServer, crv: .p256)
+/// qrCodeImage = de.getQrCodeImage()
+/// ```
+///
+/// In mdoc reader decode device engagement CBOR bytes (e.g. from QR code)
+/// ```swift
+/// let de = DeviceEngagement(data: bytes)
+/// ```
 public struct DeviceEngagement {
     static let versionImpl: String = "1.0"
     var version: String = Self.versionImpl
     let security: Security
     var deviceRetrievalMethods: [DeviceRetrievalMethod]? = nil
     var serverRetrievalOptions: ServerRetrievalOptions? = nil
+	
+	/// Generate device engagement
+	/// - Parameters
+	///    - isBleServer: true for BLE mdoc peripheral server mode, false for BLE mdoc central client mode
+	///    - crv: The EC curve type used in the mdoc ephemeral private key
     public init(isBleServer: Bool?, crv: ECCurveType = .p256) {
         let pk = CoseKeyPrivate(crv: crv)
         security = Security(d: pk.d, deviceKey: pk.key)
@@ -22,7 +38,7 @@ public struct DeviceEngagement {
             deviceRetrievalMethods = [.ble(isBleServer: isBleServer, uuid: DeviceRetrievalMethod.getRandomBleUuid())]
         }
     }
-    
+    /// initialize from cbor data
     public init?(data: [UInt8]) {
         guard let obj = try? CBOR.decode(data) else { return nil }
         self.init(cbor: obj)

@@ -4,7 +4,14 @@
 import Foundation
 import SwiftCBOR
 
-/// device retrieval mdoc response. It is CBOR encoded
+/// Device retrieval mdoc response. It is CBOR encoded
+///
+/// In mdoc reader initialize from CBOR data received from holder (data exchange)
+/// In mdoc holder initialize from CBOR data received from server (registration)
+///
+/// ```swift
+/// let dr = DeviceResponse(data: bytes)
+/// ```
 struct DeviceResponse {
 	let version: String
 	/// An array of all returned documents
