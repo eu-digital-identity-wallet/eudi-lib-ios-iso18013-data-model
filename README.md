@@ -40,4 +40,4 @@ In mdoc holder initialize from CBOR data received from server (registration)
 let dr = DeviceResponse(data: bytes)
 ```
 
-[Reference Documentation](Documentation/Reference/README)
+[Reference Documentation](Documentation/Reference/README.md)
