@@ -2,10 +2,7 @@
 Implementation of the mDoc data model according to [ISO/IEC 18013-5](https://www.iso.org/standard/69084.html) standard
 (0.9.0)
 
-## Reference
-Detailed documentation is provided [here](Documentation/Reference/README.md) 
-
-## Main data structures
+## Overview
 ### `DeviceEngagement`
 The `DeviceEngagement` structure contains information to perform device engagement.
 At present, device engagement using QR code and data retrieval using Bluetooth low energy (BLE) are available.
@@ -44,4 +41,6 @@ In mdoc holder initialize from CBOR data received from server (registration)
 let dr = DeviceResponse(data: bytes)
 ```
 
+## Reference
+Detailed documentation is provided [here](Documentation/Reference/README.md) 
 
