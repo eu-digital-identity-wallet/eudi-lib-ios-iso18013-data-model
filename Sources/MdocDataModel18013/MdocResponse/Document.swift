@@ -8,7 +8,7 @@ import SwiftCBOR
 struct Document {
 	let docType: DocType
 	let issuerSigned: IssuerSigned
-	let deviceSigned: DeviceSigned
+	let deviceSigned: DeviceSigned? // todo: make mandatory
 	/// error codes for data elements that are not returned
 	let errors: Errors?
 	
@@ -27,8 +27,8 @@ extension Document: CBORDecodable {
 		docType = dt
 		guard let cis = cd[Keys.issuerSigned], let `is` = IssuerSigned(cbor: cis) else { return nil }
 		issuerSigned = `is`
-		guard let cds = cd[Keys.deviceSigned], let ds = DeviceSigned(cbor: cds) else { return nil }
-		deviceSigned = ds
+		//guard let cds = cd[Keys.deviceSigned], let ds = DeviceSigned(cbor: cds) else { return nil }; deviceSigned = ds
+		if let cds = cd[Keys.deviceSigned], let ds = DeviceSigned(cbor: cds) { deviceSigned = ds } else { deviceSigned = nil };
 		if let ce = cd[Keys.errors], let e = Errors(cbor: ce) { errors = e} else { errors = nil }
 	}
 }

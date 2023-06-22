@@ -3,7 +3,7 @@
 
 import Foundation
 
-/// Age attestation values
+/// A conforming type contains age attestation values
 protocol AgeAttest {
   var ageOverXX: [Int: Bool] { get }
 }

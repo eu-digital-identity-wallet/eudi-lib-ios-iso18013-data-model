@@ -25,17 +25,23 @@ struct IssuerSignedItem {
      }
 }
 
-extension IssuerSignedItem: CustomStringConvertible {
-    var description: String {
-        switch elementValue {
-        case .utf8String(let str): return str
+extension CBOR: CustomStringConvertible {
+	public var description: String {
+        switch self {
+        case .utf8String(let str): return "'\(str)'"
         case .byteString(_): return "ByteString"
-        case .tagged(_, .utf8String(let str)): return str
+		case .tagged(let tag, .utf8String(let str)): return "tag \(tag.rawValue) '\(str)'"
         case .unsignedInt(let i): return String(i)
         case .boolean(let b): return String(b)
-        default: return String(reflecting: elementValue)
+		case .array(let a): return "[\(a.reduce("", { $0 + ($0.count > 0 ? "," : "") + " \($1.description)" }))]"
+		case .map(let m): return "{\(m.reduce("", { $0 + ($0.count > 0 ? "," : "") + " \($1.key.description): \($1.value.description)" }))}"
+        default: return String(reflecting: self)
         }
     }
+}
+
+extension IssuerSignedItem: CustomStringConvertible {
+	var description: String { elementValue.description }
 }
 
 extension IssuerSignedItem: CBORDecodable {
