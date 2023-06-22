@@ -3,7 +3,7 @@
 
 import Foundation
 
-public struct IsoMdlModel: Decodable, AgeAttest {
+public struct IsoMdlModel: Decodable, MdocDecodable {
 	let exp: UInt64?
 	let iat: UInt64?
 	public let familyName: String?
@@ -30,6 +30,7 @@ public struct IsoMdlModel: Decodable, AgeAttest {
 	public let residentPostalCode: String?
 	public let ageInYears: UInt64?
 	public var ageOverXX = [Int: Bool]()
+	public var displayStrings = [NameValue]()
 	public let ageBirthYear: UInt64?
 	public let portrait: [UInt8]?
 	public let unDistinguishingSign: String?
@@ -105,13 +106,10 @@ extension IssuerSignedItem {
 
 extension IsoMdlModel {
 	init?(response: DeviceResponse) {
-		guard let items = response.documents?.findDoc(name: Self.docType)?.issuerSigned.nameSpaces?[Self.namespace] else { return nil }
-		let dict = Dictionary(grouping: items, by: { $0.elementIdentifier })
-		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { getValue(string: key.rawValue) }
-		func getValue<T>(string s: String) -> T? {
-			guard let item = dict[s]?.first else { return nil }
-			return item.getValue()
-		}
+		guard let (items,dict) = Self.getSignedItems(response) else { return nil }
+		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getItemValue(dict, string: key.rawValue) }
+		Self.extractAgeOverValues(dict, &ageOverXX)
+		Self.extractDisplayStrings(items, &displayStrings)
 		exp = getValue(key: .exp)
 		iat = getValue(key: .iat)
 		familyName = getValue(key: .familyName)
@@ -149,12 +147,5 @@ extension IsoMdlModel {
 		biometricTemplateSignatureSign = getValue(key: .biometricTemplateSignatureSign)
 		webapiInfo = getValue(key: .webapiInfo)
 		oidcInfo = getValue(key: .oidcInfo)
-		let ageOverKeys = dict.keys.filter { $0.hasPrefix("age_over_")}
-		for k in ageOverKeys {
-			if let age = Int(k.suffix(k.count - 9)) {
-				let b: Bool? = getValue(string: k)
-				if let b { ageOverXX[age] = b }
-			}
-		}
 	}
 }
