@@ -37,7 +37,8 @@ extension MdocDecodable {
 		
 	static func extractDisplayStrings(_ items: [IssuerSignedItem], _ displayStrings: inout [NameValue]) {
 		for item in items {
-			displayStrings.append(NameValue(name: item.elementIdentifier, value: item.description))
+			let name = item.elementIdentifier
+			displayStrings.append(NameValue(name: name, value: item.description))
 		}
 	}
 }

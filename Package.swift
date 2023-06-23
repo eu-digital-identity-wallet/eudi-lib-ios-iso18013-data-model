@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "MdocDataModel18013",
     defaultLocalization: "en",
-    platforms: [.macOS(.v10_15), .iOS("13.4"), .watchOS("6.2")],
+	platforms: [.macOS(.v10_15), .iOS(.v16), .watchOS(.v9)],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
@@ -21,7 +21,7 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "MdocDataModel18013", dependencies: ["SwiftCBOR"]),
+			name: "MdocDataModel18013", dependencies: ["SwiftCBOR"], resources: [.process("Resources")]),
         .testTarget(
             name: "MdocDataModel18013Tests",
             dependencies: ["MdocDataModel18013"]),
