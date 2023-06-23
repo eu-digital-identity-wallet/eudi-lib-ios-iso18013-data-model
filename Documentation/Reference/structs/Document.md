@@ -32,7 +32,7 @@ let issuerSigned: IssuerSigned
 ### `deviceSigned`
 
 ```swift
-let deviceSigned: DeviceSigned
+let deviceSigned: DeviceSigned?
 ```
 
 ### `errors`

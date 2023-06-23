@@ -5,6 +5,13 @@
 extension CBOR
 ```
 
+## Properties
+### `description`
+
+```swift
+public var description: String
+```
+
 ## Methods
 ### `unwrap()`
 

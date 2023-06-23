@@ -24,5 +24,5 @@ let nameSpaces: IssuerNameSpaces?
 ### `issuerAuth`
 
 ```swift
-let issuerAuth: IssuerAuth
+let issuerAuth: IssuerAuth?
 ```

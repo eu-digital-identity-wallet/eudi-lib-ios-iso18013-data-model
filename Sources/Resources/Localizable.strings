@@ -8,7 +8,10 @@
 "eu_pid_doctype_name" = "EU PID";
 "family_name_national_characters" = "Family Name in national characters";
 "given_name_national_characters" = "Given Name in national characters";
-"persistent_id" = "Persistent Identifier";
+"anon_id" = "Anonymous Identifier";
+"unique_id" = "Unique Identifier";
+"wallet_pseudo_id" = "Wallet Pseudo Identifier";
+"issuer_pseudo_id" = "Issuer Pseudo Identifier";
 "family_name_birth" = "Family Name at Birth";
 "family_name_birth_national_characters" = "Family Name at Birth in national characters";
 "first_name_birth" = "First Name at Birth";
