@@ -12,7 +12,7 @@ import SwiftCBOR
 /// ```swift
 /// let dr = DeviceResponse(data: bytes)
 /// ```
-struct DeviceResponse {
+public struct DeviceResponse {
 	let version: String
 	/// An array of all returned documents
 	let documents: [Document]?
@@ -29,7 +29,7 @@ struct DeviceResponse {
 }
 
 extension DeviceResponse: CBORDecodable {
-	init?(cbor: CBOR) {
+	public init?(cbor: CBOR) {
 		guard case .map(let cd) = cbor else { return nil }
 		guard case .utf8String(let v) = cd[Keys.version] else { return nil }
 		version = v

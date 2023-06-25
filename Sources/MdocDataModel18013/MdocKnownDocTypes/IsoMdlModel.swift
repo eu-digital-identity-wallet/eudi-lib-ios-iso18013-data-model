@@ -105,7 +105,7 @@ extension IssuerSignedItem {
 }
 
 extension IsoMdlModel {
-	init?(response: DeviceResponse) {
+	public init?(response: DeviceResponse) {
 		guard let (items,dict) = Self.getSignedItems(response) else { return nil }
 		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getItemValue(dict, string: key.rawValue) }
 		Self.extractAgeOverValues(dict, &ageOverXX)

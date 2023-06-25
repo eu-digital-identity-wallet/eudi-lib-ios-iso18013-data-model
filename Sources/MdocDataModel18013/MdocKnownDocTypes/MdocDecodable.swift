@@ -6,7 +6,7 @@ import Foundation
 /// A conforming type represents mdoc data.
 ///
 /// Can be decoded by a CBOR device response
-protocol MdocDecodable: AgeAttest {
+public protocol MdocDecodable: AgeAttest {
 	static var namespace: String { get }
 	static var docType: String { get }
 	var displayStrings: [NameValue] { get }

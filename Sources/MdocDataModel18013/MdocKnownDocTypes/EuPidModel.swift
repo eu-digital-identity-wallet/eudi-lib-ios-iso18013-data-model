@@ -5,8 +5,8 @@
 import Foundation
 
 public struct EuPidModel: Codable, MdocDecodable {
-	static let namespace = "eu.europa.ec.eudiw.pid.1"
-	static let docType = "eu.europa.ec.eudiw.pid.1"
+	public static let namespace = "eu.europa.ec.eudiw.pid.1"
+	public static let docType = "eu.europa.ec.eudiw.pid.1"
 	
 	public let family_name: String?
 	public let family_name_national_characters: String?
@@ -76,7 +76,7 @@ public struct EuPidModel: Codable, MdocDecodable {
 }
 
 extension EuPidModel {
-	init?(response: DeviceResponse) {
+	public init?(response: DeviceResponse) {
 		guard let (items,dict) = Self.getSignedItems(response) else { return nil }
 		func getValue<T>(key: EuPidModel.CodingKeys) -> T? { Self.getItemValue(dict, string: key.rawValue) }
 		Self.extractAgeOverValues(dict, &ageOverXX)

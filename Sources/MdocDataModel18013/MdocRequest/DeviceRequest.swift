@@ -13,7 +13,7 @@ import SwiftCBOR
 /// let isoKeys: [IsoMdlModel.CodingKeys] = [.familyName, .documentNumber, .drivingPrivileges, .issueDate, .expiryDate, .portrait]
 ///	let dr3 = DeviceRequest(mdl: isoKeys, agesOver: [18,21], intentToRetain: true)
 /// ```
-struct DeviceRequest {
+public struct DeviceRequest {
 	/// The current version
 	static let currentVersion = "1.0"
 	/// The version requested
@@ -28,7 +28,7 @@ struct DeviceRequest {
 }
 
 extension DeviceRequest: CBORDecodable {
-    init?(cbor: CBOR) {
+    public init?(cbor: CBOR) {
         guard case let .map(m) = cbor else { return nil }
         guard case let .utf8String(v) = m[Keys.version] else { return nil }
         version = v
@@ -41,7 +41,9 @@ extension DeviceRequest: CBORDecodable {
 }
 
 extension DeviceRequest: CBOREncodable {
-	func toCBOR(options: CBOROptions) -> CBOR {
+    public func encode(options: CBOROptions) -> [UInt8] { toCBOR(options: options).encode(options: options) }
+    
+	public func toCBOR(options: CBOROptions) -> CBOR {
 		var m = [CBOR: CBOR]()
         m[.utf8String(Keys.version.rawValue)] = .utf8String(version)
         m[.utf8String(Keys.docRequests.rawValue)] = .array(docRequests.map { $0.toCBOR(options: options) })
