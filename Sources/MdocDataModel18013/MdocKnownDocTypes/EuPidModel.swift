@@ -7,6 +7,7 @@ import Foundation
 public struct EuPidModel: Codable, MdocDecodable {
 	public static let namespace = "eu.europa.ec.eudiw.pid.1"
 	public static let docType = "eu.europa.ec.eudiw.pid.1"
+	public static let title = String.LocalizationValue("eu_pid_doctype_name")
 	
 	public let family_name: String?
 	public let family_name_national_characters: String?
