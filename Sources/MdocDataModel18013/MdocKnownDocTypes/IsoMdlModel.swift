@@ -86,7 +86,8 @@ public struct IsoMdlModel: Decodable, MdocDecodable {
 	
 	public static var namespace: String { "org.iso.18013.5.1" }
 	public static var docType: String { "org.iso.18013.5.1.mDL" }
-	
+	public static let title = String.LocalizationValue("mdl_doctype_name")
+
 	public static var mandatoryKeys: [String] {
 		Self.isoMandatoryKeys.map { $0.rawValue }
 	}

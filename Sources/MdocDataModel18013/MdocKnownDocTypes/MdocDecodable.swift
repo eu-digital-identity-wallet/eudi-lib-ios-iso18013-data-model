@@ -9,6 +9,7 @@ import Foundation
 public protocol MdocDecodable: AgeAttest {
 	static var namespace: String { get }
 	static var docType: String { get }
+	static var title: String.LocalizationValue { get }
 	var displayStrings: [NameValue] { get }
 	init?(response: DeviceResponse)
 }
