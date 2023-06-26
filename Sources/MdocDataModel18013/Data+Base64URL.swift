@@ -1,6 +1,18 @@
 import Foundation
 
 extension Data {
+
+/// init from local file
+    public init?(name: String, ext: String = "json", from bundle:Bundle = Bundle.main) {
+        guard let url = bundle.url(forResource: name, withExtension: ext) else { return nil }
+        try? self.init(contentsOf: url, options: .mappedIfSafe)
+    }
+
+   public func decodeJSON<T: Decodable>(type: T.Type) -> T? {
+        let decoder = JSONDecoder()
+        guard let response = try? decoder.decode(type.self, from: self) else { return nil }
+        return response
+    }
     /// Decodes a base64-url encoded string to data.
     ///
     /// https://tools.ietf.org/html/rfc4648#page-7

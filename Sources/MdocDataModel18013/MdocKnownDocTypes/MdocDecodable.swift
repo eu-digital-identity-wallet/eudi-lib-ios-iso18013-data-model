@@ -6,7 +6,7 @@ import Foundation
 /// A conforming type represents mdoc data.
 ///
 /// Can be decoded by a CBOR device response
-protocol MdocDecodable: AgeAttest {
+public protocol MdocDecodable: AgeAttest {
 	static var namespace: String { get }
 	static var docType: String { get }
 	var displayStrings: [NameValue] { get }
@@ -37,7 +37,8 @@ extension MdocDecodable {
 		
 	static func extractDisplayStrings(_ items: [IssuerSignedItem], _ displayStrings: inout [NameValue]) {
 		for item in items {
-			displayStrings.append(NameValue(name: item.elementIdentifier, value: item.description))
+			let name = item.elementIdentifier
+			displayStrings.append(NameValue(name: name, value: item.description))
 		}
 	}
 }

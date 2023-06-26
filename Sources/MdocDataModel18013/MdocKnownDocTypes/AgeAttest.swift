@@ -4,7 +4,7 @@
 import Foundation
 
 /// A conforming type contains age attestation values
-protocol AgeAttest {
+public protocol AgeAttest {
   var ageOverXX: [Int: Bool] { get }
 }
 

@@ -231,7 +231,6 @@ extension Dictionary where Key == CBOR {
 }
 
 public protocol CBORDecodable {
-	init?(data: [UInt8])
 	init?(cbor: CBOR)
 }
 
@@ -241,3 +240,5 @@ typealias DataElementIdentifier = String // Data element identifier
 typealias DataElementValue = CBOR
 typealias ErrorCode = UInt64
 typealias DigestID = UInt64
+
+public class BundleClass {}
