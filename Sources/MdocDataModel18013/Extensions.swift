@@ -62,16 +62,16 @@ extension Array where Element == UInt8 {
 }
 
 extension CBOREncodable {
-    func encode(options: SwiftCBOR.CBOROptions) -> [UInt8] {
+    public func encode(options: SwiftCBOR.CBOROptions) -> [UInt8] {
         toCBOR(options: CBOROptions()).encode()
     }
-    var taggedEncoded: CBOR {
+    public var taggedEncoded: CBOR {
         CBOR.tagged(CBOR.Tag(rawValue: 24), .byteString(CBOR.encode(self)))
     }
 }
 
 extension CBORDecodable {
-    init?(data: [UInt8]) {
+    public init?(data: [UInt8]) {
         guard let obj = try? CBOR.decode(data) else { return nil }
         self.init(cbor: obj)
     }
@@ -221,11 +221,11 @@ extension CBOR.Tag {
 // MARK: - Dictionary subscript extensions
 
 extension Dictionary where Key == CBOR {
-    subscript<Index: RawRepresentable>(index: Index) -> Value? where Index.RawValue == String {
+    public subscript<Index: RawRepresentable>(index: Index) -> Value? where Index.RawValue == String {
 				self[CBOR(stringLiteral: index.rawValue)]
     }
     
-    subscript<Index: RawRepresentable>(index: Index) -> Value? where Index.RawValue == Int {
+	public subscript<Index: RawRepresentable>(index: Index) -> Value? where Index.RawValue == Int {
 				self[CBOR(integerLiteral: index.rawValue)]
     }
 }
