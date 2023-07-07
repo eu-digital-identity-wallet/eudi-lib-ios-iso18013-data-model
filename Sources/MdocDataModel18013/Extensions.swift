@@ -66,7 +66,7 @@ extension CBOREncodable {
         toCBOR(options: CBOROptions()).encode()
     }
     public var taggedEncoded: CBOR {
-        CBOR.tagged(CBOR.Tag(rawValue: 24), .byteString(CBOR.encode(self)))
+        CBOR.tagged(.encodedCBORDataItem, .byteString(CBOR.encode(self)))
     }
 }
 

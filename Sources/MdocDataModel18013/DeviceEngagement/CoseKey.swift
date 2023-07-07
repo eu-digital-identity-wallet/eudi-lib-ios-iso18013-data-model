@@ -10,7 +10,7 @@ public enum ECCurveType: UInt64 {
 }
 
 /// COSE_Key as defined in RFC 8152
-struct CoseKey: Equatable {
+public struct CoseKey: Equatable {
     /// EC identifier
     let crv: ECCurveType
     /// key type
@@ -50,7 +50,7 @@ struct CoseKeyPrivate  {
 }
 
 extension CoseKey: CBOREncodable {
-    func toCBOR(options: CBOROptions) -> CBOR {
+    public func toCBOR(options: CBOROptions) -> CBOR {
         let cbor: CBOR = [
             -1: .unsignedInt(crv.rawValue), 1: .unsignedInt(kty),
              -2: .byteString(x), -3: .byteString(y),
@@ -60,7 +60,7 @@ extension CoseKey: CBOREncodable {
 }
 
 extension CoseKey: CBORDecodable {
-    init?(cbor obj: CBOR) {
+    public init?(cbor obj: CBOR) {
         guard let calg = obj[-1], case let CBOR.unsignedInt(ralg) = calg, let alg = ECCurveType(rawValue: ralg) else { return nil }
         crv = alg
         guard let ckty = obj[1], case let CBOR.unsignedInt(rkty) = ckty else { return nil }
