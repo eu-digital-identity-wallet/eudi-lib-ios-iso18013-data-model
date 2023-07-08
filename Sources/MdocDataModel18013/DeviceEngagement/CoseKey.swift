@@ -22,7 +22,7 @@ public struct CoseKey: Equatable {
 }
 
 /// COSE_Key + private key
-struct CoseKeyPrivate  {
+public struct CoseKeyPrivate  {
     let key: CoseKey
     let d: [UInt8]
     
@@ -70,6 +70,21 @@ extension CoseKey: CBORDecodable {
         guard let cy = obj[-3], case let CBOR.byteString(ry) = cy else { return nil }
         y = ry
     }
+}
+
+extension CoseKey {
+	public init(x: [UInt8], y: [UInt8], crv: ECCurveType = .p256) {
+		self.crv = crv
+		self.x = x
+		self.y = y
+	}
+}
+
+extension CoseKeyPrivate {
+	public init(x: [UInt8], y: [UInt8], d: [UInt8], crv: ECCurveType = .p256) {
+		self.key = CoseKey(x: x, y: y, crv: crv)
+		self.d = d
+	}
 }
 
 

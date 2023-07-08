@@ -33,6 +33,26 @@ extension String {
     var fullDateEncoded: CBOR {
         CBOR.tagged(CBOR.Tag(rawValue: 1004), .utf8String(self))
     }
+	
+	public func toBytes() -> [UInt8]? {
+		let length = count
+		if length & 1 != 0 {
+			return nil
+		}
+		var bytes = [UInt8]()
+		bytes.reserveCapacity(length/2)
+		var index = startIndex
+		for _ in 0..<length/2 {
+			let nextIndex = self.index(index, offsetBy: 2)
+			if let b = UInt8(self[index..<nextIndex], radix: 16) {
+				bytes.append(b)
+			} else {
+				return nil
+			}
+			index = nextIndex
+		}
+		return bytes
+	}
 }
 
 extension Data {
@@ -78,12 +98,16 @@ extension CBORDecodable {
 }
 
 extension CBOR {
-    func decodeTagged<T: CBORDecodable>(_ t: T.Type = T.self) -> T? {
-        guard case let CBOR.tagged(tag, cborEncoded) = self, tag.rawValue == 24, case let .byteString(bytes) = cborEncoded else {  return nil }
+    public func decodeTaggedBytes() -> [UInt8]? {
+        guard case let CBOR.tagged(tag, cborEncoded) = self, tag == .encodedCBORDataItem, case let .byteString(bytes) = cborEncoded else {  return nil }
+        return bytes
+    }
+    public func decodeTagged<T: CBORDecodable>(_ t: T.Type = T.self) -> T? {
+        guard case let CBOR.tagged(tag, cborEncoded) = self, tag == .encodedCBORDataItem, case let .byteString(bytes) = cborEncoded else {  return nil }
         return .init(data: bytes)
     }
     
-    func decodeFullDate() -> String? {
+    public func decodeFullDate() -> String? {
         guard case let CBOR.tagged(tag, cborEncoded) = self, tag.rawValue == 1004, case let .utf8String(s) = cborEncoded else { return nil }
         return s
     }
