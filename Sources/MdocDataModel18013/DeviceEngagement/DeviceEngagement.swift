@@ -26,14 +26,20 @@ public struct DeviceEngagement {
     let security: Security
     var deviceRetrievalMethods: [DeviceRetrievalMethod]? = nil
     var serverRetrievalOptions: ServerRetrievalOptions? = nil
-	
+	// private key data for holder only
+    var d: [UInt8]?
+    #if DEBUG
+    mutating func setD(d: [UInt8]) { self.d = d }
+    #endif
+
 	/// Generate device engagement
 	/// - Parameters
 	///    - isBleServer: true for BLE mdoc peripheral server mode, false for BLE mdoc central client mode
 	///    - crv: The EC curve type used in the mdoc ephemeral private key
     public init(isBleServer: Bool?, crv: ECCurveType = .p256) {
         let pk = CoseKeyPrivate(crv: crv)
-        security = Security(d: pk.d, deviceKey: pk.key)
+        security = Security(deviceKey: pk.key)
+        d = pk.d
         if let isBleServer {
             deviceRetrievalMethods = [.ble(isBleServer: isBleServer, uuid: DeviceRetrievalMethod.getRandomBleUuid())]
         }
@@ -43,6 +49,11 @@ public struct DeviceEngagement {
         guard let obj = try? CBOR.decode(data) else { return nil }
         self.init(cbor: obj)
     }
+
+    public var privateKey: CoseKeyPrivate? {
+        guard let d else { return nil }
+        return CoseKeyPrivate(key: security.deviceKey, d: d)
+     }
 }
 
 extension DeviceEngagement: CBOREncodable {
