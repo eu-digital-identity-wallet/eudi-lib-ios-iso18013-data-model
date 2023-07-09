@@ -24,7 +24,7 @@ public struct CoseKey: Equatable {
 /// COSE_Key + private key
 public struct CoseKeyPrivate  {
 	
-	let key: CoseKey
+	public let key: CoseKey
 	let d: [UInt8]
 	
 	init(key: CoseKey, d: [UInt8]) {
