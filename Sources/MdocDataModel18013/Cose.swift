@@ -70,11 +70,11 @@ extension Cose {
 			self.init(alg: alg, keyId: cborMap[Headers.keyId]?.asBytes(), rawHeader: cbor)
 		}
 		
-		// MARK: - Private
-		init(alg: UInt64?, keyId: [UInt8]?, rawHeader : CBOR? = nil){
+		init?(alg: UInt64?, keyId: [UInt8]?, rawHeader : CBOR? = nil){
+			guard alg != nil || rawHeader != nil else { return nil }
 			self.algorithm = alg
 			self.keyId = keyId
-			self.rawHeader = rawHeader
+			self.rawHeader = rawHeader ?? .byteString(CBOR.map([.unsignedInt(UInt64(Headers.algorithm.rawValue)) : .unsignedInt(alg!)]).encode())
 		}
 	}
 }
@@ -130,7 +130,7 @@ extension Cose {
 	}
 	///initializer to create a detached cose signature
 	public init(type: CoseType, algorithm: UInt64, signature: Data) {
-		self.protectedHeader = CoseHeader(alg: algorithm, keyId: nil)
+		self.protectedHeader = CoseHeader(alg: algorithm, keyId: nil)!
 		self.unprotectedHeader = nil
 		self.payload = .null
 		self.signature = signature
@@ -138,7 +138,7 @@ extension Cose {
 	}
 	///initializer to create a payload cose message
 	public init(type: CoseType, algorithm: UInt64, payloadData: Data) {
-		self.protectedHeader = CoseHeader(alg: algorithm, keyId: nil)
+		self.protectedHeader = CoseHeader(alg: algorithm, keyId: nil)!
 		self.unprotectedHeader = nil
 		self.payload = .byteString(payloadData.bytes)
 		self.signature = Data()
