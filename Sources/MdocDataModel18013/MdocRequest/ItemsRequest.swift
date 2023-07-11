@@ -1,11 +1,11 @@
 import Foundation
 import SwiftCBOR
 
-struct ItemsRequest {
+public struct ItemsRequest {
 	/// Requested document type.
-    let docType: DocType
+    public let docType: DocType
 	/// Requested data elements for each NameSpace
-    let nameSpaces: RequestNameSpaces
+    public let nameSpaces: RequestNameSpaces
 	/// May be used by the mdoc reader to provide additional information
     let requestInfo: CBOR?
 
@@ -17,7 +17,7 @@ struct ItemsRequest {
 }
 
 extension ItemsRequest: CBORDecodable {
-    init?(cbor: CBOR) {
+    public init?(cbor: CBOR) {
         guard case let .map(m) = cbor else { return nil }
         guard case let .utf8String(dt) = m[Keys.docType] else { return nil }
         docType = dt
@@ -28,7 +28,7 @@ extension ItemsRequest: CBORDecodable {
 }
 
 extension ItemsRequest: CBOREncodable {
-	func toCBOR(options: CBOROptions) -> CBOR {
+	public func toCBOR(options: CBOROptions) -> CBOR {
 		var m = [CBOR: CBOR]()
         m[.utf8String(Keys.docType.rawValue)] = .utf8String(docType)
         m[.utf8String(Keys.nameSpaces.rawValue)] = nameSpaces.toCBOR(options: options)

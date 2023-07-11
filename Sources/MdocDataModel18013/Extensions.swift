@@ -261,9 +261,9 @@ public protocol CBORDecodable {
 	init?(cbor: CBOR)
 }
 
-typealias DocType = String
-typealias NameSpace = String
-typealias DataElementIdentifier = String // Data element identifier
+public typealias DocType = String
+public typealias NameSpace = String
+public typealias DataElementIdentifier = String // Data element identifier
 typealias DataElementValue = CBOR
 typealias ErrorCode = UInt64
 typealias DigestID = UInt64

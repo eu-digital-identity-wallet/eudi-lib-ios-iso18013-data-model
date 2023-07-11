@@ -84,8 +84,9 @@ public struct Cose {
 	public let type: CoseType
 	let protectedHeader : CoseHeader
 	let unprotectedHeader : CoseHeader?
-	let payload : CBOR
-	let signature : Data
+	public let payload : CBOR
+	public let signature : Data
+
 	public var verifyAlgorithm: VerifyAlgorithm? { guard type == .sign1, let alg = protectedHeader.algorithm else { return nil }; return VerifyAlgorithm(rawValue: alg) }
 	public var macAlgorithm: MacAlgorithm? { guard type == .mac0, let alg = protectedHeader.algorithm else { return nil }; return MacAlgorithm(rawValue: alg) }
 
@@ -118,7 +119,7 @@ public struct Cose {
 }
 
 extension Cose {
-	init?(type: CoseType, cbor: SwiftCBOR.CBOR) {
+	public init?(type: CoseType, cbor: SwiftCBOR.CBOR) {
 		guard let coseList = cbor.asList(), let protectedHeader = CoseHeader(fromBytestring: coseList[0]),
 			  let signature = coseList[3].asBytes() else { return nil }
 		
@@ -143,6 +144,13 @@ extension Cose {
 		self.payload = .byteString(payloadData.bytes)
 		self.signature = Data()
 		self.type = type
+	}
+	public init(other: Cose, payloadData: Data) {
+		self.protectedHeader = other.protectedHeader
+		self.unprotectedHeader = other.unprotectedHeader
+		self.payload = .byteString(payloadData.bytes)
+		self.signature = other.signature
+		self.type = other.type
 	}
 }
 

@@ -2,14 +2,14 @@ import Foundation
 import SwiftCBOR
 
 /// contains the requested data elements and the namespace they belong to.
-struct RequestNameSpaces {
-    let nameSpaces: [NameSpace: RequestDataElements]
-    subscript(ns: String)-> RequestDataElements? { nameSpaces[ns] }
+public struct RequestNameSpaces {
+    public let nameSpaces: [NameSpace: RequestDataElements]
+    public subscript(ns: String)-> RequestDataElements? { nameSpaces[ns] }
 } 
 
  
 extension RequestNameSpaces: CBORDecodable {
-	init?(cbor: CBOR) {
+	public init?(cbor: CBOR) {
   		guard case let .map(e) = cbor else { return nil }
 		let dePairs = e.compactMap { (k: CBOR, v: CBOR) -> (NameSpace, RequestDataElements)?  in
 			guard case .utf8String(let ns) = k else { return nil }
@@ -23,7 +23,7 @@ extension RequestNameSpaces: CBORDecodable {
 }
 
 extension RequestNameSpaces: CBOREncodable {
-	func toCBOR(options: CBOROptions) -> CBOR {
+	public func toCBOR(options: CBOROptions) -> CBOR {
 		let m = nameSpaces.map { (ns: NameSpace, rde: RequestDataElements) -> (CBOR, CBOR) in
 			(.utf8String(ns), rde.toCBOR(options: options))
 		}

@@ -17,9 +17,9 @@ public struct DeviceRequest {
 	/// The current version
 	static let currentVersion = "1.0"
 	/// The version requested
-    let version: String
+    public let version: String
 	/// An array of all requested documents.
-    let docRequests: [DocRequest]
+    public let docRequests: [DocRequest]
 
     enum Keys: String {
         case version
@@ -62,6 +62,6 @@ extension DeviceRequest {
 		for ao in agesOver { isoDataElements["age_over_\(ao)"] = intentToRetain }
 		let isoReqElements = RequestDataElements(dataElements: isoDataElements )
 		let itemsReq = ItemsRequest(docType: IsoMdlModel.docType, nameSpaces: RequestNameSpaces(nameSpaces: [IsoMdlModel.namespace: isoReqElements]), requestInfo: nil)
-		self.init(version: "1.0", docRequests: [DocRequest(itemsRequest: itemsReq, readerAuth: nil)])
+		self.init(version: "1.0", docRequests: [DocRequest(itemsRequest: itemsReq, itemsRequestRawData: nil, readerAuth: nil, readerAuthRawCBOR: nil)])
 	}
 }
