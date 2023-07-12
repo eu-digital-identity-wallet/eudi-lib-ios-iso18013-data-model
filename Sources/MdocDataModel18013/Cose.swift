@@ -49,6 +49,7 @@ extension Cose {
 }
 
 extension Cose {
+	/// Cose header structure defined in https://datatracker.ietf.org/doc/html/rfc8152
 	struct CoseHeader {
 		enum Headers : Int {
 			case keyId = 4
@@ -60,7 +61,8 @@ extension Cose {
 		let algorithm : UInt64?
 		
 		// MARK: - Initializers
-		
+		/// Initialize from CBOR
+		/// - Parameter cbor: CBOR representation of the header
 		init?(fromBytestring cbor: CBOR){
 			guard let cborMap = cbor.decodeBytestring()?.asMap(),
 				  let alg = cborMap[Headers.algorithm]?.asUInt64() else {
@@ -101,12 +103,12 @@ public struct Cose {
 		return keyData
 	}
 	
+	/// Structure according to https://tools.ietf.org/html/rfc8152#section-4.2
 	public var signatureStruct : Data? {
 		get {
 			guard let header = protectedHeader.rawHeader else {
 				return nil
 			}			
-			// Structure according to https://tools.ietf.org/html/rfc8152#section-4.2
 			switch type {
 			case .sign1, .mac0:
 				let context = CBOR(stringLiteral: self.type.rawValue)
@@ -119,6 +121,10 @@ public struct Cose {
 }
 
 extension Cose {
+	///initializer to create a cose message from a cbor representation
+	/// - Parameters:
+	///  - type: Cose message type
+	///  - cbor: CBOR representation of the cose message
 	public init?(type: CoseType, cbor: SwiftCBOR.CBOR) {
 		guard let coseList = cbor.asList(), let protectedHeader = CoseHeader(fromBytestring: coseList[0]),
 			  let signature = coseList[3].asBytes() else { return nil }
@@ -145,6 +151,10 @@ extension Cose {
 		self.signature = Data()
 		self.type = type
 	}
+	///initializer to create a cose message from a detached cose and a payload
+	/// - Parameters:
+	/// - other: detached cose message
+	/// - payloadData: payload data
 	public init(other: Cose, payloadData: Data) {
 		self.protectedHeader = other.protectedHeader
 		self.unprotectedHeader = other.unprotectedHeader
@@ -153,7 +163,6 @@ extension Cose {
 		self.type = other.type
 	}
 }
-
 
 extension Cose: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
