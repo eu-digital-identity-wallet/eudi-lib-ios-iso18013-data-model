@@ -117,8 +117,8 @@ extension CoseKeyPrivate {
 	}
 }
 
-/// A COSE_Key pair
-public struct CoseKeyPair {
+/// A COSE_Key exchange pair
+public struct CoseKeyExchange {
 	public let publicKey: CoseKey
 	public let privateKey: CoseKeyPrivate
 
