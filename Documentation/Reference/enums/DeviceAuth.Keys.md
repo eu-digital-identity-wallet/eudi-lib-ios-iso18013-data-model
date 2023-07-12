@@ -9,7 +9,7 @@
   - `deviceMac`
 
 ```swift
-enum	Keys: String
+enum Keys: String
 ```
 
 ## Cases

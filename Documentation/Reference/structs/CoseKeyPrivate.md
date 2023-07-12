@@ -8,10 +8,10 @@
   - `key`
   - `d`
 - [Methods](#methods)
-  - `init(crv:)`
+  - `init(key:d:)`
 
 ```swift
-struct CoseKeyPrivate
+public struct CoseKeyPrivate
 ```
 
 COSE_Key + private key
@@ -20,7 +20,7 @@ COSE_Key + private key
 ### `key`
 
 ```swift
-let key: CoseKey
+public let key: CoseKey
 ```
 
 ### `d`
@@ -30,8 +30,8 @@ let d: [UInt8]
 ```
 
 ## Methods
-### `init(crv:)`
+### `init(key:d:)`
 
 ```swift
-init(crv: ECCurveType)
+init(key: CoseKey, d: [UInt8])
 ```

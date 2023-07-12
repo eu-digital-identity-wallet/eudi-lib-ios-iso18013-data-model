@@ -11,7 +11,7 @@
   - `y`
 
 ```swift
-struct CoseKey: Equatable
+public struct CoseKey: Equatable
 ```
 
 COSE_Key as defined in RFC 8152
@@ -20,7 +20,7 @@ COSE_Key as defined in RFC 8152
 ### `crv`
 
 ```swift
-let crv: ECCurveType
+public let crv: ECCurveType
 ```
 
 EC identifier

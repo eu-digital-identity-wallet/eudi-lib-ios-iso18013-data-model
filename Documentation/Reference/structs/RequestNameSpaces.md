@@ -8,7 +8,7 @@
   - `nameSpaces`
 
 ```swift
-struct RequestNameSpaces
+public struct RequestNameSpaces
 ```
 
 contains the requested data elements and the namespace they belong to.
@@ -17,5 +17,5 @@ contains the requested data elements and the namespace they belong to.
 ### `nameSpaces`
 
 ```swift
-let nameSpaces: [NameSpace: RequestDataElements]
+public let nameSpaces: [NameSpace: RequestDataElements]
 ```

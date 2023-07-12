@@ -1,8 +1,8 @@
 **EXTENSION**
 
-# `Array`
+# `CBOREncodable`
 ```swift
-extension Array where Element == UInt8
+extension CBOREncodable
 ```
 
 ## Properties
@@ -13,8 +13,8 @@ public var taggedEncoded: CBOR
 ```
 
 ## Methods
-### `toHexString()`
+### `encode(options:)`
 
 ```swift
-public func toHexString() -> String
+public func encode(options: SwiftCBOR.CBOROptions) -> [UInt8]
 ```

@@ -8,7 +8,7 @@
   - `coseMacOrSignature`
 
 ```swift
-struct DeviceAuth
+public struct DeviceAuth
 ```
 
 contains either the DeviceSignature or the DeviceMac element

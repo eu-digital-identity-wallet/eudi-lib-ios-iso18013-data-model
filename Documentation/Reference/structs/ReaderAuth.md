@@ -26,7 +26,7 @@ encoded data
 ### `iaca`
 
 ```swift
-let iaca: SecCertificate
+let iaca: [[UInt8]]
 ```
 
-IACA certificate
+one or more certificates

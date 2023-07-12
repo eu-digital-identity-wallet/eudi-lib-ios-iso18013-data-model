@@ -3,5 +3,5 @@
 # `DataElementIdentifier`
 
 ```swift
-typealias DataElementIdentifier = String
+public typealias DataElementIdentifier = String
 ```

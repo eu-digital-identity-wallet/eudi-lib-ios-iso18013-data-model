@@ -86,6 +86,7 @@ extension CoseKey {
 		self.x = x
 		self.y = y
 	}
+	/// An ANSI x9.63 representation of the public key.
 	public func getx963Representation() -> Data {
 		let keyData = NSMutableData(bytes: [0x04], length: [0x04].count)
 		keyData.append(Data(x))
@@ -95,16 +96,35 @@ extension CoseKey {
 }
 
 extension CoseKeyPrivate {
+	/// Create a COSE_Key from Elliptic Curve paramters of the private key.
+	/// - Parameters:
+	///   - x: /// value of x-coordinate
+	///   - y: /// value of y-coordinate
+	///   - d: /// value of x-coordinate
+	///   - crv: /// EC identifier
 	public init(x: [UInt8], y: [UInt8], d: [UInt8], crv: ECCurveType = .p256) {
 		self.key = CoseKey(x: x, y: y, crv: crv)
 		self.d = d
 	}
+
+	/// An ANSI x9.63 representation of the private key.
 	public func getx963Representation() -> Data {
 		let keyData = NSMutableData(bytes: [0x04], length: [0x04].count)
 		keyData.append(Data(key.x))
 		keyData.append(Data(key.y))
 		keyData.append(Data(d))
 		return keyData as Data
+	}
+}
+
+/// A COSE_Key pair
+public struct CoseKeyPair {
+	public let publicKey: CoseKey
+	public let privateKey: CoseKeyPrivate
+
+	public init(publicKey: CoseKey, privateKey: CoseKeyPrivate) {
+		self.publicKey = publicKey
+		self.privateKey = privateKey
 	}
 }
 

@@ -8,6 +8,8 @@
   - `cipherSuiteIdentifier`
   - `d`
   - `deviceKey`
+- [Methods](#methods)
+  - `setD(d:)`
 
 ```swift
 struct Security
@@ -25,13 +27,20 @@ static let cipherSuiteIdentifier: UInt64 = 1
 ### `d`
 
 ```swift
-public var d: [UInt8]?
+var d: [UInt8]?
 ```
 
 ### `deviceKey`
 
 ```swift
-public var deviceKey: CoseKey
+let deviceKey: CoseKey
 ```
 
 security struct. of the holder transfered (only the public key of the mDL is encoded)
+
+## Methods
+### `setD(d:)`
+
+```swift
+mutating func setD(d: [UInt8])
+```

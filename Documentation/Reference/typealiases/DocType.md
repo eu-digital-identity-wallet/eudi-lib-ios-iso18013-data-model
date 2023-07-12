@@ -3,5 +3,5 @@
 # `DocType`
 
 ```swift
-typealias DocType = String
+public typealias DocType = String
 ```

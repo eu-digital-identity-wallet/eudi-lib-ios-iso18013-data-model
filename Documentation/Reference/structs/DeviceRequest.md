@@ -10,7 +10,7 @@
   - `docRequests`
 
 ```swift
-struct DeviceRequest
+public struct DeviceRequest
 ```
 
 Device retrieval mdoc request structure
@@ -36,7 +36,7 @@ The current version
 ### `version`
 
 ```swift
-let version: String
+public let version: String
 ```
 
 The version requested
@@ -44,7 +44,7 @@ The version requested
 ### `docRequests`
 
 ```swift
-let docRequests: [DocRequest]
+public let docRequests: [DocRequest]
 ```
 
 An array of all requested documents.

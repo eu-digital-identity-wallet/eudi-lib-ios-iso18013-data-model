@@ -7,12 +7,6 @@ public protocol CBORDecodable
 ```
 
 ## Methods
-### `init(data:)`
-
-```swift
-init?(data: [UInt8])
-```
-
 ### `init(cbor:)`
 
 ```swift
