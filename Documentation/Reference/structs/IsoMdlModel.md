@@ -31,6 +31,7 @@
   - `residentPostalCode`
   - `ageInYears`
   - `ageOverXX`
+  - `displayStrings`
   - `ageBirthYear`
   - `portrait`
   - `unDistinguishingSign`
@@ -45,11 +46,12 @@
   - `oidcInfo`
   - `namespace`
   - `docType`
+  - `title`
   - `mandatoryKeys`
   - `isoMandatoryKeys`
 
 ```swift
-public struct IsoMdlModel: Decodable, AgeAttest
+public struct IsoMdlModel: Decodable, MdocDecodable
 ```
 
 ## Properties
@@ -209,6 +211,12 @@ public let ageInYears: UInt64?
 public var ageOverXX = [Int: Bool]()
 ```
 
+### `displayStrings`
+
+```swift
+public var displayStrings = [NameValue]()
+```
+
 ### `ageBirthYear`
 
 ```swift
@@ -291,6 +299,12 @@ public static var namespace: String
 
 ```swift
 public static var docType: String
+```
+
+### `title`
+
+```swift
+public static let title = String.LocalizationValue("mdl_doctype_name")
 ```
 
 ### `mandatoryKeys`

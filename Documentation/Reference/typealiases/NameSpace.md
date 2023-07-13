@@ -3,5 +3,5 @@
 # `NameSpace`
 
 ```swift
-typealias NameSpace = String
+public typealias NameSpace = String
 ```

@@ -9,7 +9,7 @@
   - `elementIdentifiers`
 
 ```swift
-struct RequestDataElements
+public struct RequestDataElements
 ```
 
 Requested data elements identified by their data element identifier.
@@ -18,7 +18,7 @@ Requested data elements identified by their data element identifier.
 ### `dataElements`
 
 ```swift
-let dataElements: [DataElementIdentifier: IntentToRetain]
+public let dataElements: [DataElementIdentifier: IntentToRetain]
 ```
 
 IntentToRetain indicates whether the mdoc verifier intends to retain the received data element
@@ -26,5 +26,5 @@ IntentToRetain indicates whether the mdoc verifier intends to retain the receive
 ### `elementIdentifiers`
 
 ```swift
-var elementIdentifiers: [DataElementIdentifier]
+public var elementIdentifiers: [DataElementIdentifier]
 ```

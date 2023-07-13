@@ -7,12 +7,12 @@ import Security
 
 extension Cose {
 	/// COSE Message Identification
-	enum CoseType : String {
+	public enum CoseType : String {
 		/// COSE Single Signer Data Object
 		/// Only one signature is applied on the message payload
 		case sign1 = "Signature1"
 		case mac0 = "MAC0"
-		/// Identtifies Cose Message Type from input data
+		/// Idenntifies Cose Message Type from input data
 		static func from(data: Data) -> CoseType? {
 			guard let cose = try? CBORDecoder(input: data.bytes).decodeItem()?.asCose() else {
 				return nil
@@ -32,17 +32,16 @@ extension Cose {
 	/// ECDSA Algorithm Values defined in
 	///
 	/// Table1 in rfc/rfc8152#section-16.2
-	enum VerifyAlgorithm: UInt64 {
+	public enum VerifyAlgorithm: UInt64 {
 		case es256 = 6 //-7 ECDSA w/ SHA-256
 		case es384 = 34 //-35 ECDSA w/ SHA-384
 		case es512 = 35//-36 ECDSA w/ SHA-512
-		case ps256 = 36 //-37
 	}
 	
 	/// MAC Algorithm Values
 	///
 	/// Table 7  in rfc/rfc8152#section-16.2
-	enum MacAlgorithm: UInt64 {
+	public enum MacAlgorithm: UInt64 {
 		case hmac256 = 5 //HMAC w/ SHA-256
 		case hmac384 = 6 //HMAC w/ SHA-384
 		case hmac512 = 7 //HMAC w/ SHA-512
@@ -50,19 +49,20 @@ extension Cose {
 }
 
 extension Cose {
+	/// Cose header structure defined in https://datatracker.ietf.org/doc/html/rfc8152
 	struct CoseHeader {
 		enum Headers : Int {
 			case keyId = 4
 			case algorithm = 1
 		}
 		
-		
 		let rawHeader : CBOR?
 		let keyId : [UInt8]?
 		let algorithm : UInt64?
 		
 		// MARK: - Initializers
-		
+		/// Initialize from CBOR
+		/// - Parameter cbor: CBOR representation of the header
 		init?(fromBytestring cbor: CBOR){
 			guard let cborMap = cbor.decodeBytestring()?.asMap(),
 				  let alg = cborMap[Headers.algorithm]?.asUInt64() else {
@@ -72,24 +72,25 @@ extension Cose {
 			self.init(alg: alg, keyId: cborMap[Headers.keyId]?.asBytes(), rawHeader: cbor)
 		}
 		
-		// MARK: - Private
-		private init(alg: UInt64?, keyId: [UInt8]?, rawHeader : CBOR? = nil){
+		init?(alg: UInt64?, keyId: [UInt8]?, rawHeader : CBOR? = nil){
+			guard alg != nil || rawHeader != nil else { return nil }
 			self.algorithm = alg
 			self.keyId = keyId
-			self.rawHeader = rawHeader
+			self.rawHeader = rawHeader ?? .byteString(CBOR.map([.unsignedInt(UInt64(Headers.algorithm.rawValue)) : .unsignedInt(alg!)]).encode())
 		}
 	}
 }
 
  /// Struct which describes  a representation for cryptographic keys;  how to create and process signatures, message authentication codes, and  encryption using Concise Binary Object Representation (CBOR) or serialization.
-struct Cose {
-	let type: CoseType
+public struct Cose {
+	public let type: CoseType
 	let protectedHeader : CoseHeader
 	let unprotectedHeader : CoseHeader?
-	let payload : CBOR
-	let signature : Data
-	var verifyAlgorithm: VerifyAlgorithm? { guard type == .sign1, let alg = protectedHeader.algorithm else { return nil }; return VerifyAlgorithm(rawValue: alg) }
-	var macAlgorithm: MacAlgorithm? { guard type == .mac0, let alg = protectedHeader.algorithm else { return nil }; return MacAlgorithm(rawValue: alg) }
+	public let payload : CBOR
+	public let signature : Data
+
+	public var verifyAlgorithm: VerifyAlgorithm? { guard type == .sign1, let alg = protectedHeader.algorithm else { return nil }; return VerifyAlgorithm(rawValue: alg) }
+	public var macAlgorithm: MacAlgorithm? { guard type == .mac0, let alg = protectedHeader.algorithm else { return nil }; return MacAlgorithm(rawValue: alg) }
 
 	var keyId : Data? {
 		var keyData : Data?
@@ -102,12 +103,12 @@ struct Cose {
 		return keyData
 	}
 	
-	var signatureStruct : Data? {
+	/// Structure according to https://tools.ietf.org/html/rfc8152#section-4.2
+	public var signatureStruct : Data? {
 		get {
 			guard let header = protectedHeader.rawHeader else {
 				return nil
 			}			
-			// Structure according to https://tools.ietf.org/html/rfc8152#section-4.2
 			switch type {
 			case .sign1, .mac0:
 				let context = CBOR(stringLiteral: self.type.rawValue)
@@ -120,7 +121,11 @@ struct Cose {
 }
 
 extension Cose {
-	init?(type: CoseType, cbor: SwiftCBOR.CBOR) {
+	///initializer to create a cose message from a cbor representation
+	/// - Parameters:
+	///  - type: Cose message type
+	///  - cbor: CBOR representation of the cose message
+	public init?(type: CoseType, cbor: SwiftCBOR.CBOR) {
 		guard let coseList = cbor.asList(), let protectedHeader = CoseHeader(fromBytestring: coseList[0]),
 			  let signature = coseList[3].asBytes() else { return nil }
 		
@@ -130,11 +135,37 @@ extension Cose {
 		self.signature = Data(signature)
 		self.type = type
 	}
+	///initializer to create a detached cose signature
+	public init(type: CoseType, algorithm: UInt64, signature: Data) {
+		self.protectedHeader = CoseHeader(alg: algorithm, keyId: nil)!
+		self.unprotectedHeader = nil
+		self.payload = .null
+		self.signature = signature
+		self.type = type
+	}
+	///initializer to create a payload cose message
+	public init(type: CoseType, algorithm: UInt64, payloadData: Data) {
+		self.protectedHeader = CoseHeader(alg: algorithm, keyId: nil)!
+		self.unprotectedHeader = nil
+		self.payload = .byteString(payloadData.bytes)
+		self.signature = Data()
+		self.type = type
+	}
+	///initializer to create a cose message from a detached cose and a payload
+	/// - Parameters:
+	/// - other: detached cose message
+	/// - payloadData: payload data
+	public init(other: Cose, payloadData: Data) {
+		self.protectedHeader = other.protectedHeader
+		self.unprotectedHeader = other.unprotectedHeader
+		self.payload = .byteString(payloadData.bytes)
+		self.signature = other.signature
+		self.type = other.type
+	}
 }
 
-
 extension Cose: CBOREncodable {
-	func toCBOR(options: CBOROptions) -> CBOR {
+	public func toCBOR(options: CBOROptions) -> CBOR {
         .array([protectedHeader.rawHeader ?? .map([:]), unprotectedHeader?.rawHeader ?? .map([:]), payload, .byteString(signature.bytes)])
     }
 }

@@ -11,7 +11,7 @@
   - `status`
 
 ```swift
-struct DeviceResponse
+public struct DeviceResponse
 ```
 
 Device retrieval mdoc response. It is CBOR encoded

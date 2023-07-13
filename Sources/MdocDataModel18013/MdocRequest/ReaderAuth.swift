@@ -5,8 +5,8 @@ import SwiftCBOR
 struct ReaderAuth {
 	/// encoded data
     let coseSign1: Cose
-	/// IACA certificate
-	let iaca: SecCertificate
+	/// one or more certificates
+	let iaca: [[UInt8]] 
 }
 
 extension ReaderAuth: CBORDecodable {
@@ -14,10 +14,10 @@ extension ReaderAuth: CBORDecodable {
         // The signature is contained in an untagged COSE_Sign1 structure as defined in RFC 8152 and identified
         guard let cose = Cose(type: .sign1, cbor: cbor) else { return nil }
         coseSign1 = cose
-		guard let ch = cose.unprotectedHeader?.rawHeader, case let .map(mch) = ch else { return nil }
-		guard case let .byteString(biaca) = mch[.unsignedInt(33)] else { return nil }
-		guard let sc = SecCertificateCreateWithData(nil, Data(biaca) as CFData) else { return nil }
-		iaca = sc
+	    guard let ch = cose.unprotectedHeader?.rawHeader, case let .map(mch) = ch  else { return nil }
+		if case let .byteString(bs) = mch[.unsignedInt(33)] { iaca = [bs] }
+		else if case let .array(a) = mch[.unsignedInt(33)] { iaca = a.compactMap { if case let .byteString(bs) = $0 { return bs } else { return nil } } }
+		else { return nil }
     }
 }
 

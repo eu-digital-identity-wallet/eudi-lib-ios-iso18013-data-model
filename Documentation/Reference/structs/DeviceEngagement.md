@@ -10,7 +10,10 @@
   - `security`
   - `deviceRetrievalMethods`
   - `serverRetrievalOptions`
+  - `d`
+  - `privateKey`
 - [Methods](#methods)
+  - `setD(d:)`
   - `init(isBleServer:crv:)`
   - `init(data:)`
 
@@ -62,7 +65,25 @@ var deviceRetrievalMethods: [DeviceRetrievalMethod]? = nil
 var serverRetrievalOptions: ServerRetrievalOptions? = nil
 ```
 
+### `d`
+
+```swift
+var d: [UInt8]?
+```
+
+### `privateKey`
+
+```swift
+public var privateKey: CoseKeyPrivate?
+```
+
 ## Methods
+### `setD(d:)`
+
+```swift
+mutating func setD(d: [UInt8])
+```
+
 ### `init(isBleServer:crv:)`
 
 ```swift

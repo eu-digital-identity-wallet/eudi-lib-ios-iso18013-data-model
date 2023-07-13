@@ -22,5 +22,7 @@ let mso: MobileSecurityObject
 ### `iaca`
 
 ```swift
-let iaca: SecCertificate
+let iaca: [[UInt8]]
 ```
+
+one or more certificates

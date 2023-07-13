@@ -10,14 +10,14 @@
   - `requestInfo`
 
 ```swift
-struct ItemsRequest
+public struct ItemsRequest
 ```
 
 ## Properties
 ### `docType`
 
 ```swift
-let docType: DocType
+public let docType: DocType
 ```
 
 Requested document type.
@@ -25,7 +25,7 @@ Requested document type.
 ### `nameSpaces`
 
 ```swift
-let nameSpaces: RequestNameSpaces
+public let nameSpaces: RequestNameSpaces
 ```
 
 Requested data elements for each NameSpace

@@ -16,7 +16,7 @@
   - `signatureStruct`
 
 ```swift
-struct Cose
+public struct Cose
 ```
 
 Struct which describes  a representation for cryptographic keys;  how to create and process signatures, message authentication codes, and  encryption using Concise Binary Object Representation (CBOR) or serialization.
@@ -25,7 +25,7 @@ Struct which describes  a representation for cryptographic keys;  how to create 
 ### `type`
 
 ```swift
-let type: CoseType
+public let type: CoseType
 ```
 
 ### `protectedHeader`
@@ -43,25 +43,25 @@ let unprotectedHeader : CoseHeader?
 ### `payload`
 
 ```swift
-let payload : CBOR
+public let payload : CBOR
 ```
 
 ### `signature`
 
 ```swift
-let signature : Data
+public let signature : Data
 ```
 
 ### `verifyAlgorithm`
 
 ```swift
-var verifyAlgorithm: VerifyAlgorithm?
+public var verifyAlgorithm: VerifyAlgorithm?
 ```
 
 ### `macAlgorithm`
 
 ```swift
-var macAlgorithm: MacAlgorithm?
+public var macAlgorithm: MacAlgorithm?
 ```
 
 ### `keyId`
@@ -73,5 +73,5 @@ var keyId : Data?
 ### `signatureStruct`
 
 ```swift
-var signatureStruct : Data?
+public var signatureStruct : Data?
 ```

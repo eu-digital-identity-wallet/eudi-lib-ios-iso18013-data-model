@@ -13,6 +13,20 @@ public var bytes: Array<UInt8>
 ```
 
 ## Methods
+### `init(name:ext:from:)`
+
+```swift
+public init?(name: String, ext: String = "json", from bundle:Bundle = Bundle.main)
+```
+
+init from local file
+
+### `decodeJSON(type:)`
+
+```swift
+public func decodeJSON<T: Decodable>(type: T.Type) -> T?
+```
+
 ### `init(base64URLEncoded:options:)`
 
 ```swift

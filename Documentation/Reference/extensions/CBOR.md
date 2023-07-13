@@ -13,6 +13,24 @@ public var description: String
 ```
 
 ## Methods
+### `decodeTaggedBytes()`
+
+```swift
+public func decodeTaggedBytes() -> [UInt8]?
+```
+
+### `decodeTagged(_:)`
+
+```swift
+public func decodeTagged<T: CBORDecodable>(_ t: T.Type = T.self) -> T?
+```
+
+### `decodeFullDate()`
+
+```swift
+public func decodeFullDate() -> String?
+```
+
 ### `unwrap()`
 
 ```swift

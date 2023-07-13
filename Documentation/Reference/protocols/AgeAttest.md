@@ -3,10 +3,10 @@
 # `AgeAttest`
 
 ```swift
-protocol AgeAttest
+public protocol AgeAttest
 ```
 
-Age attestation values
+A conforming type contains age attestation values
 
 ## Properties
 ### `ageOverXX`

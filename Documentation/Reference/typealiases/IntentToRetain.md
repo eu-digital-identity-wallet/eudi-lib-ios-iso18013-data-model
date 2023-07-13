@@ -3,5 +3,5 @@
 # `IntentToRetain`
 
 ```swift
-typealias IntentToRetain = Bool
+public typealias IntentToRetain = Bool
 ```
