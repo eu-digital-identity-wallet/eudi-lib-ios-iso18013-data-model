@@ -54,6 +54,22 @@ public struct DeviceEngagement {
         guard let d else { return nil }
         return CoseKeyPrivate(key: security.deviceKey, d: d)
      }
+	
+	public var isBleServer: Bool? {
+		guard let deviceRetrievalMethods else { return nil}
+		for case let .ble(isBleServer, _) in deviceRetrievalMethods {
+			return isBleServer
+		}
+		return nil
+	}
+	
+	public var ble_uuid: String? {
+		guard let deviceRetrievalMethods else { return nil}
+		for case let .ble(_, uuid) in deviceRetrievalMethods {
+			return uuid
+		}
+		return nil
+	}
 }
 
 extension DeviceEngagement: CBOREncodable {
