@@ -110,6 +110,15 @@ final class MdocDataModel18013Tests: XCTestCase {
 		let model = try XCTUnwrap(IsoMdlModel(response: dr))
 		XCTAssertEqual(model.familyName, "Doe")
 	}
+
+	func testEncodeDeviceResponse() throws {
+		let cborIn = try XCTUnwrap(try CBOR.decode(AnnexdTestData.d412.bytes))
+		print("Input CBOR", cborIn.description, "\n\n")
+		let dr = try XCTUnwrap(DeviceResponse(cbor: cborIn))
+		let cborDr = dr.toCBOR(options: CBOROptions())
+		print("Re-encoded CBOR", cborDr.description, "\n\n")
+		
+	}
     
   #if os(iOS)
     func testGenerateBLEengageQRCode() throws {

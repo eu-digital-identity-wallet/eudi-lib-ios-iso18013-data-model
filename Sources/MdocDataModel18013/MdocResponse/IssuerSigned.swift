@@ -23,3 +23,12 @@ extension IssuerSigned: CBORDecodable {
 		if let cia = m[Keys.issuerAuth], let ia = IssuerAuth(cbor: cia) { issuerAuth = ia } else { issuerAuth = nil }
 	}
 }
+
+extension IssuerSigned: CBOREncodable {
+	func toCBOR(options: CBOROptions) -> CBOR {
+		var cbor = [CBOR: CBOR]()
+		if let ns = nameSpaces { cbor[.utf8String(Keys.nameSpaces.rawValue)] = ns.toCBOR(options: options) }
+		if let ia = issuerAuth { cbor[.utf8String(Keys.issuerAuth.rawValue)] = ia.toCBOR(options: options) }
+		return .map(cbor)
+	}
+}

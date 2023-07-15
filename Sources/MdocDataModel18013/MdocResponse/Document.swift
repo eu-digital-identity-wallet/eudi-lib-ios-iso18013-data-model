@@ -33,6 +33,17 @@ extension Document: CBORDecodable {
 	}
 }
 
+extension Document: CBOREncodable {
+	public func toCBOR(options: CBOROptions) -> CBOR {
+		var cbor = [CBOR: CBOR]()
+		cbor[.utf8String(Keys.docType.rawValue)] = .utf8String(docType)
+		cbor[.utf8String(Keys.issuerSigned.rawValue)] = issuerSigned.toCBOR(options: options)
+		if let dsign = deviceSigned { cbor[.utf8String(Keys.deviceSigned.rawValue)] = dsign.toCBOR(options: options) }
+		if let errors { cbor[.utf8String(Keys.errors.rawValue)] = errors.toCBOR(options: options) }
+		return .map(cbor)
+	}
+}
+
 extension Array where Element == Document {
 	func findDoc(name: String) -> Document? { first(where: { $0.docType == name} ) }
 }

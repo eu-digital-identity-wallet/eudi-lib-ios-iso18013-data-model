@@ -72,7 +72,7 @@ extension Cose {
 			self.init(alg: alg, keyId: cborMap[Headers.keyId]?.asBytes(), rawHeader: cbor)
 		}
 		
-		init?(alg: UInt64?, keyId: [UInt8]?, rawHeader : CBOR? = nil){
+		public init?(alg: UInt64?, keyId: [UInt8]?, rawHeader : CBOR? = nil){
 			guard alg != nil || rawHeader != nil else { return nil }
 			self.algorithm = alg
 			self.keyId = keyId
@@ -144,11 +144,11 @@ extension Cose {
 		self.type = type
 	}
 	///initializer to create a payload cose message
-	public init(type: CoseType, algorithm: UInt64, payloadData: Data) {
+	public init(type: CoseType, algorithm: UInt64, payloadData: Data, unprotectedHeaderCbor: CBOR? = nil, signature: Data? = nil) {
 		self.protectedHeader = CoseHeader(alg: algorithm, keyId: nil)!
-		self.unprotectedHeader = nil
+		self.unprotectedHeader = unprotectedHeaderCbor != nil ? CoseHeader(alg: nil, keyId: nil, rawHeader: unprotectedHeaderCbor!) : nil
 		self.payload = .byteString(payloadData.bytes)
-		self.signature = Data()
+		self.signature = signature ?? Data()
 		self.type = type
 	}
 	///initializer to create a cose message from a detached cose and a payload

@@ -19,11 +19,20 @@ struct DeviceSigned {
 extension DeviceSigned: CBORDecodable {
 	init?(cbor: CBOR) {
 		guard case let .map(m) = cbor else { return nil }
-		guard case let .tagged(_, cdns) = m[Keys.nameSpaces], case let .byteString(bs) = cdns, let dns = DeviceNameSpaces(data: bs) else { return nil }
+		guard case let .tagged(t, cdns) = m[Keys.nameSpaces], t == .encodedCBORDataItem, case let .byteString(bs) = cdns, let dns = DeviceNameSpaces(data: bs) else { return nil }
 		nameSpaces = dns
 		guard let cdu = m[Keys.deviceAuth], let du = DeviceAuth(cbor: cdu) else { return nil }
 		deviceAuth = du
 		nsRawBytes = bs
+	}
+}
+
+extension DeviceSigned: CBOREncodable {
+	public func toCBOR(options: CBOROptions) -> CBOR {
+		var cbor = [CBOR: CBOR]()
+		cbor[.utf8String(Keys.nameSpaces.rawValue)] = nsRawBytes.taggedEncoded
+		cbor[.utf8String(Keys.deviceAuth.rawValue)] = deviceAuth.toCBOR(options: options)
+		return .map(cbor)
 	}
 }
 
