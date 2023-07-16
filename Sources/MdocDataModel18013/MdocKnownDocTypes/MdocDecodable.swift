@@ -7,6 +7,7 @@ import Foundation
 ///
 /// Can be decoded by a CBOR device response
 public protocol MdocDecodable: AgeAttest {
+	var response: DeviceResponse? { get }
 	static var namespace: String { get }
 	static var docType: String { get }
 	static var title: String.LocalizationValue { get }
