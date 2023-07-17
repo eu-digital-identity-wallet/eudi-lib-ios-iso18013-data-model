@@ -7,7 +7,7 @@ import SwiftCBOR
 /// Contains the mdoc authentication structure and the data elements protected by mdoc authentication
 struct DeviceSigned {
 	let nameSpaces: DeviceNameSpaces
-	let nsRawBytes: [UInt8]
+	let nameSpacesRawData: [UInt8]
 	let deviceAuth: DeviceAuth
 	//DeviceNameSpacesBytes = #6.24(bstr .cbor DeviceNameSpaces)
 	enum Keys: String {
@@ -23,14 +23,14 @@ extension DeviceSigned: CBORDecodable {
 		nameSpaces = dns
 		guard let cdu = m[Keys.deviceAuth], let du = DeviceAuth(cbor: cdu) else { return nil }
 		deviceAuth = du
-		nsRawBytes = bs
+		nameSpacesRawData = bs
 	}
 }
 
 extension DeviceSigned: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
 		var cbor = [CBOR: CBOR]()
-		cbor[.utf8String(Keys.nameSpaces.rawValue)] = nsRawBytes.taggedEncoded
+		cbor[.utf8String(Keys.nameSpaces.rawValue)] = nameSpacesRawData.taggedEncoded
 		cbor[.utf8String(Keys.deviceAuth.rawValue)] = deviceAuth.toCBOR(options: options)
 		return .map(cbor)
 	}

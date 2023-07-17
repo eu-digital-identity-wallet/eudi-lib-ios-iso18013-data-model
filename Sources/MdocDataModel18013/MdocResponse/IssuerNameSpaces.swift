@@ -5,13 +5,13 @@ import Foundation
 import SwiftCBOR
 
 /// Returned data elements for each namespace
-struct IssuerNameSpaces {
-	let issuerNameSpaces: [NameSpace: [IssuerSignedItem]]
-	subscript(ns: String) -> [IssuerSignedItem]? { issuerNameSpaces[ns] }
+public struct IssuerNameSpaces {
+	public let issuerNameSpaces: [NameSpace: [IssuerSignedItem]]
+	public subscript(ns: String) -> [IssuerSignedItem]? { issuerNameSpaces[ns] }
 }
 
 extension IssuerNameSpaces: CBORDecodable {
-	init?(cbor: CBOR) {
+	public init?(cbor: CBOR) {
 		guard case let .map(m) = cbor else { return nil }
 		var temp = [NameSpace: [IssuerSignedItem]]()
 		for (k,v) in m {
@@ -28,7 +28,7 @@ extension IssuerNameSpaces: CBORDecodable {
 }
 
 extension IssuerNameSpaces: CBOREncodable {
-	func toCBOR(options: CBOROptions) -> CBOR {
+	public func toCBOR(options: CBOROptions) -> CBOR {
 		var cbor = [CBOR: CBOR]()
 		for (n, items) in issuerNameSpaces {
 			cbor[.utf8String(n)] = .array(items.map { .tagged(.encodedCBORDataItem, .byteString($0.encode(options: options))) })
@@ -38,5 +38,5 @@ extension IssuerNameSpaces: CBOREncodable {
 }
 
 extension Array where Element == IssuerSignedItem {
-	func findItem(name: String) -> IssuerSignedItem? { first(where: { $0.elementIdentifier == name} ) }
+	public func findItem(name: String) -> IssuerSignedItem? { first(where: { $0.elementIdentifier == name} ) }
 }

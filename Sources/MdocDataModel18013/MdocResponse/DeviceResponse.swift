@@ -13,12 +13,12 @@ import SwiftCBOR
 /// let dr = DeviceResponse(data: bytes)
 /// ```
 public struct DeviceResponse {
-	let version: String
+	public let version: String
 	/// An array of all returned documents
-	let documents: [Document]?
+	public let documents: [Document]?
 	/// An array of all returned document errors
-	let documentErrors: [DocumentError]?
-	let status: UInt64
+	public let documentErrors: [DocumentError]?
+	public let status: UInt64
 	
 	enum Keys: String {
 		case version

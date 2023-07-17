@@ -5,17 +5,17 @@ import Foundation
 import SwiftCBOR
 
 /// Data item signed by issuer
-struct IssuerSignedItem {
+public struct IssuerSignedItem {
     /// Digest ID for issuer data authentication
-    let digestID: UInt64
+	public let digestID: UInt64
     /// Random value for issuer data authentication
     let random: [UInt8]
     /// Data element identifier
-    let elementIdentifier: DataElementIdentifier
+	public let elementIdentifier: DataElementIdentifier
     /// Data element value
     let elementValue: DataElementValue
     /// Raw CBOR data
-    var rawData: [UInt8]?
+	public var rawData: [UInt8]?
     
     enum Keys: String {
        case digestID
@@ -44,17 +44,17 @@ extension CBOR: CustomStringConvertible {
 }
 
 extension IssuerSignedItem: CustomStringConvertible {
-	var description: String { elementValue.description }
+	public var description: String { elementValue.description }
 }
 
 extension IssuerSignedItem: CBORDecodable {
-    init?(data: [UInt8]) {
+	public init?(data: [UInt8]) {
         guard let cbor = try? CBOR.decode(data) else { return nil }
         self.init(cbor: cbor)
         rawData = data
     }
 
-    init?(cbor: CBOR) {
+	public init?(cbor: CBOR) {
 		guard case .map(let cd) = cbor else { return nil }
         guard case .unsignedInt(let did) = cd[Keys.digestID] else { return nil }
         digestID = did
@@ -69,13 +69,13 @@ extension IssuerSignedItem: CBORDecodable {
 
 extension IssuerSignedItem: CBOREncodable {
     /// called IssuerSignedItemBytes
-    func encode(options: CBOROptions) -> [UInt8] {
+	public func encode(options: CBOROptions) -> [UInt8] {
         if let rawData { return rawData }
         // it is not recommended to encode again, the digest may change
-        return toCBOR(options: CBOROptions()).taggedEncoded.encode()
+        return toCBOR(options: CBOROptions()).encode()
     }
     
-    func toCBOR(options: CBOROptions) -> CBOR {
+	public func toCBOR(options: CBOROptions) -> CBOR {
         var cbor = [CBOR: CBOR]()
         cbor[.utf8String(Keys.digestID.rawValue)] = .unsignedInt(digestID)
         cbor[.utf8String(Keys.random.rawValue)] = .byteString(random)

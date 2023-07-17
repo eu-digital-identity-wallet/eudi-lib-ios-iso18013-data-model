@@ -5,12 +5,12 @@ import Foundation
 import SwiftCBOR
 
 /// Contains a returned cocument. The document type of the returned document is indicated by the docType element.
-struct Document {
-	let docType: DocType
-	let issuerSigned: IssuerSigned
+public struct Document {
+	public let docType: DocType
+	public let issuerSigned: IssuerSigned
 	let deviceSigned: DeviceSigned? // todo: make mandatory
 	/// error codes for data elements that are not returned
-	let errors: Errors?
+	public let errors: Errors?
 	
 	enum Keys:String {
 		case docType
@@ -21,7 +21,7 @@ struct Document {
 }
 
 extension Document: CBORDecodable {
-	init?(cbor: CBOR) {
+	public init?(cbor: CBOR) {
 		guard case .map(let cd) = cbor else { return nil }
 		guard case .utf8String(let dt) = cd[Keys.docType] else { return nil }
 		docType = dt
@@ -45,9 +45,9 @@ extension Document: CBOREncodable {
 }
 
 extension Array where Element == Document {
-	func findDoc(name: String) -> Document? { first(where: { $0.docType == name} ) }
+	public func findDoc(name: String) -> Document? { first(where: { $0.docType == name} ) }
 }
 
 extension Array where Element == ItemsRequest {
-	func findDoc(name: String) -> ItemsRequest? { first(where: { $0.docType == name} ) }
+	public func findDoc(name: String) -> ItemsRequest? { first(where: { $0.docType == name} ) }
 }
