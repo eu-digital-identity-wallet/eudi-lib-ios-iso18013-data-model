@@ -28,6 +28,7 @@ public struct DeviceEngagement {
     var serverRetrievalOptions: ServerRetrievalOptions? = nil
 	// private key data for holder only
     var d: [UInt8]?
+	public var qrCoded: [UInt8]?
     #if DEBUG
     mutating func setD(d: [UInt8]) { self.d = d }
     #endif
@@ -79,7 +80,6 @@ extension DeviceEngagement: CBOREncodable {
         if let sro = serverRetrievalOptions { res[3] = sro.toCBOR(options: options) }
         return res
     }
-    public func encode(options: CBOROptions) -> [UInt8] { toCBOR(options: options).encode(options: options) }
 }
 
 

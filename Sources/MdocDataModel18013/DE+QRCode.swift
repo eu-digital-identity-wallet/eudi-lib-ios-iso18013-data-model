@@ -25,13 +25,12 @@ public enum InputCorrectionLevel: Int {
 }
 
 extension DeviceEngagement {
-    var qrCode: String { "mdoc:" + Data(encode(options: .init())).base64URLEncodedString() }
-}
+    var qrCode: String { "mdoc:" + Data(qrCoded!).base64URLEncodedString() }
 
 #if os(iOS)
-extension DeviceEngagement {
     /// Create QR CIImage
-    public func getQrCodeImage(_ inputCorrectionLevel: InputCorrectionLevel = .m) -> UIImage? {
+    public mutating func getQrCodeImage(_ inputCorrectionLevel: InputCorrectionLevel = .m) -> UIImage? {
+		qrCoded = encode(options: CBOROptions())
         guard let stringData = qrCode.data(using: .utf8) else { return nil}
         let correctionLevel = ["L", "M", "Q", "H"][inputCorrectionLevel.rawValue]
         guard let qrFilter = CIFilter(name: "CIQRCodeGenerator") else { return nil }
@@ -47,5 +46,5 @@ extension DeviceEngagement {
         let uiImage = UIImage(cgImage: cgimg)
         return uiImage
     }
-}
 #endif
+}
