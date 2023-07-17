@@ -4,18 +4,18 @@
 import Foundation
 import SwiftCBOR
 
-//Mobile security object (MSO)
-struct MobileSecurityObject {
-	let version: String
+/// Mobile security object (MSO)
+public struct MobileSecurityObject {
+	public let version: String
 	/// Message digest algorithm used
-	let digestAlgorithm: String
+	public let digestAlgorithm: String
 	/// Value digests
-	let valueDigests: ValueDigests
+	public let valueDigests: ValueDigests
 	/// device key info
 	let deviceKeyInfo: DeviceKeyInfo
 	/// docType  as used in Documents
-	let docType: DocType
-	let validityInfo: ValidityInfo
+	public let docType: DocType
+	public let validityInfo: ValidityInfo
 	
 	enum Keys: String {
 		case version
@@ -28,7 +28,7 @@ struct MobileSecurityObject {
 }
 
 extension MobileSecurityObject: CBORDecodable {
-	init?(data: [UInt8]) {
+	public init?(data: [UInt8]) {
 		// MobileSecurityObjectBytes = #6.24(bstr .cbor MobileSecurityObject)
 		guard let obj = try? CBOR.decode(data) else { return nil }
 		guard case let CBOR.tagged(tag, cborEncoded) = obj, tag.rawValue == 24, case let .byteString(bytes) = cborEncoded else { return nil }
@@ -36,7 +36,7 @@ extension MobileSecurityObject: CBORDecodable {
 		self.init(cbor: cbor)
 	}
 
-	init?(cbor: CBOR) {
+	public init?(cbor: CBOR) {
 		guard case let .map(v) = cbor else { return nil }
 		guard case let .utf8String(s) = v[Keys.version] else { return nil }
 		version = s
