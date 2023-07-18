@@ -7,7 +7,7 @@ import SwiftCBOR
 /// Contains the mobile security object for issuer data authentication and the data elements protected by issuer data authentication.
 public struct IssuerSigned {
 	public let nameSpaces: IssuerNameSpaces?
-	let issuerAuth: IssuerAuth? //todo: make mandatory
+	public let issuerAuth: IssuerAuth? //todo: make mandatory
 	
 	enum Keys: String {
 	   case nameSpaces

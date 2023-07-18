@@ -81,6 +81,12 @@ extension CoseKey: CBORDecodable {
 }
 
 extension CoseKey {
+	public init(crv: ECCurveType, x963Representation: Data) {
+		let keyData = x963Representation.dropFirst()
+		let count = keyData.count/2
+		self.init(x: keyData[0..<count].bytes, y: keyData[count...].bytes, crv: crv)
+	}
+
 	public init(x: [UInt8], y: [UInt8], crv: ECCurveType = .p256) {
 		self.crv = crv
 		self.x = x

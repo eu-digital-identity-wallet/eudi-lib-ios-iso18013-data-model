@@ -7,8 +7,10 @@ import SwiftCBOR
 /// Mobile security object (MSO)
 public struct MobileSecurityObject {
 	public let version: String
+	public static let defaultVersion = "1.0"
 	/// Message digest algorithm used
 	public let digestAlgorithm: String
+	public static let defaultDigestAlgorithmKind = DigestAlgorithmKind.SHA256
 	/// Value digests
 	public let valueDigests: ValueDigests
 	/// device key info
@@ -25,6 +27,15 @@ public struct MobileSecurityObject {
 		case docType
 		case validityInfo
 	  }
+	
+	public init(version: String, digestAlgorithm: String, valueDigests: ValueDigests, deviceKey: CoseKey, docType: DocType, validityInfo: ValidityInfo) {
+		self.version = version
+		self.digestAlgorithm = digestAlgorithm
+		self.valueDigests = valueDigests
+		self.deviceKeyInfo = DeviceKeyInfo(deviceKey: deviceKey)
+		self.docType = docType
+		self.validityInfo = validityInfo
+	}
 }
 
 extension MobileSecurityObject: CBORDecodable {
@@ -50,5 +61,18 @@ extension MobileSecurityObject: CBORDecodable {
 		docType = dt
 		guard let cvi = v[Keys.validityInfo], let vi = ValidityInfo(cbor: cvi) else { return nil }
 		validityInfo = vi
+	}
+}
+
+
+extension MobileSecurityObject: CBOREncodable {
+	public func toCBOR(options: CBOROptions) -> CBOR {
+		var m = [CBOR: CBOR]()
+		m[.utf8String(Keys.version.rawValue)] = .utf8String(version)
+		m[.utf8String(Keys.digestAlgorithm.rawValue)] = .utf8String(digestAlgorithm)
+		m[.utf8String(Keys.valueDigests.rawValue)] = valueDigests.toCBOR(options: options)
+		m[.utf8String(Keys.deviceKeyInfo.rawValue)] = deviceKeyInfo.toCBOR(options: options)
+		m[.utf8String(Keys.validityInfo.rawValue)] = validityInfo.toCBOR(options: options)
+		return .map(m)
 	}
 }

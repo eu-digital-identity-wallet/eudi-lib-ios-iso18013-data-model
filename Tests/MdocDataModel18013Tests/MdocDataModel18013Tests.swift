@@ -127,4 +127,10 @@ final class MdocDataModel18013Tests: XCTestCase {
         XCTAssertNotNil(de.getQrCodeImage(.m)) 
     }
   #endif
+
+  func test_iso_date_string() {
+	let df = ISO8601DateFormatter(); df.formatOptions = [.withFullDate, .withTime, .withTimeZone, .withColonSeparatorInTime, .withDashSeparatorInDate]
+	let str = df.string(from: Date())
+	print(str)
+  }
 }

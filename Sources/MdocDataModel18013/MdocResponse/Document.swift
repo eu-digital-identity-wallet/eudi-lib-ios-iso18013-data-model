@@ -8,7 +8,7 @@ import SwiftCBOR
 public struct Document {
 	public let docType: DocType
 	public let issuerSigned: IssuerSigned
-	let deviceSigned: DeviceSigned? // todo: make mandatory
+	public let deviceSigned: DeviceSigned? // todo: make mandatory
 	/// error codes for data elements that are not returned
 	public let errors: Errors?
 	

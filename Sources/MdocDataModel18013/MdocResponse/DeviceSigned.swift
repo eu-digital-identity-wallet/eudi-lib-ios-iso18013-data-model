@@ -5,7 +5,7 @@ import Foundation
 import SwiftCBOR
 
 /// Contains the mdoc authentication structure and the data elements protected by mdoc authentication
-struct DeviceSigned {
+public struct DeviceSigned {
 	let nameSpaces: DeviceNameSpaces
 	let nameSpacesRawData: [UInt8]
 	let deviceAuth: DeviceAuth
@@ -17,7 +17,7 @@ struct DeviceSigned {
 }
 
 extension DeviceSigned: CBORDecodable {
-	init?(cbor: CBOR) {
+	public init?(cbor: CBOR) {
 		guard case let .map(m) = cbor else { return nil }
 		guard case let .tagged(t, cdns) = m[Keys.nameSpaces], t == .encodedCBORDataItem, case let .byteString(bs) = cdns, let dns = DeviceNameSpaces(data: bs) else { return nil }
 		nameSpaces = dns
@@ -37,13 +37,13 @@ extension DeviceSigned: CBOREncodable {
 }
 
 /// Device data elements per namespac
-struct DeviceNameSpaces {
-	let deviceNameSpaces: [NameSpace: DeviceSignedItems]
-	subscript(ns: NameSpace) -> DeviceSignedItems? { deviceNameSpaces[ns] }
+public struct DeviceNameSpaces {
+	public let deviceNameSpaces: [NameSpace: DeviceSignedItems]
+	public subscript(ns: NameSpace) -> DeviceSignedItems? { deviceNameSpaces[ns] }
 }
 
 extension DeviceNameSpaces: CBORDecodable {
-	init?(cbor: CBOR) {
+	public init?(cbor: CBOR) {
 		guard case let .map(m) = cbor else { return nil }
 		let dnsPairs = m.compactMap { (k: CBOR, v: CBOR) -> (NameSpace, DeviceSignedItems)?  in
 			guard case .utf8String(let ns) = k else { return nil }
@@ -56,13 +56,13 @@ extension DeviceNameSpaces: CBORDecodable {
 }
 
 /// Contains the data element identifiers and values for a namespace
-struct DeviceSignedItems {
-	let deviceSignedItems: [DataElementIdentifier: DataElementValue]
-	subscript(ei: DataElementIdentifier) -> DataElementValue? { deviceSignedItems[ei] }
+public struct DeviceSignedItems {
+	public let deviceSignedItems: [DataElementIdentifier: DataElementValue]
+	public subscript(ei: DataElementIdentifier) -> DataElementValue? { deviceSignedItems[ei] }
 }
 
 extension DeviceSignedItems: CBORDecodable {
-	init?(cbor: CBOR) {
+	public init?(cbor: CBOR) {
 		guard case let .map(m) = cbor else { return nil }
 		let dsiPairs = m.compactMap { (k: CBOR, v: CBOR) -> (DataElementIdentifier, DataElementValue)?  in
 			guard case .utf8String(let dei) = k else { return nil }

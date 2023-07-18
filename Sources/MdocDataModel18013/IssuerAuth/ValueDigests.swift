@@ -8,6 +8,10 @@ import SwiftCBOR
 public struct ValueDigests {
 	public let valueDigests: [NameSpace: DigestIDs]
 	public subscript(ns: NameSpace) -> DigestIDs? {valueDigests[ns] }
+	
+	public init(valueDigests: [NameSpace : DigestIDs]) {
+		self.valueDigests = valueDigests
+	}
 }
 
 extension ValueDigests: CBORDecodable {

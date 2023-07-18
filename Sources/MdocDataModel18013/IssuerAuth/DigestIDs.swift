@@ -7,6 +7,11 @@ import SwiftCBOR
 public struct DigestIDs {
 	public let digestIDs: [DigestID: [UInt8]]
 	public subscript(digestID: DigestID) -> [UInt8]? {digestIDs[digestID] }
+	
+	public init(digestIDs: [DigestID : [UInt8]]) {
+		self.digestIDs = digestIDs
+	}
+
 }
 
 extension DigestIDs: CBORDecodable {

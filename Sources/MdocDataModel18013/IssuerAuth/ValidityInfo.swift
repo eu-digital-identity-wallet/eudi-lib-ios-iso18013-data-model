@@ -17,6 +17,12 @@ public struct ValidityInfo {
 		case validUntil
 		case expectedUpdate
 	}
+	public init(signed: String, validFrom: String, validUntil: String, expectedUpdate: String? = nil) {
+		self.signed = signed
+		self.validFrom = validFrom
+		self.validUntil = validUntil
+		self.expectedUpdate = expectedUpdate
+	}
 }
 
 extension ValidityInfo: CBORDecodable {

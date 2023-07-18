@@ -19,6 +19,10 @@ public struct DeviceKeyInfo {
 		case keyAuthorizations
 		case keyInfo
 	}
+	
+	public init(deviceKey: CoseKey) {
+		self.deviceKey = deviceKey; self.keyAuthorizations = nil; self.keyInfo = nil
+	}
 }
 
 extension DeviceKeyInfo: CBORDecodable {
