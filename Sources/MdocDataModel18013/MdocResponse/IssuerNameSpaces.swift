@@ -6,8 +6,13 @@ import SwiftCBOR
 
 /// Returned data elements for each namespace
 public struct IssuerNameSpaces {
-	public let issuerNameSpaces: [NameSpace: [IssuerSignedItem]]
-	public subscript(ns: String) -> [IssuerSignedItem]? { issuerNameSpaces[ns] }
+	
+	public let nameSpaces: [NameSpace: [IssuerSignedItem]]
+	public subscript(ns: String) -> [IssuerSignedItem]? { nameSpaces[ns] }
+	
+	public init(nameSpaces: [NameSpace : [IssuerSignedItem]]) {
+		self.nameSpaces = nameSpaces
+	}
 }
 
 extension IssuerNameSpaces: CBORDecodable {
@@ -23,14 +28,14 @@ extension IssuerNameSpaces: CBORDecodable {
 			temp[ns] = items
 		}
 		guard temp.count > 0 else { return nil }
-		issuerNameSpaces = temp
+		nameSpaces = temp
 	}
 }
 
 extension IssuerNameSpaces: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
 		var cbor = [CBOR: CBOR]()
-		for (n, items) in issuerNameSpaces {
+		for (n, items) in nameSpaces {
 			cbor[.utf8String(n)] = .array(items.map { .tagged(.encodedCBORDataItem, .byteString($0.encode(options: options))) })
 		}
 		return .map(cbor)

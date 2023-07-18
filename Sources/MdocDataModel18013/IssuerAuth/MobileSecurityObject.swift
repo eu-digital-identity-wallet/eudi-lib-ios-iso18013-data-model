@@ -72,6 +72,7 @@ extension MobileSecurityObject: CBOREncodable {
 		m[.utf8String(Keys.digestAlgorithm.rawValue)] = .utf8String(digestAlgorithm)
 		m[.utf8String(Keys.valueDigests.rawValue)] = valueDigests.toCBOR(options: options)
 		m[.utf8String(Keys.deviceKeyInfo.rawValue)] = deviceKeyInfo.toCBOR(options: options)
+		m[.utf8String(Keys.docType.rawValue)] = .utf8String(docType)
 		m[.utf8String(Keys.validityInfo.rawValue)] = validityInfo.toCBOR(options: options)
 		return .map(m)
 	}

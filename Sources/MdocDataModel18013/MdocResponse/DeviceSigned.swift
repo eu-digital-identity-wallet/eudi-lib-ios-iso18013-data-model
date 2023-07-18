@@ -14,6 +14,12 @@ public struct DeviceSigned {
 		case nameSpaces
 		case deviceAuth
 	}
+	
+	public init(deviceAuth: DeviceAuth) {
+		nameSpaces = DeviceNameSpaces(deviceNameSpaces: [:])
+		nameSpacesRawData = CBOR.map([:]).encode()
+		self.deviceAuth = deviceAuth
+	}
 }
 
 extension DeviceSigned: CBORDecodable {

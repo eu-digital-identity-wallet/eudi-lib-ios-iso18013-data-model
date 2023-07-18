@@ -6,6 +6,7 @@ import SwiftCBOR
 
 /// Contains a returned cocument. The document type of the returned document is indicated by the docType element.
 public struct Document {
+	
 	public let docType: DocType
 	public let issuerSigned: IssuerSigned
 	public let deviceSigned: DeviceSigned? // todo: make mandatory
@@ -17,6 +18,13 @@ public struct Document {
 		case issuerSigned
 		case deviceSigned
 		case errors
+	}
+	
+	public init(docType: DocType, issuerSigned: IssuerSigned, deviceSigned: DeviceSigned? = nil, errors: Errors? = nil) {
+		self.docType = docType
+		self.issuerSigned = issuerSigned
+		self.deviceSigned = deviceSigned
+		self.errors = errors
 	}
 }
 

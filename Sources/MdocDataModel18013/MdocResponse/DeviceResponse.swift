@@ -14,6 +14,7 @@ import SwiftCBOR
 /// ```
 public struct DeviceResponse {
 	public let version: String
+	static let defaultVersion = "1.0"
 	/// An array of all returned documents
 	public let documents: [Document]?
 	/// An array of all returned document errors
@@ -25,6 +26,13 @@ public struct DeviceResponse {
 		case documents
 		case documentErrors
 		case status
+	}
+
+	public init(version: String? = nil, documents: [Document]? = nil, documentErrors: [DocumentError]? = nil, status: UInt64) {
+		self.version = version ?? Self.defaultVersion
+		self.documents = documents
+		self.documentErrors = documentErrors
+		self.status = status
 	}
 }
 

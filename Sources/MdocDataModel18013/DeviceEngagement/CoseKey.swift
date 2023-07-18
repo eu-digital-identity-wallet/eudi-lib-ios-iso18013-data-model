@@ -27,14 +27,14 @@ public struct CoseKeyPrivate  {
 	public let key: CoseKey
 	let d: [UInt8]
 	
-	init(key: CoseKey, d: [UInt8]) {
+	public init(key: CoseKey, d: [UInt8]) {
 		self.key = key
 		self.d = d
 	}
 }
 
 extension CoseKeyPrivate {    
-	init(crv: ECCurveType) {
+	public init(crv: ECCurveType) {
 		var privateKeyx963Data: Data
 		switch crv {
 		case .p256:
