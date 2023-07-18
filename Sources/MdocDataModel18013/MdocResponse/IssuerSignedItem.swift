@@ -68,7 +68,7 @@ extension IssuerSignedItem: CBORDecodable {
 }
 
 extension IssuerSignedItem: CBOREncodable {
-    /// called IssuerSignedItemBytes
+    /// NOT tagged
 	public func encode(options: CBOROptions) -> [UInt8] {
         if let rawData { return rawData }
         // it is not recommended to encode again, the digest may change
