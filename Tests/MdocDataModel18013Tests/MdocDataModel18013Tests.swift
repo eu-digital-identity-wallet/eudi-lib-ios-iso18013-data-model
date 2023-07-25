@@ -104,11 +104,20 @@ final class MdocDataModel18013Tests: XCTestCase {
 		XCTAssertEqual(valueDigests1[0]!.toHexString().localizedUppercase, "75167333B47B6C2BFB86ECCC1F438CF57AF055371AC55E1E359E20F254ADCEBF")
 		XCTAssertEqual(valueDigests2.digestIDs.count, 4)
 		XCTAssert(isoNS.count > 0)
-		XCTAssertEqual(doc.deviceSigned?.nsRawBytes.count, 1); XCTAssertEqual(doc.deviceSigned?.nsRawBytes[0], 160) // {} A0 empty dic
+		XCTAssertEqual(doc.deviceSigned?.nameSpacesRawData.count, 1); XCTAssertEqual(doc.deviceSigned?.nameSpacesRawData[0], 160) // {} A0 empty dic
 		XCTAssertEqual(doc.deviceSigned?.deviceAuth.coseMacOrSignature.macAlgorithm, Cose.MacAlgorithm.hmac256)
 		XCTAssertEqual(doc.deviceSigned?.deviceAuth.coseMacOrSignature.signature.bytes.toHexString().uppercased(), "E99521A85AD7891B806A07F8B5388A332D92C189A7BF293EE1F543405AE6824D")
 		let model = try XCTUnwrap(IsoMdlModel(response: dr))
 		XCTAssertEqual(model.familyName, "Doe")
+	}
+
+	func testEncodeDeviceResponse() throws {
+		let cborIn = try XCTUnwrap(try CBOR.decode(AnnexdTestData.d412.bytes))
+		print("Input CBOR", cborIn.description, "\n\n")
+		let dr = try XCTUnwrap(DeviceResponse(cbor: cborIn))
+		let cborDr = dr.toCBOR(options: CBOROptions())
+		print("Re-encoded CBOR", cborDr.description, "\n\n")
+		
 	}
     
   #if os(iOS)
@@ -118,4 +127,10 @@ final class MdocDataModel18013Tests: XCTestCase {
         XCTAssertNotNil(de.getQrCodeImage(.m)) 
     }
   #endif
+
+  func test_iso_date_string() {
+	let df = ISO8601DateFormatter(); df.formatOptions = [.withFullDate, .withTime, .withTimeZone, .withColonSeparatorInTime, .withDashSeparatorInDate]
+	let str = df.string(from: Date())
+	print(str)
+  }
 }

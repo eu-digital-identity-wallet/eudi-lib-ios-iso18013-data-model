@@ -28,6 +28,7 @@ public struct DeviceEngagement {
     var serverRetrievalOptions: ServerRetrievalOptions? = nil
 	// private key data for holder only
     var d: [UInt8]?
+	public var qrCoded: [UInt8]?
     #if DEBUG
     mutating func setD(d: [UInt8]) { self.d = d }
     #endif
@@ -54,6 +55,22 @@ public struct DeviceEngagement {
         guard let d else { return nil }
         return CoseKeyPrivate(key: security.deviceKey, d: d)
      }
+	
+	public var isBleServer: Bool? {
+		guard let deviceRetrievalMethods else { return nil}
+		for case let .ble(isBleServer, _) in deviceRetrievalMethods {
+			return isBleServer
+		}
+		return nil
+	}
+	
+	public var ble_uuid: String? {
+		guard let deviceRetrievalMethods else { return nil}
+		for case let .ble(_, uuid) in deviceRetrievalMethods {
+			return uuid
+		}
+		return nil
+	}
 }
 
 extension DeviceEngagement: CBOREncodable {
@@ -63,7 +80,6 @@ extension DeviceEngagement: CBOREncodable {
         if let sro = serverRetrievalOptions { res[3] = sro.toCBOR(options: options) }
         return res
     }
-    public func encode(options: CBOROptions) -> [UInt8] { toCBOR(options: options).encode(options: options) }
 }
 
 

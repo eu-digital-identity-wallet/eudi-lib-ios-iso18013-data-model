@@ -5,13 +5,17 @@ import Foundation
 import SwiftCBOR
 
 /// Digests of all data elements per namespace
-struct ValueDigests {
-	let valueDigests: [NameSpace: DigestIDs]
-	subscript(ns: NameSpace) -> DigestIDs? {valueDigests[ns] }
+public struct ValueDigests {
+	public let valueDigests: [NameSpace: DigestIDs]
+	public subscript(ns: NameSpace) -> DigestIDs? {valueDigests[ns] }
+	
+	public init(valueDigests: [NameSpace : DigestIDs]) {
+		self.valueDigests = valueDigests
+	}
 }
 
 extension ValueDigests: CBORDecodable {
-	init?(cbor: CBOR) {
+	public init?(cbor: CBOR) {
 		guard case let .map(d) = cbor else { return nil }
 		var temp = [NameSpace: DigestIDs]()
 		for (k,v) in d {
@@ -22,19 +26,19 @@ extension ValueDigests: CBORDecodable {
 	}
 }
 
-struct DigestIDs {
-	let digestIDs: [DigestID: [UInt8]]
-	subscript(digestID: DigestID) -> [UInt8]? {digestIDs[digestID] }
+extension ValueDigests: CBOREncodable {
+	public func toCBOR(options: CBOROptions) -> CBOR {
+		var m = [CBOR: CBOR]()
+		for (k,v) in valueDigests {
+			m[.utf8String(k)] = v.toCBOR(options: CBOROptions())
+		}
+		return .map(m)
+	}
 }
 
-extension DigestIDs: CBORDecodable {
-	init?(cbor: CBOR) {
-		guard case let .map(d) = cbor else { return nil }
-		var temp = [DigestID: [UInt8]]()
-		for (k,v) in d {
-			if case .unsignedInt(let ui) = k, case .byteString(let ud) = v { temp[ui] = ud}
-		}
-		guard temp.count > 0 else  { return nil }
-		digestIDs = temp
-	}
+/// Table 21 — Digest algorithm identifiers
+public enum DigestAlgorithmKind: String {
+	case SHA256 = "SHA-256"
+	case SHA384 = "SHA-384"
+	case SHA512 = "SHA-512"
 }

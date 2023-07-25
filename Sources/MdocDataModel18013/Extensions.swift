@@ -264,8 +264,8 @@ public protocol CBORDecodable {
 public typealias DocType = String
 public typealias NameSpace = String
 public typealias DataElementIdentifier = String // Data element identifier
-typealias DataElementValue = CBOR
-typealias ErrorCode = UInt64
-typealias DigestID = UInt64
+public typealias DataElementValue = CBOR
+public typealias ErrorCode = UInt64
+public typealias DigestID = UInt64
 
 public class BundleClass {}

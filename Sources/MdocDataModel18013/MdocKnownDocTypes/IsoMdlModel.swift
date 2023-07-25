@@ -4,6 +4,7 @@
 import Foundation
 
 public struct IsoMdlModel: Decodable, MdocDecodable {
+	public var response: DeviceResponse?
 	let exp: UInt64?
 	let iat: UInt64?
 	public let familyName: String?
@@ -107,6 +108,7 @@ extension IssuerSignedItem {
 
 extension IsoMdlModel {
 	public init?(response: DeviceResponse) {
+		self.response = response
 		guard let (items,dict) = Self.getSignedItems(response) else { return nil }
 		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getItemValue(dict, string: key.rawValue) }
 		Self.extractAgeOverValues(dict, &ageOverXX)

@@ -9,8 +9,8 @@ typealias DataElementsArray = [DataElementIdentifier]
 typealias AuthorizedDataElements = [NameSpace: DataElementsArray]
 
 /// mdoc authentication public key and information related to this key.
-struct DeviceKeyInfo {
-	let deviceKey: CoseKey
+public struct DeviceKeyInfo {
+	public let deviceKey: CoseKey
 	let keyAuthorizations: KeyAuthorizations?
 	let keyInfo: CBOR?
 	
@@ -19,15 +19,29 @@ struct DeviceKeyInfo {
 		case keyAuthorizations
 		case keyInfo
 	}
+	
+	public init(deviceKey: CoseKey) {
+		self.deviceKey = deviceKey; self.keyAuthorizations = nil; self.keyInfo = nil
+	}
 }
 
 extension DeviceKeyInfo: CBORDecodable {
-	init?(cbor: CBOR) {
+	public init?(cbor: CBOR) {
 		guard case let .map(v) = cbor else { return nil }
 		guard let cdk = v[Keys.deviceKey], let dk = CoseKey(cbor: cdk) else { return nil }
 		deviceKey = dk
 		if let cka = v[Keys.keyAuthorizations], let ka = KeyAuthorizations(cbor: cka) { keyAuthorizations = ka } else { keyAuthorizations = nil }
 		keyInfo = v[Keys.keyInfo]
+	}
+}
+
+extension DeviceKeyInfo: CBOREncodable {
+	public func toCBOR(options: CBOROptions) -> CBOR {
+		var m = [CBOR: CBOR]()
+		m[.utf8String(Keys.deviceKey.rawValue)] = deviceKey.toCBOR(options: options)
+		if let keyAuthorizations { m[.utf8String(Keys.keyAuthorizations.rawValue)] = keyAuthorizations.toCBOR(options: options) }
+		if let keyInfo { m[.utf8String(Keys.keyInfo.rawValue)] = keyInfo }
+		return .map(m)
 	}
 }
 
@@ -61,5 +75,20 @@ extension KeyAuthorizations: CBORDecodable {
 			}
 		}
 		if de.count > 0 { dataElements = de } else { dataElements = nil }
+	}
+}
+
+extension KeyAuthorizations: CBOREncodable {
+	public func toCBOR(options: CBOROptions) -> CBOR {
+		var m = [CBOR: CBOR]()
+		if let nameSpaces {
+			m[.utf8String(Keys.nameSpaces.rawValue)] = .array(nameSpaces.map { .utf8String($0) })
+		}
+		if let dataElements {
+			var d = [CBOR: CBOR]()
+			for (k,v) in dataElements { d[.utf8String(k)] = .array(v.map { .utf8String($0) }) }
+			m[.utf8String(Keys.dataElements.rawValue)] = .map(d)
+		}
+		return .map(m)
 	}
 }
