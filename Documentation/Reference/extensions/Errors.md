@@ -1,8 +1,8 @@
 **EXTENSION**
 
-# `DeviceResponse`
+# `Errors`
 ```swift
-extension DeviceResponse: CBORDecodable
+extension Errors: CBORDecodable
 ```
 
 ## Methods

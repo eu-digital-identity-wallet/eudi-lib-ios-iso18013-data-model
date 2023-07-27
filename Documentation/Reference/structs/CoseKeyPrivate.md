@@ -33,5 +33,5 @@ let d: [UInt8]
 ### `init(key:d:)`
 
 ```swift
-init(key: CoseKey, d: [UInt8])
+public init(key: CoseKey, d: [UInt8])
 ```

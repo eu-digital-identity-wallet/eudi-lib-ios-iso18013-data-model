@@ -6,6 +6,8 @@
 
 - [Properties](#properties)
   - `coseMacOrSignature`
+- [Methods](#methods)
+  - `init(coseMacOrSignature:)`
 
 ```swift
 public struct DeviceAuth
@@ -18,4 +20,11 @@ contains either the DeviceSignature or the DeviceMac element
 
 ```swift
 let coseMacOrSignature: Cose
+```
+
+## Methods
+### `init(coseMacOrSignature:)`
+
+```swift
+public init(coseMacOrSignature: Cose)
 ```

@@ -18,3 +18,21 @@ public var taggedEncoded: CBOR
 ```swift
 public func toHexString() -> String
 ```
+
+### `findDoc(name:)`
+
+```swift
+public func findDoc(name: String) -> Document?
+```
+
+### `findDoc(name:)`
+
+```swift
+public func findDoc(name: String) -> ItemsRequest?
+```
+
+### `findItem(name:)`
+
+```swift
+public func findItem(name: String) -> IssuerSignedItem?
+```

@@ -11,7 +11,10 @@
   - `deviceRetrievalMethods`
   - `serverRetrievalOptions`
   - `d`
+  - `qrCoded`
   - `privateKey`
+  - `isBleServer`
+  - `ble_uuid`
 - [Methods](#methods)
   - `setD(d:)`
   - `init(isBleServer:crv:)`
@@ -71,10 +74,28 @@ var serverRetrievalOptions: ServerRetrievalOptions? = nil
 var d: [UInt8]?
 ```
 
+### `qrCoded`
+
+```swift
+public var qrCoded: [UInt8]?
+```
+
 ### `privateKey`
 
 ```swift
 public var privateKey: CoseKeyPrivate?
+```
+
+### `isBleServer`
+
+```swift
+public var isBleServer: Bool?
+```
+
+### `ble_uuid`
+
+```swift
+public var ble_uuid: String?
 ```
 
 ## Methods

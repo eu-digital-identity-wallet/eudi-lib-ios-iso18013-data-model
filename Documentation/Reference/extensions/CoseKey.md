@@ -18,6 +18,12 @@ public func toCBOR(options: CBOROptions) -> CBOR
 public init?(cbor obj: CBOR)
 ```
 
+### `init(crv:x963Representation:)`
+
+```swift
+public init(crv: ECCurveType, x963Representation: Data)
+```
+
 ### `init(x:y:crv:)`
 
 ```swift

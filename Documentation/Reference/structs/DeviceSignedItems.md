@@ -8,7 +8,7 @@
   - `deviceSignedItems`
 
 ```swift
-struct DeviceSignedItems
+public struct DeviceSignedItems
 ```
 
 Contains the data element identifiers and values for a namespace
@@ -17,5 +17,5 @@ Contains the data element identifiers and values for a namespace
 ### `deviceSignedItems`
 
 ```swift
-let deviceSignedItems: [DataElementIdentifier: DataElementValue]
+public let deviceSignedItems: [DataElementIdentifier: DataElementValue]
 ```

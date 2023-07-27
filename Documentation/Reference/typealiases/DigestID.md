@@ -3,5 +3,5 @@
 # `DigestID`
 
 ```swift
-typealias DigestID = UInt64
+public typealias DigestID = UInt64
 ```

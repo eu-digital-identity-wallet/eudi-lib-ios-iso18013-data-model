@@ -3,5 +3,5 @@
 # `ErrorCode`
 
 ```swift
-typealias ErrorCode = UInt64
+public typealias ErrorCode = UInt64
 ```

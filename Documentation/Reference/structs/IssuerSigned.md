@@ -5,24 +5,33 @@
 **Contents**
 
 - [Properties](#properties)
-  - `nameSpaces`
+  - `issuerNameSpaces`
   - `issuerAuth`
+- [Methods](#methods)
+  - `init(issuerNameSpaces:issuerAuth:)`
 
 ```swift
-struct IssuerSigned
+public struct IssuerSigned
 ```
 
 Contains the mobile security object for issuer data authentication and the data elements protected by issuer data authentication.
 
 ## Properties
-### `nameSpaces`
+### `issuerNameSpaces`
 
 ```swift
-let nameSpaces: IssuerNameSpaces?
+public let issuerNameSpaces: IssuerNameSpaces?
 ```
 
 ### `issuerAuth`
 
 ```swift
-let issuerAuth: IssuerAuth?
+public let issuerAuth: IssuerAuth?
+```
+
+## Methods
+### `init(issuerNameSpaces:issuerAuth:)`
+
+```swift
+public init(issuerNameSpaces: IssuerNameSpaces? = nil, issuerAuth: IssuerAuth? = nil)
 ```

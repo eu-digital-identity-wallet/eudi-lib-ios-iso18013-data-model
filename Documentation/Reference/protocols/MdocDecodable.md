@@ -11,6 +11,12 @@ A conforming type represents mdoc data.
 Can be decoded by a CBOR device response
 
 ## Properties
+### `response`
+
+```swift
+var response: DeviceResponse?
+```
+
 ### `namespace`
 
 ```swift
@@ -26,7 +32,7 @@ static var docType: String
 ### `title`
 
 ```swift
-static var title: String.LocalizationValue
+static var title: String
 ```
 
 ### `displayStrings`

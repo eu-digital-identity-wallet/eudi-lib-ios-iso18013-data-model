@@ -9,9 +9,11 @@
   - `validFrom`
   - `validUntil`
   - `expectedUpdate`
+- [Methods](#methods)
+  - `init(signed:validFrom:validUntil:expectedUpdate:)`
 
 ```swift
-struct ValidityInfo
+public struct ValidityInfo
 ```
 
 The `ValidityInfo` structure contains information related to the validity of the MSO and its signature
@@ -20,23 +22,30 @@ The `ValidityInfo` structure contains information related to the validity of the
 ### `signed`
 
 ```swift
-let signed: String
+public let signed: String
 ```
 
 ### `validFrom`
 
 ```swift
-let validFrom: String
+public let validFrom: String
 ```
 
 ### `validUntil`
 
 ```swift
-let validUntil: String
+public let validUntil: String
 ```
 
 ### `expectedUpdate`
 
 ```swift
-let expectedUpdate: String?
+public let expectedUpdate: String?
+```
+
+## Methods
+### `init(signed:validFrom:validUntil:expectedUpdate:)`
+
+```swift
+public init(signed: String, validFrom: String, validUntil: String, expectedUpdate: String? = nil)
 ```

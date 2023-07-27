@@ -8,9 +8,11 @@
   - `deviceKey`
   - `keyAuthorizations`
   - `keyInfo`
+- [Methods](#methods)
+  - `init(deviceKey:)`
 
 ```swift
-struct DeviceKeyInfo
+public struct DeviceKeyInfo
 ```
 
 mdoc authentication public key and information related to this key.
@@ -19,7 +21,7 @@ mdoc authentication public key and information related to this key.
 ### `deviceKey`
 
 ```swift
-let deviceKey: CoseKey
+public let deviceKey: CoseKey
 ```
 
 ### `keyAuthorizations`
@@ -32,4 +34,11 @@ let keyAuthorizations: KeyAuthorizations?
 
 ```swift
 let keyInfo: CBOR?
+```
+
+## Methods
+### `init(deviceKey:)`
+
+```swift
+public init(deviceKey: CoseKey)
 ```

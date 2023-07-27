@@ -6,7 +6,7 @@
 
 - [Properties](#properties)
   - `docType`
-  - `nameSpaces`
+  - `requestNameSpaces`
   - `requestInfo`
 
 ```swift
@@ -22,10 +22,10 @@ public let docType: DocType
 
 Requested document type.
 
-### `nameSpaces`
+### `requestNameSpaces`
 
 ```swift
-public let nameSpaces: RequestNameSpaces
+public let requestNameSpaces: RequestNameSpaces
 ```
 
 Requested data elements for each NameSpace

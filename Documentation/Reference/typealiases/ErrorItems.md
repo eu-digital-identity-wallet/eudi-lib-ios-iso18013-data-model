@@ -3,5 +3,5 @@
 # `ErrorItems`
 
 ```swift
-typealias ErrorItems = [DataElementIdentifier: ErrorCode]
+public typealias ErrorItems = [DataElementIdentifier: ErrorCode]
 ```

@@ -6,11 +6,13 @@
 
 - [Properties](#properties)
   - `nameSpaces`
-  - `nsRawBytes`
+  - `nameSpacesRawData`
   - `deviceAuth`
+- [Methods](#methods)
+  - `init(deviceAuth:)`
 
 ```swift
-struct DeviceSigned
+public struct DeviceSigned
 ```
 
 Contains the mdoc authentication structure and the data elements protected by mdoc authentication
@@ -22,14 +24,21 @@ Contains the mdoc authentication structure and the data elements protected by md
 let nameSpaces: DeviceNameSpaces
 ```
 
-### `nsRawBytes`
+### `nameSpacesRawData`
 
 ```swift
-let nsRawBytes: [UInt8]
+let nameSpacesRawData: [UInt8]
 ```
 
 ### `deviceAuth`
 
 ```swift
 let deviceAuth: DeviceAuth
+```
+
+## Methods
+### `init(deviceAuth:)`
+
+```swift
+public init(deviceAuth: DeviceAuth)
 ```

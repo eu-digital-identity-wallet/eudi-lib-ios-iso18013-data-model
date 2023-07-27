@@ -5,17 +5,26 @@
 **Contents**
 
 - [Properties](#properties)
-  - `issuerNameSpaces`
+  - `nameSpaces`
+- [Methods](#methods)
+  - `init(nameSpaces:)`
 
 ```swift
-struct IssuerNameSpaces
+public struct IssuerNameSpaces
 ```
 
 Returned data elements for each namespace
 
 ## Properties
-### `issuerNameSpaces`
+### `nameSpaces`
 
 ```swift
-let issuerNameSpaces: [NameSpace: [IssuerSignedItem]]
+public let nameSpaces: [NameSpace: [IssuerSignedItem]]
+```
+
+## Methods
+### `init(nameSpaces:)`
+
+```swift
+public init(nameSpaces: [NameSpace : [IssuerSignedItem]])
 ```

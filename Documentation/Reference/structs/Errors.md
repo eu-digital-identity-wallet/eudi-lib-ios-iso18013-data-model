@@ -6,9 +6,11 @@
 
 - [Properties](#properties)
   - `errors`
+- [Methods](#methods)
+  - `init(errors:)`
 
 ```swift
-struct Errors
+public struct Errors
 ```
 
 Error codes for each namespace for items that are not returned
@@ -17,5 +19,12 @@ Error codes for each namespace for items that are not returned
 ### `errors`
 
 ```swift
-let errors: [NameSpace: ErrorItems]
+public let errors: [NameSpace: ErrorItems]
+```
+
+## Methods
+### `init(errors:)`
+
+```swift
+public init(errors: [NameSpace : ErrorItems])
 ```

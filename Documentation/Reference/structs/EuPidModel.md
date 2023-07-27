@@ -5,6 +5,7 @@
 **Contents**
 
 - [Properties](#properties)
+  - `response`
   - `namespace`
   - `docType`
   - `title`
@@ -44,6 +45,12 @@ public struct EuPidModel: Codable, MdocDecodable
 ```
 
 ## Properties
+### `response`
+
+```swift
+public var response: DeviceResponse?
+```
+
 ### `namespace`
 
 ```swift
@@ -59,7 +66,7 @@ public static let docType = "eu.europa.ec.eudiw.pid.1"
 ### `title`
 
 ```swift
-public static let title = String.LocalizationValue("eu_pid_doctype_name")
+public static let title = String("eu_pid_doctype_name")
 ```
 
 ### `family_name`
