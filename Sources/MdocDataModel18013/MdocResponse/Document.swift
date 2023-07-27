@@ -5,12 +5,13 @@ import Foundation
 import SwiftCBOR
 
 /// Contains a returned cocument. The document type of the returned document is indicated by the docType element.
-struct Document {
-	let docType: DocType
-	let issuerSigned: IssuerSigned
-	let deviceSigned: DeviceSigned? // todo: make mandatory
+public struct Document {
+	
+	public let docType: DocType
+	public let issuerSigned: IssuerSigned
+	public let deviceSigned: DeviceSigned? // todo: make mandatory
 	/// error codes for data elements that are not returned
-	let errors: Errors?
+	public let errors: Errors?
 	
 	enum Keys:String {
 		case docType
@@ -18,10 +19,17 @@ struct Document {
 		case deviceSigned
 		case errors
 	}
+	
+	public init(docType: DocType, issuerSigned: IssuerSigned, deviceSigned: DeviceSigned? = nil, errors: Errors? = nil) {
+		self.docType = docType
+		self.issuerSigned = issuerSigned
+		self.deviceSigned = deviceSigned
+		self.errors = errors
+	}
 }
 
 extension Document: CBORDecodable {
-	init?(cbor: CBOR) {
+	public init?(cbor: CBOR) {
 		guard case .map(let cd) = cbor else { return nil }
 		guard case .utf8String(let dt) = cd[Keys.docType] else { return nil }
 		docType = dt
@@ -33,10 +41,21 @@ extension Document: CBORDecodable {
 	}
 }
 
+extension Document: CBOREncodable {
+	public func toCBOR(options: CBOROptions) -> CBOR {
+		var cbor = [CBOR: CBOR]()
+		cbor[.utf8String(Keys.docType.rawValue)] = .utf8String(docType)
+		cbor[.utf8String(Keys.issuerSigned.rawValue)] = issuerSigned.toCBOR(options: options)
+		if let dsign = deviceSigned { cbor[.utf8String(Keys.deviceSigned.rawValue)] = dsign.toCBOR(options: options) }
+		if let errors { cbor[.utf8String(Keys.errors.rawValue)] = errors.toCBOR(options: options) }
+		return .map(cbor)
+	}
+}
+
 extension Array where Element == Document {
-	func findDoc(name: String) -> Document? { first(where: { $0.docType == name} ) }
+	public func findDoc(name: String) -> Document? { first(where: { $0.docType == name} ) }
 }
 
 extension Array where Element == ItemsRequest {
-	func findDoc(name: String) -> ItemsRequest? { first(where: { $0.docType == name} ) }
+	public func findDoc(name: String) -> ItemsRequest? { first(where: { $0.docType == name} ) }
 }

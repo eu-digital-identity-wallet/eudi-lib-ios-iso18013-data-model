@@ -4,18 +4,20 @@
 import Foundation
 import SwiftCBOR
 
-//Mobile security object (MSO)
-struct MobileSecurityObject {
-	let version: String
+/// Mobile security object (MSO)
+public struct MobileSecurityObject {
+	public let version: String
+	public static let defaultVersion = "1.0"
 	/// Message digest algorithm used
-	let digestAlgorithm: String
+	public let digestAlgorithm: String
+	public static let defaultDigestAlgorithmKind = DigestAlgorithmKind.SHA256
 	/// Value digests
-	let valueDigests: ValueDigests
+	public let valueDigests: ValueDigests
 	/// device key info
 	let deviceKeyInfo: DeviceKeyInfo
 	/// docType  as used in Documents
-	let docType: DocType
-	let validityInfo: ValidityInfo
+	public let docType: DocType
+	public let validityInfo: ValidityInfo
 	
 	enum Keys: String {
 		case version
@@ -25,10 +27,19 @@ struct MobileSecurityObject {
 		case docType
 		case validityInfo
 	  }
+	
+	public init(version: String, digestAlgorithm: String, valueDigests: ValueDigests, deviceKey: CoseKey, docType: DocType, validityInfo: ValidityInfo) {
+		self.version = version
+		self.digestAlgorithm = digestAlgorithm
+		self.valueDigests = valueDigests
+		self.deviceKeyInfo = DeviceKeyInfo(deviceKey: deviceKey)
+		self.docType = docType
+		self.validityInfo = validityInfo
+	}
 }
 
 extension MobileSecurityObject: CBORDecodable {
-	init?(data: [UInt8]) {
+	public init?(data: [UInt8]) {
 		// MobileSecurityObjectBytes = #6.24(bstr .cbor MobileSecurityObject)
 		guard let obj = try? CBOR.decode(data) else { return nil }
 		guard case let CBOR.tagged(tag, cborEncoded) = obj, tag.rawValue == 24, case let .byteString(bytes) = cborEncoded else { return nil }
@@ -36,7 +47,7 @@ extension MobileSecurityObject: CBORDecodable {
 		self.init(cbor: cbor)
 	}
 
-	init?(cbor: CBOR) {
+	public init?(cbor: CBOR) {
 		guard case let .map(v) = cbor else { return nil }
 		guard case let .utf8String(s) = v[Keys.version] else { return nil }
 		version = s
@@ -50,5 +61,19 @@ extension MobileSecurityObject: CBORDecodable {
 		docType = dt
 		guard let cvi = v[Keys.validityInfo], let vi = ValidityInfo(cbor: cvi) else { return nil }
 		validityInfo = vi
+	}
+}
+
+
+extension MobileSecurityObject: CBOREncodable {
+	public func toCBOR(options: CBOROptions) -> CBOR {
+		var m = [CBOR: CBOR]()
+		m[.utf8String(Keys.version.rawValue)] = .utf8String(version)
+		m[.utf8String(Keys.digestAlgorithm.rawValue)] = .utf8String(digestAlgorithm)
+		m[.utf8String(Keys.valueDigests.rawValue)] = valueDigests.toCBOR(options: options)
+		m[.utf8String(Keys.deviceKeyInfo.rawValue)] = deviceKeyInfo.toCBOR(options: options)
+		m[.utf8String(Keys.docType.rawValue)] = .utf8String(docType)
+		m[.utf8String(Keys.validityInfo.rawValue)] = validityInfo.toCBOR(options: options)
+		return .map(m)
 	}
 }

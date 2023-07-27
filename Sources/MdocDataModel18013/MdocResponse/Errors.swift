@@ -4,16 +4,21 @@
 import Foundation
 import SwiftCBOR
 
-typealias ErrorItems = [DataElementIdentifier: ErrorCode]
+public typealias ErrorItems = [DataElementIdentifier: ErrorCode]
 
 /// Error codes for each namespace for items that are not returned
-struct Errors {
-    let errors: [NameSpace: ErrorItems]
-    subscript(ns: String) -> ErrorItems? { errors[ns] }
+public struct Errors {
+	
+	public let errors: [NameSpace: ErrorItems]
+	public subscript(ns: String) -> ErrorItems? { errors[ns] }
+	
+	public init(errors: [NameSpace : ErrorItems]) {
+		self.errors = errors
+	}
 }
 
 extension Errors: CBORDecodable {
-    init?(cbor: CBOR) {
+	public init?(cbor: CBOR) {
         guard case let .map(e) = cbor else { return nil }
         if e.count == 0 { return nil }
         let pairs = e.compactMap { (key: CBOR, value: CBOR) -> (NameSpace, ErrorItems)? in
@@ -33,7 +38,7 @@ extension Errors: CBORDecodable {
 }
 
 extension Errors: CBOREncodable {
-    func toCBOR(options: CBOROptions) -> CBOR {
+	public func toCBOR(options: CBOROptions) -> CBOR {
         let map1 = errors.map { (ns: NameSpace, ei: ErrorItems) -> (CBOR, CBOR) in
             let kns = CBOR.utf8String(ns)
             let mei = ei.map { (dei: DataElementIdentifier, ec: ErrorCode) -> (CBOR, CBOR) in
@@ -46,31 +51,3 @@ extension Errors: CBOREncodable {
     }
 }
 
-/// Error codes for documents that are not returned
-struct DocumentError {
-	let docErrors: [DocType: ErrorCode]
-	subscript(dt: DocType) -> ErrorCode? { docErrors[dt] }
-}
-
-extension DocumentError: CBORDecodable {
-	init?(cbor: CBOR) {
-		guard case let .map(e) = cbor else { return nil }
-		let dePairs = e.compactMap { (k: CBOR, v: CBOR) -> (DocType, ErrorCode)?  in
-			guard case .utf8String(let dt) = k else { return nil }
-			guard case .unsignedInt(let ec) = v else { return nil }
-			return (dt,ec)
-		}
-		let de = Dictionary(dePairs, uniquingKeysWith: { (first, _) in first })
-		if de.count == 0 { return nil }
-		docErrors = de
-	}
-}
-
-extension DocumentError: CBOREncodable {
-	func toCBOR(options: CBOROptions) -> CBOR {
-		let m = docErrors.map { (dt: DocType, ec: ErrorCode) -> (CBOR, CBOR) in
-			(.utf8String(dt), .unsignedInt(ec))
-		}
-		return .map(Dictionary(m, uniquingKeysWith: { (d, _) in d }))
-	}
-}

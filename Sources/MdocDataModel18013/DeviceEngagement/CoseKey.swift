@@ -27,14 +27,14 @@ public struct CoseKeyPrivate  {
 	public let key: CoseKey
 	let d: [UInt8]
 	
-	init(key: CoseKey, d: [UInt8]) {
+	public init(key: CoseKey, d: [UInt8]) {
 		self.key = key
 		self.d = d
 	}
 }
 
 extension CoseKeyPrivate {    
-	init(crv: ECCurveType) {
+	public init(crv: ECCurveType) {
 		var privateKeyx963Data: Data
 		switch crv {
 		case .p256:
@@ -81,6 +81,12 @@ extension CoseKey: CBORDecodable {
 }
 
 extension CoseKey {
+	public init(crv: ECCurveType, x963Representation: Data) {
+		let keyData = x963Representation.dropFirst()
+		let count = keyData.count/2
+		self.init(x: keyData[0..<count].bytes, y: keyData[count...].bytes, crv: crv)
+	}
+
 	public init(x: [UInt8], y: [UInt8], crv: ECCurveType = .p256) {
 		self.crv = crv
 		self.x = x

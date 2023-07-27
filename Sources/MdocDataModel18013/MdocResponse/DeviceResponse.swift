@@ -13,18 +13,26 @@ import SwiftCBOR
 /// let dr = DeviceResponse(data: bytes)
 /// ```
 public struct DeviceResponse {
-	let version: String
+	public let version: String
+	static let defaultVersion = "1.0"
 	/// An array of all returned documents
-	let documents: [Document]?
+	public let documents: [Document]?
 	/// An array of all returned document errors
-	let documentErrors: [DocumentError]?
-	let status: UInt64
+	public let documentErrors: [DocumentError]?
+	public let status: UInt64
 	
 	enum Keys: String {
 		case version
 		case documents
 		case documentErrors
 		case status
+	}
+
+	public init(version: String? = nil, documents: [Document]? = nil, documentErrors: [DocumentError]? = nil, status: UInt64) {
+		self.version = version ?? Self.defaultVersion
+		self.documents = documents
+		self.documentErrors = documentErrors
+		self.status = status
 	}
 }
 
@@ -46,4 +54,14 @@ extension DeviceResponse: CBORDecodable {
 	}
 }
 
+extension DeviceResponse: CBOREncodable {
+	public func toCBOR(options: CBOROptions) -> CBOR {
+		var cbor = [CBOR: CBOR]()
+		cbor[.utf8String(Keys.version.rawValue)] = .utf8String(version)
+		if let ds = documents { cbor[.utf8String(Keys.documents.rawValue)] = ds.toCBOR(options: options) }
+		if let de = documentErrors { cbor[.utf8String(Keys.documentErrors.rawValue)] = .array(de.map {$0.toCBOR(options: options)}) }
+		cbor[.utf8String(Keys.status.rawValue)] = .unsignedInt(status)
+		return .map(cbor)
+	}
+}
 

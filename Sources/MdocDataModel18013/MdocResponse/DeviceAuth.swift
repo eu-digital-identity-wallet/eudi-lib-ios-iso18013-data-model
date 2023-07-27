@@ -11,11 +11,9 @@ public struct DeviceAuth {
 		case deviceSignature
 		case deviceMac
 	}
-}
-
-extension DeviceAuth { 
-	public init(cose: Cose) {
-		self.coseMacOrSignature = cose
+	
+	public init(coseMacOrSignature: Cose) {
+		self.coseMacOrSignature = coseMacOrSignature
 	}
 }
 

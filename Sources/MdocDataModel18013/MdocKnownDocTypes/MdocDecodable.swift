@@ -7,9 +7,10 @@ import Foundation
 ///
 /// Can be decoded by a CBOR device response
 public protocol MdocDecodable: AgeAttest {
+	var response: DeviceResponse? { get }
 	static var namespace: String { get }
 	static var docType: String { get }
-	static var title: String.LocalizationValue { get }
+	static var title: String { get }
 	var displayStrings: [NameValue] { get }
 	init?(response: DeviceResponse)
 }
@@ -21,7 +22,7 @@ extension MdocDecodable {
 	}
 	
 	static func getSignedItems(_ response: DeviceResponse) -> ([IssuerSignedItem],[String: IssuerSignedItem])? {
-		guard let items = response.documents?.findDoc(name: Self.docType)?.issuerSigned.nameSpaces?[Self.namespace] else { return nil }
+		guard let items = response.documents?.findDoc(name: Self.docType)?.issuerSigned.issuerNameSpaces?[Self.namespace] else { return nil }
 		let dict = Dictionary(grouping: items, by: { $0.elementIdentifier }).compactMapValues { $0.first }
 		return (items, dict)
 	}
