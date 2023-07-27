@@ -3,11 +3,7 @@
 
 name: Swift
 
-on:
-  push:
-    branches: [ $default-branch ]
-  pull_request:
-    branches: [ $default-branch ]
+on: [push]
 
 jobs:
   build:
@@ -15,8 +11,11 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Build
-      run: swift build -v
-    - name: Run tests
-      run: swift test -v
+      - uses: swift-actions/setup-swift@v1
+      - name: Get swift version
+        run: swift --version # Swift 5.8
+      - name: Build
+        run: swift build
+      - name: Run tests
+        run: swift test
+
