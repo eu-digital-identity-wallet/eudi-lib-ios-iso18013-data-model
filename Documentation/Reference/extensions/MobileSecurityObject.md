@@ -1,11 +1,17 @@
 **EXTENSION**
 
-# `DeviceResponse`
+# `MobileSecurityObject`
 ```swift
-extension DeviceResponse: CBORDecodable
+extension MobileSecurityObject: CBORDecodable
 ```
 
 ## Methods
+### `init(data:)`
+
+```swift
+public init?(data: [UInt8])
+```
+
 ### `init(cbor:)`
 
 ```swift

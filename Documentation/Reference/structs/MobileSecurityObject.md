@@ -6,35 +6,53 @@
 
 - [Properties](#properties)
   - `version`
+  - `defaultVersion`
   - `digestAlgorithm`
+  - `defaultDigestAlgorithmKind`
   - `valueDigests`
   - `deviceKeyInfo`
   - `docType`
   - `validityInfo`
+- [Methods](#methods)
+  - `init(version:digestAlgorithm:valueDigests:deviceKey:docType:validityInfo:)`
 
 ```swift
-struct MobileSecurityObject
+public struct MobileSecurityObject
 ```
+
+Mobile security object (MSO)
 
 ## Properties
 ### `version`
 
 ```swift
-let version: String
+public let version: String
+```
+
+### `defaultVersion`
+
+```swift
+public static let defaultVersion = "1.0"
 ```
 
 ### `digestAlgorithm`
 
 ```swift
-let digestAlgorithm: String
+public let digestAlgorithm: String
 ```
 
 Message digest algorithm used
 
+### `defaultDigestAlgorithmKind`
+
+```swift
+public static let defaultDigestAlgorithmKind = DigestAlgorithmKind.SHA256
+```
+
 ### `valueDigests`
 
 ```swift
-let valueDigests: ValueDigests
+public let valueDigests: ValueDigests
 ```
 
 Value digests
@@ -50,7 +68,7 @@ device key info
 ### `docType`
 
 ```swift
-let docType: DocType
+public let docType: DocType
 ```
 
 docType  as used in Documents
@@ -58,5 +76,12 @@ docType  as used in Documents
 ### `validityInfo`
 
 ```swift
-let validityInfo: ValidityInfo
+public let validityInfo: ValidityInfo
+```
+
+## Methods
+### `init(version:digestAlgorithm:valueDigests:deviceKey:docType:validityInfo:)`
+
+```swift
+public init(version: String, digestAlgorithm: String, valueDigests: ValueDigests, deviceKey: CoseKey, docType: DocType, validityInfo: ValidityInfo)
 ```

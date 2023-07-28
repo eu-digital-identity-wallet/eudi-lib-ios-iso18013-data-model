@@ -8,7 +8,7 @@
   - `deviceNameSpaces`
 
 ```swift
-struct DeviceNameSpaces
+public struct DeviceNameSpaces
 ```
 
 Device data elements per namespac
@@ -17,5 +17,5 @@ Device data elements per namespac
 ### `deviceNameSpaces`
 
 ```swift
-let deviceNameSpaces: [NameSpace: DeviceSignedItems]
+public let deviceNameSpaces: [NameSpace: DeviceSignedItems]
 ```

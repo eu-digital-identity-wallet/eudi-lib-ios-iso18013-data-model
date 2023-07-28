@@ -1,8 +1,8 @@
 **EXTENSION**
 
-# `DeviceResponse`
+# `IssuerNameSpaces`
 ```swift
-extension DeviceResponse: CBORDecodable
+extension IssuerNameSpaces: CBORDecodable
 ```
 
 ## Methods

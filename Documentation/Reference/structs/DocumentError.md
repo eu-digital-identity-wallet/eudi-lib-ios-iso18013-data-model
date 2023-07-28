@@ -6,9 +6,11 @@
 
 - [Properties](#properties)
   - `docErrors`
+- [Methods](#methods)
+  - `init(docErrors:)`
 
 ```swift
-struct DocumentError
+public struct DocumentError
 ```
 
 Error codes for documents that are not returned
@@ -17,5 +19,12 @@ Error codes for documents that are not returned
 ### `docErrors`
 
 ```swift
-let docErrors: [DocType: ErrorCode]
+public let docErrors: [DocType: ErrorCode]
+```
+
+## Methods
+### `init(docErrors:)`
+
+```swift
+public init(docErrors: [DocType : ErrorCode])
 ```

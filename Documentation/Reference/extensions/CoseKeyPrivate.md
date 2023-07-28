@@ -6,6 +6,12 @@ extension CoseKeyPrivate
 ```
 
 ## Methods
+### `init(crv:)`
+
+```swift
+public init(crv: ECCurveType)
+```
+
 ### `init(x:y:d:crv:)`
 
 ```swift

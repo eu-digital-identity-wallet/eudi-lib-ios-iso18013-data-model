@@ -6,23 +6,53 @@
 
 - [Properties](#properties)
   - `mso`
+  - `msoRawData`
+  - `verifyAlgorithm`
+  - `signature`
   - `iaca`
+- [Methods](#methods)
+  - `init(mso:msoRawData:verifyAlgorithm:signature:iaca:)`
 
 ```swift
-struct IssuerAuth
+public struct IssuerAuth
 ```
 
 ## Properties
 ### `mso`
 
 ```swift
-let mso: MobileSecurityObject
+public let mso: MobileSecurityObject
+```
+
+### `msoRawData`
+
+```swift
+let msoRawData: [UInt8]
+```
+
+### `verifyAlgorithm`
+
+```swift
+public let verifyAlgorithm: Cose.VerifyAlgorithm
+```
+
+one or more certificates
+
+### `signature`
+
+```swift
+public let signature: Data
 ```
 
 ### `iaca`
 
 ```swift
-let iaca: [[UInt8]]
+public let iaca: [[UInt8]]
 ```
 
-one or more certificates
+## Methods
+### `init(mso:msoRawData:verifyAlgorithm:signature:iaca:)`
+
+```swift
+public init(mso: MobileSecurityObject, msoRawData: [UInt8], verifyAlgorithm: Cose.VerifyAlgorithm, signature: Data, iaca: [[UInt8]])
+```

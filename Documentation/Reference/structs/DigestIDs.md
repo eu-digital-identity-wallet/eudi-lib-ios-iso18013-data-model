@@ -6,14 +6,23 @@
 
 - [Properties](#properties)
   - `digestIDs`
+- [Methods](#methods)
+  - `init(digestIDs:)`
 
 ```swift
-struct DigestIDs
+public struct DigestIDs
 ```
 
 ## Properties
 ### `digestIDs`
 
 ```swift
-let digestIDs: [DigestID: [UInt8]]
+public let digestIDs: [DigestID: [UInt8]]
+```
+
+## Methods
+### `init(digestIDs:)`
+
+```swift
+public init(digestIDs: [DigestID : [UInt8]])
 ```

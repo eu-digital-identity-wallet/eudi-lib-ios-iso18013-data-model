@@ -1,6 +1,9 @@
 **EXTENSION**
 
 # `DeviceEngagement`
+```swift
+extension DeviceEngagement
+```
 
 ## Methods
 ### `getQrCodeImage(_:)`
@@ -11,12 +14,6 @@ Create QR CIImage
 
 ```swift
 public func toCBOR(options: SwiftCBOR.CBOROptions) -> SwiftCBOR.CBOR
-```
-
-### `encode(options:)`
-
-```swift
-public func encode(options: CBOROptions) -> [UInt8]
 ```
 
 ### `init(cbor:)`

@@ -1,8 +1,8 @@
 **EXTENSION**
 
-# `DeviceResponse`
+# `DigestIDs`
 ```swift
-extension DeviceResponse: CBORDecodable
+extension DigestIDs: CBORDecodable
 ```
 
 ## Methods

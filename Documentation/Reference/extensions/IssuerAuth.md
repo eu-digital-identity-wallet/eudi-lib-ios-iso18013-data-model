@@ -1,8 +1,8 @@
 **EXTENSION**
 
-# `DeviceResponse`
+# `IssuerAuth`
 ```swift
-extension DeviceResponse: CBORDecodable
+extension IssuerAuth: CBORDecodable
 ```
 
 ## Methods
@@ -15,5 +15,5 @@ public init?(cbor: CBOR)
 ### `toCBOR(options:)`
 
 ```swift
-public func toCBOR(options: CBOROptions) -> CBOR
+public func toCBOR(options: SwiftCBOR.CBOROptions) -> SwiftCBOR.CBOR
 ```

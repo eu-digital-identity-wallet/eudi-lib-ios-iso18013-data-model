@@ -2,16 +2,10 @@
 
 # `DeviceAuth`
 ```swift
-extension DeviceAuth
+extension DeviceAuth: CBORDecodable
 ```
 
 ## Methods
-### `init(cose:)`
-
-```swift
-public init(cose: Cose)
-```
-
 ### `init(cbor:)`
 
 ```swift

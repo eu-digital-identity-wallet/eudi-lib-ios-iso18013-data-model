@@ -6,9 +6,12 @@
 
 - [Properties](#properties)
   - `version`
+  - `defaultVersion`
   - `documents`
   - `documentErrors`
   - `status`
+- [Methods](#methods)
+  - `init(version:documents:documentErrors:status:)`
 
 ```swift
 public struct DeviceResponse
@@ -27,13 +30,19 @@ let dr = DeviceResponse(data: bytes)
 ### `version`
 
 ```swift
-let version: String
+public let version: String
+```
+
+### `defaultVersion`
+
+```swift
+static let defaultVersion = "1.0"
 ```
 
 ### `documents`
 
 ```swift
-let documents: [Document]?
+public let documents: [Document]?
 ```
 
 An array of all returned documents
@@ -41,7 +50,7 @@ An array of all returned documents
 ### `documentErrors`
 
 ```swift
-let documentErrors: [DocumentError]?
+public let documentErrors: [DocumentError]?
 ```
 
 An array of all returned document errors
@@ -49,5 +58,12 @@ An array of all returned document errors
 ### `status`
 
 ```swift
-let status: UInt64
+public let status: UInt64
+```
+
+## Methods
+### `init(version:documents:documentErrors:status:)`
+
+```swift
+public init(version: String? = nil, documents: [Document]? = nil, documentErrors: [DocumentError]? = nil, status: UInt64)
 ```

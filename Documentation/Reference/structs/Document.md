@@ -9,9 +9,11 @@
   - `issuerSigned`
   - `deviceSigned`
   - `errors`
+- [Methods](#methods)
+  - `init(docType:issuerSigned:deviceSigned:errors:)`
 
 ```swift
-struct Document
+public struct Document
 ```
 
 Contains a returned cocument. The document type of the returned document is indicated by the docType element.
@@ -20,25 +22,32 @@ Contains a returned cocument. The document type of the returned document is indi
 ### `docType`
 
 ```swift
-let docType: DocType
+public let docType: DocType
 ```
 
 ### `issuerSigned`
 
 ```swift
-let issuerSigned: IssuerSigned
+public let issuerSigned: IssuerSigned
 ```
 
 ### `deviceSigned`
 
 ```swift
-let deviceSigned: DeviceSigned?
+public let deviceSigned: DeviceSigned?
 ```
 
 ### `errors`
 
 ```swift
-let errors: Errors?
+public let errors: Errors?
 ```
 
 error codes for data elements that are not returned
+
+## Methods
+### `init(docType:issuerSigned:deviceSigned:errors:)`
+
+```swift
+public init(docType: DocType, issuerSigned: IssuerSigned, deviceSigned: DeviceSigned? = nil, errors: Errors? = nil)
+```

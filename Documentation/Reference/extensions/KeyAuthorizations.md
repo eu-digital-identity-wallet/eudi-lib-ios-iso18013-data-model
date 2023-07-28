@@ -1,17 +1,11 @@
 **EXTENSION**
 
-# `DeviceResponse`
+# `KeyAuthorizations`
 ```swift
-extension DeviceResponse: CBORDecodable
+extension KeyAuthorizations: CBOREncodable
 ```
 
 ## Methods
-### `init(cbor:)`
-
-```swift
-public init?(cbor: CBOR)
-```
-
 ### `toCBOR(options:)`
 
 ```swift

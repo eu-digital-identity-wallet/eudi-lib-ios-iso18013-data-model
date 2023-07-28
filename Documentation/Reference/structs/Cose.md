@@ -75,3 +75,5 @@ var keyId : Data?
 ```swift
 public var signatureStruct : Data?
 ```
+
+Structure according to https://tools.ietf.org/html/rfc8152#section-4.2

@@ -12,7 +12,7 @@
   - `rawData`
 
 ```swift
-struct IssuerSignedItem
+public struct IssuerSignedItem
 ```
 
 Data item signed by issuer
@@ -21,7 +21,7 @@ Data item signed by issuer
 ### `digestID`
 
 ```swift
-let digestID: UInt64
+public let digestID: UInt64
 ```
 
 Digest ID for issuer data authentication
@@ -37,7 +37,7 @@ Random value for issuer data authentication
 ### `elementIdentifier`
 
 ```swift
-let elementIdentifier: DataElementIdentifier
+public let elementIdentifier: DataElementIdentifier
 ```
 
 Data element identifier
@@ -53,7 +53,7 @@ Data element value
 ### `rawData`
 
 ```swift
-var rawData: [UInt8]?
+public var rawData: [UInt8]?
 ```
 
 Raw CBOR data

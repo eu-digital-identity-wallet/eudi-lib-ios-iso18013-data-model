@@ -24,5 +24,5 @@ public let data: String
 ### `deviceResponse`
 
 ```swift
-public var deviceResponse: DeviceResponse
+public var deviceResponse: DeviceResponse?
 ```

@@ -6,9 +6,11 @@
 
 - [Properties](#properties)
   - `valueDigests`
+- [Methods](#methods)
+  - `init(valueDigests:)`
 
 ```swift
-struct ValueDigests
+public struct ValueDigests
 ```
 
 Digests of all data elements per namespace
@@ -17,5 +19,12 @@ Digests of all data elements per namespace
 ### `valueDigests`
 
 ```swift
-let valueDigests: [NameSpace: DigestIDs]
+public let valueDigests: [NameSpace: DigestIDs]
+```
+
+## Methods
+### `init(valueDigests:)`
+
+```swift
+public init(valueDigests: [NameSpace : DigestIDs])
 ```

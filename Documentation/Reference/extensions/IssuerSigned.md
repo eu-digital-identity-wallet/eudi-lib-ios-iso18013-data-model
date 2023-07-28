@@ -1,8 +1,8 @@
 **EXTENSION**
 
-# `DeviceResponse`
+# `IssuerSigned`
 ```swift
-extension DeviceResponse: CBORDecodable
+extension IssuerSigned: CBORDecodable
 ```
 
 ## Methods

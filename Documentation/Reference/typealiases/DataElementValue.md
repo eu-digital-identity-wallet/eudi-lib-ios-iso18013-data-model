@@ -3,5 +3,5 @@
 # `DataElementValue`
 
 ```swift
-typealias DataElementValue = CBOR
+public typealias DataElementValue = CBOR
 ```

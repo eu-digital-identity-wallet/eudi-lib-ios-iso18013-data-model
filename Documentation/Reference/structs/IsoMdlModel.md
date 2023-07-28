@@ -5,6 +5,7 @@
 **Contents**
 
 - [Properties](#properties)
+  - `response`
   - `exp`
   - `iat`
   - `familyName`
@@ -55,6 +56,12 @@ public struct IsoMdlModel: Decodable, MdocDecodable
 ```
 
 ## Properties
+### `response`
+
+```swift
+public var response: DeviceResponse?
+```
+
 ### `exp`
 
 ```swift
@@ -304,7 +311,7 @@ public static var docType: String
 ### `title`
 
 ```swift
-public static let title = String.LocalizationValue("mdl_doctype_name")
+public static let title = String("mdl_doctype_name")
 ```
 
 ### `mandatoryKeys`
