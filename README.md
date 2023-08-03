@@ -1,6 +1,10 @@
 # eudi-lib-ios-iso18013-data-model
 
 [![Swift](https://github.com/eu-digital-identity-wallet/eudi-lib-ios-iso18013-data-model/actions/workflows/swift.yml/badge.svg)](https://github.com/eu-digital-identity-wallet/eudi-lib-ios-iso18013-data-model/actions/workflows/swift.yml)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=eu-digital-identity-wallet_eudi-lib-ios-iso18013-data-model&metric=ncloc&token=b00a8ef181dca9772a601a2889bf78338ac9e0e9)](https://sonarcloud.io/summary/new_code?id=eu-digital-identity-wallet_eudi-lib-ios-iso18013-data-model)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=eu-digital-identity-wallet_eudi-lib-ios-iso18013-data-model&metric=duplicated_lines_density&token=b00a8ef181dca9772a601a2889bf78338ac9e0e9)](https://sonarcloud.io/summary/new_code?id=eu-digital-identity-wallet_eudi-lib-ios-iso18013-data-model)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=eu-digital-identity-wallet_eudi-lib-ios-iso18013-data-model&metric=reliability_rating&token=b00a8ef181dca9772a601a2889bf78338ac9e0e9)](https://sonarcloud.io/summary/new_code?id=eu-digital-identity-wallet_eudi-lib-ios-iso18013-data-model)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=eu-digital-identity-wallet_eudi-lib-ios-iso18013-data-model&metric=vulnerabilities&token=b00a8ef181dca9772a601a2889bf78338ac9e0e9)](https://sonarcloud.io/summary/new_code?id=eu-digital-identity-wallet_eudi-lib-ios-iso18013-data-model)
 
 Implementation of the mDoc data model according to [ISO/IEC 18013-5](https://www.iso.org/standard/69084.html) standard
 (0.9.0)
