@@ -95,11 +95,11 @@ final class MdocDataModel18013Tests: XCTestCase {
 		XCTAssertEqual(fnItem.digestID, 0)
 		XCTAssertEqual(fnItem.random.toHexString().localizedUppercase, "8798645B20EA200E19FFABAC92624BEE6AEC63ACEEDECFB1B80077D22BFC20E9")
 		let issuerAuth = doc.issuerSigned.issuerAuth
-		XCTAssertEqual(issuerAuth?.mso.deviceKeyInfo.deviceKey.x.toHexString().uppercased(), "96313D6C63E24E3372742BFDB1A33BA2C897DCD68AB8C753E4FBD48DCA6B7F9A")
-		XCTAssertEqual(issuerAuth?.mso.docType, "org.iso.18013.5.1.mDL")
-		XCTAssertEqual(issuerAuth?.mso.validityInfo.validUntil, "2021-10-01T13:30:02Z")
-		let valueDigests1 = try XCTUnwrap(issuerAuth?.mso.valueDigests["org.iso.18013.5.1"])
-		let valueDigests2 = try XCTUnwrap(issuerAuth?.mso.valueDigests["org.iso.18013.5.1.US"])
+		XCTAssertEqual(issuerAuth.mso.deviceKeyInfo.deviceKey.x.toHexString().uppercased(), "96313D6C63E24E3372742BFDB1A33BA2C897DCD68AB8C753E4FBD48DCA6B7F9A")
+		XCTAssertEqual(issuerAuth.mso.docType, "org.iso.18013.5.1.mDL")
+		XCTAssertEqual(issuerAuth.mso.validityInfo.validUntil, "2021-10-01T13:30:02Z")
+		let valueDigests1 = try XCTUnwrap(issuerAuth.mso.valueDigests["org.iso.18013.5.1"])
+		let valueDigests2 = try XCTUnwrap(issuerAuth.mso.valueDigests["org.iso.18013.5.1.US"])
 		XCTAssertEqual(valueDigests1.digestIDs.count, 13)
 		XCTAssertEqual(valueDigests1[0]!.toHexString().localizedUppercase, "75167333B47B6C2BFB86ECCC1F438CF57AF055371AC55E1E359E20F254ADCEBF")
 		XCTAssertEqual(valueDigests2.digestIDs.count, 4)
@@ -122,7 +122,7 @@ final class MdocDataModel18013Tests: XCTestCase {
     
   #if os(iOS)
     func testGenerateBLEengageQRCode() throws {
-        let de = DeviceEngagement(isBleServer: true)
+		var de = DeviceEngagement(isBleServer: true)
         var strQR = de.qrCode
         XCTAssertNotNil(de.getQrCodeImage(.m)) 
     }

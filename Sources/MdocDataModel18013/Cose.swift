@@ -66,17 +66,18 @@ extension Cose {
 		init?(fromBytestring cbor: CBOR){
 			guard let cborMap = cbor.decodeBytestring()?.asMap(),
 				  let alg = cborMap[Headers.algorithm]?.asUInt64() else {
-				self.init(alg: nil, keyId: nil, rawHeader: cbor)
+				self.init(alg: nil, isNegativeAlg: nil, keyId: nil, rawHeader: cbor)
 				return
 			}
-			self.init(alg: alg, keyId: cborMap[Headers.keyId]?.asBytes(), rawHeader: cbor)
+			self.init(alg: alg, isNegativeAlg: nil, keyId: cborMap[Headers.keyId]?.asBytes(), rawHeader: cbor)
 		}
 		
-		public init?(alg: UInt64?, keyId: [UInt8]?, rawHeader : CBOR? = nil){
+		public init?(alg: UInt64?, isNegativeAlg: Bool?, keyId: [UInt8]?, rawHeader : CBOR? = nil){
 			guard alg != nil || rawHeader != nil else { return nil }
 			self.algorithm = alg
 			self.keyId = keyId
-			self.rawHeader = rawHeader ?? .byteString(CBOR.map([.unsignedInt(UInt64(Headers.algorithm.rawValue)) : .unsignedInt(alg!)]).encode())
+			func algCbor() -> CBOR { isNegativeAlg! ? .negativeInt(alg!) : .unsignedInt(alg!) }
+			self.rawHeader = rawHeader ?? .byteString(CBOR.map([.unsignedInt(UInt64(Headers.algorithm.rawValue)) : algCbor()]).encode())
 		}
 	}
 }
@@ -137,7 +138,7 @@ extension Cose {
 	}
 	///initializer to create a detached cose signature
 	public init(type: CoseType, algorithm: UInt64, signature: Data) {
-		self.protectedHeader = CoseHeader(alg: algorithm, keyId: nil)!
+		self.protectedHeader = CoseHeader(alg: algorithm, isNegativeAlg: type == .sign1, keyId: nil)!
 		self.unprotectedHeader = nil
 		self.payload = .null
 		self.signature = signature
@@ -145,8 +146,8 @@ extension Cose {
 	}
 	///initializer to create a payload cose message
 	public init(type: CoseType, algorithm: UInt64, payloadData: Data, unprotectedHeaderCbor: CBOR? = nil, signature: Data? = nil) {
-		self.protectedHeader = CoseHeader(alg: algorithm, keyId: nil)!
-		self.unprotectedHeader = unprotectedHeaderCbor != nil ? CoseHeader(alg: nil, keyId: nil, rawHeader: unprotectedHeaderCbor!) : nil
+		self.protectedHeader = CoseHeader(alg: algorithm, isNegativeAlg: type == .sign1, keyId: nil)!
+		self.unprotectedHeader = unprotectedHeaderCbor != nil ? CoseHeader(alg: nil, isNegativeAlg: nil, keyId: nil, rawHeader: unprotectedHeaderCbor!) : nil
 		self.payload = .byteString(payloadData.bytes)
 		self.signature = signature ?? Data()
 		self.type = type

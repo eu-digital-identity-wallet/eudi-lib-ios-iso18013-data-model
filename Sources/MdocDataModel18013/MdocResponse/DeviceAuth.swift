@@ -31,9 +31,10 @@ extension DeviceAuth: CBORDecodable {
 extension DeviceAuth: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
 		var m: [CBOR: CBOR] = [:]
+		let cborMS = coseMacOrSignature.toCBOR(options: options)
 		switch coseMacOrSignature.type {
-		case .sign1: m[.utf8String(Keys.deviceSignature.rawValue)] = coseMacOrSignature.toCBOR(options: options)
-		case .mac0: m[.utf8String(Keys.deviceMac.rawValue)] = coseMacOrSignature.toCBOR(options: options)
+		case .sign1: m[.utf8String(Keys.deviceSignature.rawValue)] = cborMS
+		case .mac0: m[.utf8String(Keys.deviceMac.rawValue)] = cborMS
 		}
 		return CBOR.map(m)
 	}
