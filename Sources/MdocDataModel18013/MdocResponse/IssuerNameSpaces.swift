@@ -10,7 +10,7 @@ public struct IssuerNameSpaces {
 	public let nameSpaces: [NameSpace: [IssuerSignedItem]]
 	public subscript(ns: String) -> [IssuerSignedItem]? { nameSpaces[ns] }
 	
-	public init(nameSpaces: [NameSpace : [IssuerSignedItem]]) {
+	public init(nameSpaces: [NameSpace: [IssuerSignedItem]]) {
 		self.nameSpaces = nameSpaces
 	}
 }

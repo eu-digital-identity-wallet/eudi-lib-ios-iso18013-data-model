@@ -5,6 +5,7 @@ import Foundation
 
 public struct IsoMdlModel: Decodable, MdocDecodable {
 	public var response: DeviceResponse?
+	public var devicePrivateKey: CoseKeyPrivate?
 	let exp: UInt64?
 	let iat: UInt64?
 	public let familyName: String?
@@ -85,8 +86,8 @@ public struct IsoMdlModel: Decodable, MdocDecodable {
 		case oidcInfo = "oidc_info"
 	}
 	
-	public static var namespace: String { "org.iso.18013.5.1" }
 	public static var docType: String { "org.iso.18013.5.1.mDL" }
+	public static var isoNamespace: String { "org.iso.18013.5.1" }
 	public static let title = String("mdl_doctype_name")
 
 	public static var mandatoryKeys: [String] {
@@ -97,22 +98,15 @@ public struct IsoMdlModel: Decodable, MdocDecodable {
 	}
 }
 
-extension IssuerSignedItem {
-	func getValue<T>() -> T? {
-		if T.self == ServerRetrievalOption.self { return ServerRetrievalOption(cbor: elementValue) as? T }
-		else if T.self == DrivingPrivileges.self { return DrivingPrivileges(cbor: elementValue) as? T }
-		else if case let .tagged(_, cbor) = elementValue { return cbor.unwrap() as? T }
-		return elementValue.unwrap() as? T 
-	}
-}
 
 extension IsoMdlModel {
-	public init?(response: DeviceResponse) {
+	public init?(response: DeviceResponse, devicePrivateKey: CoseKeyPrivate) {
 		self.response = response
-		guard let (items,dict) = Self.getSignedItems(response) else { return nil }
-		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getItemValue(dict, string: key.rawValue) }
-		Self.extractAgeOverValues(dict, &ageOverXX)
-		Self.extractDisplayStrings(items, &displayStrings)
+		self.devicePrivateKey = devicePrivateKey
+		guard let nameSpaces = Self.getSignedItems(response) else { return nil }
+		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getItemValue(nameSpaces, string: key.rawValue) }
+		Self.extractAgeOverValues(nameSpaces, &ageOverXX)
+		Self.extractDisplayStrings(nameSpaces, &displayStrings)
 		exp = getValue(key: .exp)
 		iat = getValue(key: .iat)
 		familyName = getValue(key: .familyName)

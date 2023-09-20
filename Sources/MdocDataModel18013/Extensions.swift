@@ -30,8 +30,16 @@ extension String {
 		}
 		return res
 	}
+	
 	var fullDateEncoded: CBOR {
 		CBOR.tagged(CBOR.Tag(rawValue: 1004), .utf8String(self))
+	}
+	
+	public func usPosixDate() -> String {
+		guard let ds = self.split(separator: "T").first else { return "" }
+		let dc = ds.split(separator: "-")
+		guard dc.count >= 3 else { return "" }
+		return "\(dc[1])/\(dc[2])/\(dc[0])"
 	}
 	
 	public func toBytes() -> [UInt8]? {
@@ -202,40 +210,52 @@ extension CBOR {
 	
 	// MARK: - Public Properties
 	
-	public static func decodeList(_ list: [CBOR]) -> [Any] {
+	public static func decodeList(_ list: [CBOR], unwrap: Bool = true) -> [Any] {
 		var result = [Any]()
 		
 		for val in list {
-			let unwrappedValue = val.unwrap()
+			let unwrappedValue: Any? = unwrap ? val.unwrap() : val
 			if let unwrappedValue = unwrappedValue as? [CBOR:CBOR] {
-				result.append(decodeDictionary(unwrappedValue))
+				result.append(decodeDictionary(unwrappedValue, unwrap: unwrap))
 			} else if let unwrappedValue = unwrappedValue as? [CBOR] {
-				result.append(decodeList(unwrappedValue))
-			} else if let unwrappedValue = unwrappedValue {
+				result.append(decodeList(unwrappedValue, unwrap: unwrap))
+			} else if let unwrappedValue {
 				result.append(unwrappedValue)
 			}
 		}
 		return result
 	}
 	
-	public static func decodeDictionary(_ dictionary: [CBOR:CBOR]) -> [String: Any] {
+	public static func decodeDictionary(_ dictionary: [CBOR:CBOR], unwrap: Bool = true) -> [String: Any] {
 		var payload = [String: Any]()
-		
 		for (key, val) in dictionary {
 			if let key = key.asString() {
-				let unwrappedValue = val.unwrap()
+				let unwrappedValue: Any? = unwrap ? val.unwrap() : val
 				if let unwrappedValue = unwrappedValue as? [CBOR:CBOR] {
-					payload[key] = decodeDictionary(unwrappedValue)
+					payload[key] = decodeDictionary(unwrappedValue, unwrap: unwrap)
 				} else if let unwrappedValue = unwrappedValue as? [CBOR] {
-					payload[key] = decodeList(unwrappedValue)
-				} else if let unwrappedValue = unwrappedValue {
+					payload[key] = decodeList(unwrappedValue, unwrap: unwrap)
+				} else if let unwrappedValue {
 					payload[key] = unwrappedValue
 				}
 			}
 		}
 		return payload
 	}
-}
+	
+	func getTypedValue<T>() -> T? {
+		if T.self == ServerRetrievalOption.self { return ServerRetrievalOption(cbor: self) as? T }
+		else if T.self == DrivingPrivileges.self { return DrivingPrivileges(cbor: self) as? T }
+		else if case let .tagged(tag, cbor) = self {
+			if T.self == String.self, tag.rawValue == 1004 || tag == .standardDateTimeString {
+				let strDate = cbor.unwrap() as? String
+				return strDate?.usPosixDate() as? T
+			}
+			return cbor.unwrap() as? T
+		}
+		return self.unwrap() as? T
+	}
+} // end extension CBOR
 
 /// COSE Message Identification
 extension CBOR.Tag {
@@ -259,6 +279,10 @@ extension Dictionary where Key == CBOR {
 
 public protocol CBORDecodable {
 	init?(cbor: CBOR)
+}
+
+extension IssuerSignedItem {
+	func getTypedValue<T>() -> T? { elementValue.getTypedValue() }
 }
 
 public typealias DocType = String

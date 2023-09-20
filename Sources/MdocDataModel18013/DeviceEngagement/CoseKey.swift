@@ -34,6 +34,7 @@ public struct CoseKeyPrivate  {
 }
 
 extension CoseKeyPrivate {    
+	// make new key
 	public init(crv: ECCurveType) {
 		var privateKeyx963Data: Data
 		switch crv {
@@ -54,6 +55,12 @@ extension CoseKeyPrivate {
 		let ddata: Data = Data(xyk[2 * klen..<3 * klen])
 		key = CoseKey(crv: crv, x: xdata.bytes, y: ydata.bytes)
 		d = ddata.bytes
+	}
+	
+	// decode cbor string
+	public init?(base64: String) {
+		guard let d = Data(base64Encoded: base64), let obj = try? CBOR.decode([UInt8](d)), let coseKey = CoseKey(cbor: obj), let cd = obj[-4], case let CBOR.byteString(rd) = cd else { return nil }
+		self.init(key: coseKey, d: rd)
 	}
 }
 
