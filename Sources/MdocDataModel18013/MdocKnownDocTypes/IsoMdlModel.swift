@@ -86,9 +86,10 @@ public struct IsoMdlModel: Decodable, MdocDecodable {
 		case oidcInfo = "oidc_info"
 	}
 	
-	public static var docType: String { "org.iso.18013.5.1.mDL" }
+	public var docType: String = Self.isoDocType
+	public var title = String("mdl_doctype_name")
+	public static var isoDocType: String { "org.iso.18013.5.1.mDL" }
 	public static var isoNamespace: String { "org.iso.18013.5.1" }
-	public static let title = String("mdl_doctype_name")
 
 	public static var mandatoryKeys: [String] {
 		Self.isoMandatoryKeys.map { $0.rawValue }
@@ -101,12 +102,11 @@ public struct IsoMdlModel: Decodable, MdocDecodable {
 
 extension IsoMdlModel {
 	public init?(response: DeviceResponse, devicePrivateKey: CoseKeyPrivate) {
-		self.response = response
-		self.devicePrivateKey = devicePrivateKey
-		guard let nameSpaces = Self.getSignedItems(response) else { return nil }
+		self.response = response; self.devicePrivateKey = devicePrivateKey
+  	guard let nameSpaces = Self.getSignedItems(response, docType) else { return nil }
+		Self.extractDisplayStrings(nameSpaces, &displayStrings)
 		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getItemValue(nameSpaces, string: key.rawValue) }
 		Self.extractAgeOverValues(nameSpaces, &ageOverXX)
-		Self.extractDisplayStrings(nameSpaces, &displayStrings)
 		exp = getValue(key: .exp)
 		iat = getValue(key: .iat)
 		familyName = getValue(key: .familyName)

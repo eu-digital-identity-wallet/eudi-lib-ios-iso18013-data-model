@@ -61,7 +61,7 @@ extension DeviceRequest {
 		var isoDataElements: [DataElementIdentifier: IntentToRetain] = Dictionary(grouping: items, by: {$0.rawValue}).mapValues {_ in intentToRetain}
 		for ao in agesOver { isoDataElements["age_over_\(ao)"] = intentToRetain }
 		let isoReqElements = RequestDataElements(dataElements: isoDataElements )
-		let itemsReq = ItemsRequest(docType: IsoMdlModel.docType, requestNameSpaces: RequestNameSpaces(nameSpaces: [IsoMdlModel.isoNamespace: isoReqElements]), requestInfo: nil)
+		let itemsReq = ItemsRequest(docType: IsoMdlModel.isoDocType, requestNameSpaces: RequestNameSpaces(nameSpaces: [IsoMdlModel.isoNamespace: isoReqElements]), requestInfo: nil)
 		self.init(version: "1.0", docRequests: [DocRequest(itemsRequest: itemsReq, itemsRequestRawData: nil, readerAuth: nil, readerAuthRawCBOR: nil)])
 	}
 }

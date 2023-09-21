@@ -7,8 +7,8 @@ import Foundation
 public struct EuPidModel: Codable, MdocDecodable {
 	public var response: DeviceResponse?
 	public var devicePrivateKey: CoseKeyPrivate?
-	public static let docType = "eu.europa.ec.eudiw.pid.1"
-	public static let title = String("eu_pid_doctype_name")
+	public var docType = "eu.europa.ec.eudiw.pid.1"
+	public var title = String("eu_pid_doctype_name")
 	
 	public let family_name: String?
 	public let given_name: String?
@@ -76,12 +76,11 @@ public struct EuPidModel: Codable, MdocDecodable {
 
 extension EuPidModel {
 	public init?(response: DeviceResponse, devicePrivateKey: CoseKeyPrivate) {
-		self.response = response
-		self.devicePrivateKey = devicePrivateKey
-		guard let nameSpaces = Self.getSignedItems(response) else { return nil }
-		func getValue<T>(key: EuPidModel.CodingKeys) -> T? { Self.getItemValue(nameSpaces, string: key.rawValue) }
-		Self.extractAgeOverValues(nameSpaces, &ageOverXX)
+		self.response = response; self.devicePrivateKey = devicePrivateKey
+		guard let nameSpaces = Self.getSignedItems(response, docType) else { return nil }
 		Self.extractDisplayStrings(nameSpaces, &displayStrings)
+		Self.extractAgeOverValues(nameSpaces, &ageOverXX)
+		func getValue<T>(key: EuPidModel.CodingKeys) -> T? { Self.getItemValue(nameSpaces, string: key.rawValue) }
 		family_name = getValue(key: .family_name)
 		given_name = getValue(key: .given_name)
 		birth_date = getValue(key: .birth_date)

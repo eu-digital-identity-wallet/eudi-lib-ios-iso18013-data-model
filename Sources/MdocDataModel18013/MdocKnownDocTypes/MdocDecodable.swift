@@ -9,13 +9,13 @@ import Foundation
 public protocol MdocDecodable: AgeAttest {
 	var response: DeviceResponse? { get }
 	var devicePrivateKey: CoseKeyPrivate? { get }
-	static var docType: String { get }
-	static var title: String { get }
+	var docType: String { get }
+	var title: String { get }
 	var displayStrings: [NameValue] { get }
-	init?(response: DeviceResponse, devicePrivateKey: CoseKeyPrivate)
-}
+} // end protocol
 
 extension MdocDecodable {
+		
 	static func getItemValue<T>(_ nameSpaces: [String: [IssuerSignedItem]], string s: String) -> T? {
 		for (_,v) in nameSpaces {
 			if let item = v.first(where: { s == $0.elementIdentifier }) { return item.getTypedValue() }
@@ -23,8 +23,8 @@ extension MdocDecodable {
 		return nil
 	}
 	
-	static func getSignedItems(_ response: DeviceResponse) -> [String: [IssuerSignedItem]]? {
-		guard let doc = response.documents?.findDoc(name: Self.docType) else { return nil }
+	static func getSignedItems(_ response: DeviceResponse, _ docType: String) -> [String: [IssuerSignedItem]]? {
+		guard let doc = response.documents?.findDoc(name: docType) else { return nil }
 		guard let nameSpaces = doc.issuerSigned.issuerNameSpaces?.nameSpaces else { return nil }
 		return nameSpaces
 	}
@@ -51,5 +51,5 @@ extension MdocDecodable {
 			}
 		}
 	}
-}
+} // end extension
 								
