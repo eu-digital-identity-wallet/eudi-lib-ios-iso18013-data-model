@@ -36,6 +36,7 @@ extension String {
 	}
 	
 	public func usPosixDate() -> String {
+		// todo: use iso-date formatter for localized display
 		guard let ds = self.split(separator: "T").first else { return "" }
 		let dc = ds.split(separator: "-")
 		guard dc.count >= 3 else { return "" }
@@ -219,6 +220,12 @@ extension CBOR {
 				result.append(decodeDictionary(unwrappedValue, unwrap: unwrap))
 			} else if let unwrappedValue = unwrappedValue as? [CBOR] {
 				result.append(decodeList(unwrappedValue, unwrap: unwrap))
+			} else if let unwrappedValue = unwrappedValue as? (CBOR.Tag, CBOR) {
+				if unwrappedValue.0.rawValue == 1004 || unwrappedValue.0 == .standardDateTimeString, let strDate = unwrappedValue.1.unwrap() as? String {
+					result.append(strDate.usPosixDate())
+				} else {
+					result.append(unwrappedValue.1.unwrap() ?? "")
+				}
 			} else if let unwrappedValue {
 				result.append(unwrappedValue)
 			}
@@ -235,6 +242,12 @@ extension CBOR {
 					payload[key] = decodeDictionary(unwrappedValue, unwrap: unwrap)
 				} else if let unwrappedValue = unwrappedValue as? [CBOR] {
 					payload[key] = decodeList(unwrappedValue, unwrap: unwrap)
+				} else if let unwrappedValue = unwrappedValue as? (CBOR.Tag, CBOR) {
+					if unwrappedValue.0.rawValue == 1004 || unwrappedValue.0 == .standardDateTimeString, let strDate = unwrappedValue.1.unwrap() as? String {
+						payload[key] = strDate.usPosixDate()
+					} else {
+						payload[key] = unwrappedValue.1.unwrap()
+					}
 				} else if let unwrappedValue {
 					payload[key] = unwrappedValue
 				}
@@ -274,6 +287,24 @@ extension Dictionary where Key == CBOR {
 	
 	public subscript<Index: RawRepresentable>(index: Index) -> Value? where Index.RawValue == Int {
 		self[CBOR(integerLiteral: index.rawValue)]
+	}
+}
+
+extension Dictionary where Key == String, Value == Any {
+	/// get inner string value from dictionary decoded by ``decodeDictionary``
+	func getInnerValue(_ path: String) -> String {
+		var dict: [String:Any]? = self
+		let pathComponents = path.components(separatedBy: ".")
+		for (i,k) in pathComponents.enumerated() {
+			guard dict != nil else { return "" }
+			if i == pathComponents.count - 1, let v = dict?[k] { return "\(v)" }
+			dict = dict?[k] as? [String:Any]
+		}
+		return ""
+	}
+	
+	public subscript<Index: RawRepresentable>(index: Index) -> String where Index.RawValue == String {
+		getInnerValue(index.rawValue)
 	}
 }
 

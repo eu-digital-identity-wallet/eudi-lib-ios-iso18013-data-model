@@ -4,6 +4,12 @@
 import Foundation
 
 public struct IsoMdlModel: Decodable, MdocDecodable {
+	public var docType: String = Self.isoDocType
+	public var nameSpaces: [NameSpace]?
+	public var title = String("mdl_doctype_name")
+	public static var isoDocType: String { "org.iso.18013.5.1.mDL" }
+	public static var isoNamespace: String { "org.iso.18013.5.1" }
+
 	public var response: DeviceResponse?
 	public var devicePrivateKey: CoseKeyPrivate?
 	let exp: UInt64?
@@ -85,11 +91,6 @@ public struct IsoMdlModel: Decodable, MdocDecodable {
 		case webapiInfo = "webapi_info"
 		case oidcInfo = "oidc_info"
 	}
-	
-	public var docType: String = Self.isoDocType
-	public var title = String("mdl_doctype_name")
-	public static var isoDocType: String { "org.iso.18013.5.1.mDL" }
-	public static var isoNamespace: String { "org.iso.18013.5.1" }
 
 	public static var mandatoryKeys: [String] {
 		Self.isoMandatoryKeys.map { $0.rawValue }
@@ -101,12 +102,12 @@ public struct IsoMdlModel: Decodable, MdocDecodable {
 
 
 extension IsoMdlModel {
-	public init?(response: DeviceResponse, devicePrivateKey: CoseKeyPrivate) {
-		self.response = response; self.devicePrivateKey = devicePrivateKey
-  	guard let nameSpaces = Self.getSignedItems(response, docType) else { return nil }
-		Self.extractDisplayStrings(nameSpaces, &displayStrings)
-		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getItemValue(nameSpaces, string: key.rawValue) }
-		Self.extractAgeOverValues(nameSpaces, &ageOverXX)
+	public init?(response: DeviceResponse, devicePrivateKey: CoseKeyPrivate, nameSpaces: [NameSpace]? = nil) {
+		self.response = response; self.devicePrivateKey = devicePrivateKey; self.nameSpaces = nameSpaces
+  	guard let nameSpaceItems = Self.getSignedItems(response, docType, nameSpaces) else { return nil }
+		Self.extractDisplayStrings(nameSpaceItems, &displayStrings)
+		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getItemValue(nameSpaceItems, string: key.rawValue) }
+		Self.extractAgeOverValues(nameSpaceItems, &ageOverXX)
 		exp = getValue(key: .exp)
 		iat = getValue(key: .iat)
 		familyName = getValue(key: .familyName)

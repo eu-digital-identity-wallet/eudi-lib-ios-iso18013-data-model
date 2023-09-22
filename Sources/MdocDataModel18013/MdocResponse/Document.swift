@@ -59,3 +59,7 @@ extension Array where Element == Document {
 extension Array where Element == ItemsRequest {
 	public func findDoc(name: String) -> ItemsRequest? { first(where: { $0.docType == name} ) }
 }
+
+extension Array where Element == NameValue {
+	public func findNameValue(name: String) -> NameValue? { first(where: { $0.name == name} ) }
+}

@@ -7,30 +7,39 @@ import Foundation
 ///
 /// Can be decoded by a CBOR device response
 public protocol MdocDecodable: AgeAttest {
-	var response: DeviceResponse? { get }
-	var devicePrivateKey: CoseKeyPrivate? { get }
-	var docType: String { get }
-	var title: String { get }
+	var response: DeviceResponse? { get set}
+	var devicePrivateKey: CoseKeyPrivate? { get set}
+	var docType: String { get set}
+	var nameSpaces: [NameSpace]? { get set}
+	var title: String { get set}
 	var displayStrings: [NameValue] { get }
 } // end protocol
 
 extension MdocDecodable {
+	
+	public func getItemValue<T>(_ s: String) -> T? {
+		guard let response else { return nil }
+		let nameSpaceItems = Self.getSignedItems(response, docType)
+		guard let nameSpaceItems else { return nil }
+		return Self.getItemValue(nameSpaceItems, string: s)
+	}
 		
-	static func getItemValue<T>(_ nameSpaces: [String: [IssuerSignedItem]], string s: String) -> T? {
-		for (_,v) in nameSpaces {
+	static func getItemValue<T>(_ nameSpaceItems: [String: [IssuerSignedItem]], string s: String) -> T? {
+		for (_,v) in nameSpaceItems {
 			if let item = v.first(where: { s == $0.elementIdentifier }) { return item.getTypedValue() }
 		}
 		return nil
 	}
 	
-	static func getSignedItems(_ response: DeviceResponse, _ docType: String) -> [String: [IssuerSignedItem]]? {
+	public static func getSignedItems(_ response: DeviceResponse, _ docType: String, _ ns: [NameSpace]? = nil) -> [String: [IssuerSignedItem]]? {
 		guard let doc = response.documents?.findDoc(name: docType) else { return nil }
-		guard let nameSpaces = doc.issuerSigned.issuerNameSpaces?.nameSpaces else { return nil }
+		guard var nameSpaces = doc.issuerSigned.issuerNameSpaces?.nameSpaces else { return nil }
+		if let ns { nameSpaces = nameSpaces.filter { ns.contains($0.key) } }
 		return nameSpaces
 	}
 	
-	static func extractAgeOverValues(_ nameSpaces: [String: [IssuerSignedItem]], _ ageOverXX: inout [Int: Bool]) {
-		for (ns,items) in nameSpaces {
+	public static func extractAgeOverValues(_ nameSpaces: [String: [IssuerSignedItem]], _ ageOverXX: inout [Int: Bool]) {
+		for (_, items) in nameSpaces {
 			for item in items {
 				let k = item.elementIdentifier
 				if !k.hasPrefix("age_over_") { continue }
@@ -42,12 +51,18 @@ extension MdocDecodable {
 		}
 	}
 		
-	static func extractDisplayStrings(_ nameSpaces: [String: [IssuerSignedItem]], _ displayStrings: inout [NameValue]) {
+	public static func extractDisplayStrings(_ nameSpaces: [String: [IssuerSignedItem]], _ displayStrings: inout [NameValue]) {
 		let bDebugDisplay = UserDefaults.standard.bool(forKey: "DebugDisplay")
 		for (ns,items) in nameSpaces {
 			for item in items {
 				let name = item.elementIdentifier
-				displayStrings.append(NameValue(name: name, value: bDebugDisplay ? item.debugDescription : item.description, ns: ns))
+				if name.hasPrefix("age_over_") { continue }
+				var value = bDebugDisplay ? item.debugDescription : item.description
+				if name == "sex", let isex = Int(value), isex <= 2 {
+					value = NSLocalizedString(isex == 1 ? "male" : "female", comment: "")
+				}
+				if !bDebugDisplay, value.count == 0 { continue }
+				displayStrings.append(NameValue(name: name, value: value, ns: ns))
 			}
 		}
 	}

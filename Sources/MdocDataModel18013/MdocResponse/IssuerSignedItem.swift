@@ -29,7 +29,9 @@ extension CBOR: CustomStringConvertible {
 	public var description: String {
         switch self {
         case .utf8String(let str): return str
-		case .tagged(let tag, .utf8String(let str)): return str
+		case .tagged(let tag, .utf8String(let str)): 
+					if tag.rawValue == 1004 || tag == .standardDateTimeString { return str.usPosixDate() }
+					return str
         case .unsignedInt(let i): return String(i)
         case .boolean(let b): return String(b)
 		case .simple(let n): return String(n)
