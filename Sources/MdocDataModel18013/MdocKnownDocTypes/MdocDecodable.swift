@@ -53,6 +53,7 @@ extension MdocDecodable {
 		
 	public static func extractDisplayStrings(_ nameSpaces: [String: [IssuerSignedItem]], _ displayStrings: inout [NameValue]) {
 		let bDebugDisplay = UserDefaults.standard.bool(forKey: "DebugDisplay")
+		var order = 0
 		for (ns,items) in nameSpaces {
 			for item in items {
 				let name = item.elementIdentifier
@@ -62,7 +63,8 @@ extension MdocDecodable {
 					value = NSLocalizedString(isex == 1 ? "male" : "female", comment: "")
 				}
 				if !bDebugDisplay, value.count == 0 { continue }
-				displayStrings.append(NameValue(name: name, value: value, ns: ns))
+				displayStrings.append(NameValue(name: name, value: value, ns: ns, order: order))
+				order = order + 1
 			}
 		}
 	}
