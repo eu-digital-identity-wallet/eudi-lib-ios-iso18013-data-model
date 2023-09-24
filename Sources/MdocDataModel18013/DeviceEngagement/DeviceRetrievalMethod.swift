@@ -6,7 +6,7 @@ import SwiftCBOR
 
 /// A `DeviceRetrievalMethod` holds two mandatory values (type and version). The first element defines the type and the second element the version for the transfer method.
 /// Additionally, may contain extra info for each connection.
-enum DeviceRetrievalMethod: Equatable {
+public enum DeviceRetrievalMethod: Equatable {
     static var version: UInt64 { 1 }
     
     case qr
@@ -26,7 +26,7 @@ extension DeviceRetrievalMethod: CBOREncodable {
     static func appendTypeAndVersion(_ cborArr: inout [CBOR], type: UInt64) {
         cborArr.append(.unsignedInt(type)); cborArr.append(.unsignedInt(version))
     }
-    func toCBOR(options: CBOROptions) -> CBOR {
+	public func toCBOR(options: CBOROptions) -> CBOR {
         var cborArr = [CBOR]()
         switch self {
         case .qr:
