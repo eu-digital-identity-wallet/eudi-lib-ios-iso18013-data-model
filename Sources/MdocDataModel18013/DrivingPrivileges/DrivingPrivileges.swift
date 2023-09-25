@@ -7,7 +7,7 @@ import SwiftCBOR
 ///  The DrivingPrivileges structure can be an empty array.
 public struct DrivingPrivileges: Codable {
 	public let drivingPrivileges: [DrivingPrivilege]
-	subscript(i: Int) -> DrivingPrivilege { drivingPrivileges[i] }
+	public subscript(i: Int) -> DrivingPrivilege { drivingPrivileges[i] }
 }
 
 extension DrivingPrivileges: CBORDecodable {
