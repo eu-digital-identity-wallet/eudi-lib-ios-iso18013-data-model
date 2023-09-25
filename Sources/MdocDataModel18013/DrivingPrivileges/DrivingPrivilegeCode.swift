@@ -5,10 +5,10 @@ import Foundation
 import SwiftCBOR
 
 /// Driving privilege code
-struct DrivingPrivilegeCode: Codable {
-    let code: String
-    let sign: String?
-    let value: String?
+public struct DrivingPrivilegeCode: Codable {
+	public let code: String
+	public let sign: String?
+	public let value: String?
     
     enum CodingKeys: String, CodingKey, CaseIterable {
         case code = "code"
@@ -18,7 +18,7 @@ struct DrivingPrivilegeCode: Codable {
 }
 
 extension DrivingPrivilegeCode: CBORDecodable {
-    init?(cbor: CBOR) {
+	public init?(cbor: CBOR) {
         guard case let .utf8String(c) = cbor[.utf8String(CodingKeys.code.rawValue)] else { return nil }
         code = c
         if case let .utf8String(s) = cbor[.utf8String(CodingKeys.sign.rawValue)] { sign = s} else { sign = nil }
@@ -27,7 +27,7 @@ extension DrivingPrivilegeCode: CBORDecodable {
 }
 
 extension DrivingPrivilegeCode: CBOREncodable {
-    func toCBOR(options: CBOROptions) -> CBOR {
+	public func toCBOR(options: CBOROptions) -> CBOR {
         var cborMap = [CBOR: CBOR]()
         cborMap[.utf8String(CodingKeys.code.rawValue)] = .utf8String(code)
         if let sign { cborMap[.utf8String(CodingKeys.sign.rawValue)] = .utf8String(sign) }

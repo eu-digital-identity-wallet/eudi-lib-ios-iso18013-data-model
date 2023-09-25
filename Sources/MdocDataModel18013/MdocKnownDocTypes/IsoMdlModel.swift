@@ -24,7 +24,7 @@ public struct IsoMdlModel: Decodable, MdocDecodable {
 	public let issuingAuthority: String?
 	public let documentNumber: String?
 	public let administrativeNumber: String?
-	let drivingPrivileges: DrivingPrivileges?
+	public let drivingPrivileges: DrivingPrivileges?
 	public let nationality: String?
 	public let eyeColour: String?
 	public let hairColour: String?
