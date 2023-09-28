@@ -4,13 +4,11 @@ import SwiftCBOR
 
 /// Signup response encoded as base64
 public struct SignUpResponse: Codable {
-	public let data: String?
 	public let response: String?
-	public let pin: String
+	public let pin: String?
 	public let privateKey: String?
-	public let publicKey: String?
 	public var deviceResponse: DeviceResponse? {
-		guard let b64 = data ?? response, let d = Data(base64Encoded: b64) else { return nil }
+		guard let b64 = response, let d = Data(base64Encoded: b64) else { return nil }
 		return DeviceResponse(data: d.bytes)
 	}
 
@@ -20,10 +18,8 @@ public struct SignUpResponse: Codable {
 	}
 	
 	enum CodingKeys: String, CodingKey {
-		case data = "Data"
 		case response
 		case pin
-		case privateKey = "PrivateKey"
-		case publicKey = "PublicKey"
+		case privateKey
 	}
 }
