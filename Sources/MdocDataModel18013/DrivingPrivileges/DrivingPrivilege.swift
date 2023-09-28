@@ -20,15 +20,15 @@ import Foundation
 import SwiftCBOR
 
 /// The categories of vehicles/restrictions/conditions contain information describing the driving privileges of the mDL holder
-struct DrivingPrivilege: Codable {
+public struct DrivingPrivilege: Codable {
     /// Vehicle category code as per ISO/IEC 18013-1
-    let vehicleCategoryCode: String
+	public let vehicleCategoryCode: String
     /// Date of issue encoded as full-date
-    let issueDate: String?
+	public let issueDate: String?
     /// Date of expiry encoded as full-date
-    let expiryDate: String?
+	public let expiryDate: String?
     /// Array of code info
-    let codes: [DrivingPrivilegeCode]?
+	public let codes: [DrivingPrivilegeCode]?
     
     enum CodingKeys: String, CodingKey, CaseIterable {
         case vehicleCategoryCode = "vehicle_category_code"
@@ -39,7 +39,7 @@ struct DrivingPrivilege: Codable {
 }
 
 extension DrivingPrivilege: CBORDecodable {
-    init?(cbor: CBOR) {
+	public init?(cbor: CBOR) {
         guard case let .utf8String(v) = cbor[.utf8String(CodingKeys.vehicleCategoryCode.rawValue)] else { return nil }
         vehicleCategoryCode = v
         if let id = cbor[.utf8String(CodingKeys.issueDate.rawValue)]?.decodeFullDate() { issueDate = id} else { issueDate = nil }
@@ -49,7 +49,7 @@ extension DrivingPrivilege: CBORDecodable {
 }
 
 extension DrivingPrivilege: CBOREncodable {
-    func toCBOR(options: CBOROptions) -> CBOR {
+	public func toCBOR(options: CBOROptions) -> CBOR {
         var cborMap = [CBOR: CBOR]()
         cborMap[.utf8String(CodingKeys.vehicleCategoryCode.rawValue)] = .utf8String(vehicleCategoryCode)
         if let issueDate { cborMap[.utf8String(CodingKeys.issueDate.rawValue)] = issueDate.fullDateEncoded }

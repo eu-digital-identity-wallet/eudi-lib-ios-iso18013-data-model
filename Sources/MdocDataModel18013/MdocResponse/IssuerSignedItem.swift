@@ -28,23 +28,42 @@ public struct IssuerSignedItem {
 extension CBOR: CustomStringConvertible {
 	public var description: String {
         switch self {
-        case .utf8String(let str): return "'\(str)'"
-		case .byteString(let bs): return "ByteString \(bs.count)"
-		case .tagged(let tag, .utf8String(let str)): return "tag \(tag.rawValue) '\(str)'"
-		case .tagged(let tag, .byteString(let bs)): return "tag \(tag.rawValue) 'ByteString \(bs.count)'"
+        case .utf8String(let str): return str
+		case .tagged(let tag, .utf8String(let str)): 
+					if tag.rawValue == 1004 || tag == .standardDateTimeString { return str.usPosixDate() }
+					return str
         case .unsignedInt(let i): return String(i)
         case .boolean(let b): return String(b)
-		case .array(let a): return "[\(a.reduce("", { $0 + ($0.count > 0 ? "," : "") + " \($1.description)" }))]"
-		case .map(let m): return "{\(m.reduce("", { $0 + ($0.count > 0 ? "," : "") + " \($1.key.description): \($1.value.description)" }))}"
-		case .null: return "Null"
 		case .simple(let n): return String(n)
-        default: return "Other"
+        default: return ""
         }
     }
 }
 
+extension CBOR: CustomDebugStringConvertible {
+	public var debugDescription: String {
+				switch self {
+				case .utf8String(let str): return "'\(str)'"
+		case .byteString(let bs): return "ByteString \(bs.count)"
+		case .tagged(let tag, .utf8String(let str)): return "tag \(tag.rawValue) '\(str)'"
+		case .tagged(let tag, .byteString(let bs)): return "tag \(tag.rawValue) 'ByteString \(bs.count)'"
+				case .unsignedInt(let i): return String(i)
+				case .boolean(let b): return String(b)
+		case .array(let a): return "[\(a.reduce("", { $0 + ($0.count > 0 ? "," : "") + " \($1.description)" }))]"
+		case .map(let m): return "{\(m.reduce("", { $0 + ($0.count > 0 ? "," : "") + " \($1.key.description): \($1.value.description)" }))}"
+		case .null: return "Null"
+		case .simple(let n): return String(n)
+				default: return "Other"
+				}
+		}
+}
+
 extension IssuerSignedItem: CustomStringConvertible {
 	public var description: String { elementValue.description }
+}
+
+extension IssuerSignedItem: CustomDebugStringConvertible {
+	public var debugDescription: String { elementValue.debugDescription }
 }
 
 extension IssuerSignedItem: CBORDecodable {

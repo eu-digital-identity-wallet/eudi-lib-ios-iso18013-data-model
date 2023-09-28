@@ -19,8 +19,8 @@ import SwiftCBOR
 @testable import MdocDataModel18013
 
 final class MdocDataModel18013Tests: XCTestCase {
-
-   
+	static var pkb64 = "pQECIAEhWCBoHIiBQnDRMLUT4yOLqJ1l8mrfNIgrjNnFq4RyZgxSmiJYIGD/Sabu6GejaR4eTiym1JkyjnBNcJ+f59pN+lCEyhVyI1ggC6EPCKyGci++LGWUX3fXpPFW6pYO8pyyKLMKs1qF0jo="
+    static var pk = CoseKeyPrivate(base64: pkb64)!
     func testExample() throws {
         // XCTest Documenation
         // https://developer.apple.com/documentation/xctest
@@ -74,7 +74,7 @@ final class MdocDataModel18013Tests: XCTestCase {
 		let dr = try XCTUnwrap(DeviceRequest(data: AnnexdTestData.d411.bytes))
 		let testItems = ["family_name", "document_number", "driving_privileges", "issue_date", "expiry_date", "portrait"].sorted()
         XCTAssertEqual(dr.version, "1.0")
-        XCTAssertEqual(dr.docRequests.first?.itemsRequest.requestNameSpaces["org.iso.18013.5.1"]?.elementIdentifiers.sorted(), testItems)
+        XCTAssertEqual(dr.docRequests.first?.itemsRequest.requestNameSpaces[IsoMdlModel.isoNamespace]?.elementIdentifiers.sorted(), testItems)
 		// test encode
 		let cborDr = dr.toCBOR(options: CBOROptions())
 		// test if successfully encoded
@@ -83,14 +83,14 @@ final class MdocDataModel18013Tests: XCTestCase {
 		// test iso make request
 		let isoKeys: [IsoMdlModel.CodingKeys] = [.familyName, .documentNumber, .drivingPrivileges, .issueDate, .expiryDate, .portrait]
 		let dr3 = DeviceRequest(mdl: isoKeys, agesOver: [], intentToRetain: true)
-		XCTAssertEqual(dr3.docRequests.first?.itemsRequest.requestNameSpaces[IsoMdlModel.namespace]?.elementIdentifiers.sorted(), testItems)
+		XCTAssertEqual(dr3.docRequests.first?.itemsRequest.requestNameSpaces[IsoMdlModel.isoNamespace]?.elementIdentifiers.sorted(), testItems)
     }
 	
 	func testDecodeSampleDataResponse() throws {
 		let dr = try XCTUnwrap(DeviceResponse(data: OtherTestData.sampleCborData.bytes))
-		let pidObj = try XCTUnwrap(EuPidModel(response: dr))
+		let pidObj = try XCTUnwrap(EuPidModel(response: dr, devicePrivateKey: Self.pk))
 		XCTAssertEqual(pidObj.family_name, "ANDERSSON")
-		let mdlObj = try XCTUnwrap(IsoMdlModel(response: dr))
+		let mdlObj = try XCTUnwrap(IsoMdlModel(response: dr, devicePrivateKey: Self.pk))
 		XCTAssertEqual(mdlObj.familyName, "ANDERSSON")
 	}
 	
@@ -123,7 +123,7 @@ final class MdocDataModel18013Tests: XCTestCase {
 		XCTAssertEqual(doc.deviceSigned?.nameSpacesRawData.count, 1); XCTAssertEqual(doc.deviceSigned?.nameSpacesRawData[0], 160) // {} A0 empty dic
 		XCTAssertEqual(doc.deviceSigned?.deviceAuth.coseMacOrSignature.macAlgorithm, Cose.MacAlgorithm.hmac256)
 		XCTAssertEqual(doc.deviceSigned?.deviceAuth.coseMacOrSignature.signature.bytes.toHexString().uppercased(), "E99521A85AD7891B806A07F8B5388A332D92C189A7BF293EE1F543405AE6824D")
-		let model = try XCTUnwrap(IsoMdlModel(response: dr))
+		let model = try XCTUnwrap(IsoMdlModel(response: dr, devicePrivateKey: Self.pk))
 		XCTAssertEqual(model.familyName, "Doe")
 	}
 

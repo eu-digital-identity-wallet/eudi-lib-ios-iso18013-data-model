@@ -19,7 +19,14 @@ limitations under the License.
 import Foundation
 
 public struct IsoMdlModel: Decodable, MdocDecodable {
+	public var docType: String = Self.isoDocType
+	public var nameSpaces: [NameSpace]?
+	public var title = String("mdl_doctype_name")
+	public static var isoDocType: String { "org.iso.18013.5.1.mDL" }
+	public static var isoNamespace: String { "org.iso.18013.5.1" }
+
 	public var response: DeviceResponse?
+	public var devicePrivateKey: CoseKeyPrivate?
 	let exp: UInt64?
 	let iat: UInt64?
 	public let familyName: String?
@@ -32,7 +39,7 @@ public struct IsoMdlModel: Decodable, MdocDecodable {
 	public let issuingAuthority: String?
 	public let documentNumber: String?
 	public let administrativeNumber: String?
-	let drivingPrivileges: DrivingPrivileges?
+	public let drivingPrivileges: DrivingPrivileges?
 	public let nationality: String?
 	public let eyeColour: String?
 	public let hairColour: String?
@@ -99,10 +106,6 @@ public struct IsoMdlModel: Decodable, MdocDecodable {
 		case webapiInfo = "webapi_info"
 		case oidcInfo = "oidc_info"
 	}
-	
-	public static var namespace: String { "org.iso.18013.5.1" }
-	public static var docType: String { "org.iso.18013.5.1.mDL" }
-	public static let title = String("mdl_doctype_name")
 
 	public static var mandatoryKeys: [String] {
 		Self.isoMandatoryKeys.map { $0.rawValue }
@@ -112,22 +115,14 @@ public struct IsoMdlModel: Decodable, MdocDecodable {
 	}
 }
 
-extension IssuerSignedItem {
-	func getValue<T>() -> T? {
-		if T.self == ServerRetrievalOption.self { return ServerRetrievalOption(cbor: elementValue) as? T }
-		else if T.self == DrivingPrivileges.self { return DrivingPrivileges(cbor: elementValue) as? T }
-		else if case let .tagged(_, cbor) = elementValue { return cbor.unwrap() as? T }
-		return elementValue.unwrap() as? T 
-	}
-}
 
 extension IsoMdlModel {
-	public init?(response: DeviceResponse) {
-		self.response = response
-		guard let (items,dict) = Self.getSignedItems(response) else { return nil }
-		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getItemValue(dict, string: key.rawValue) }
-		Self.extractAgeOverValues(dict, &ageOverXX)
-		Self.extractDisplayStrings(items, &displayStrings)
+	public init?(response: DeviceResponse, devicePrivateKey: CoseKeyPrivate, nameSpaces: [NameSpace]? = nil) {
+		self.response = response; self.devicePrivateKey = devicePrivateKey; self.nameSpaces = nameSpaces
+  	guard let nameSpaceItems = Self.getSignedItems(response, docType, nameSpaces) else { return nil }
+		Self.extractDisplayStrings(nameSpaceItems, &displayStrings)
+		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getItemValue(nameSpaceItems, string: key.rawValue) }
+		Self.extractAgeOverValues(nameSpaceItems, &ageOverXX)
 		exp = getValue(key: .exp)
 		iat = getValue(key: .iat)
 		familyName = getValue(key: .familyName)

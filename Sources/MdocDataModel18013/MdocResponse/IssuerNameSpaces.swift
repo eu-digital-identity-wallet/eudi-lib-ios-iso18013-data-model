@@ -10,7 +10,7 @@ public struct IssuerNameSpaces {
 	public let nameSpaces: [NameSpace: [IssuerSignedItem]]
 	public subscript(ns: String) -> [IssuerSignedItem]? { nameSpaces[ns] }
 	
-	public init(nameSpaces: [NameSpace : [IssuerSignedItem]]) {
+	public init(nameSpaces: [NameSpace: [IssuerSignedItem]]) {
 		self.nameSpaces = nameSpaces
 	}
 }
@@ -44,4 +44,6 @@ extension IssuerNameSpaces: CBOREncodable {
 
 extension Array where Element == IssuerSignedItem {
 	public func findItem(name: String) -> IssuerSignedItem? { first(where: { $0.elementIdentifier == name} ) }
+	public func findMap(name: String) -> [CBOR:CBOR]? { first(where: { $0.elementIdentifier == name} )?.getTypedValue() }
+	public func findArray(name: String) -> [CBOR]? { first(where: { $0.elementIdentifier == name} )?.getTypedValue() }
 }
