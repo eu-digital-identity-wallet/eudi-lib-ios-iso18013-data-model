@@ -17,33 +17,32 @@ Can be decoded by a CBOR device response
 var response: DeviceResponse?
 ```
 
-### `namespace`
+### `devicePrivateKey`
 
 ```swift
-static var namespace: String
+var devicePrivateKey: CoseKeyPrivate?
 ```
 
 ### `docType`
 
 ```swift
-static var docType: String
+var docType: String
+```
+
+### `nameSpaces`
+
+```swift
+var nameSpaces: [NameSpace]?
 ```
 
 ### `title`
 
 ```swift
-static var title: String
+var title: String
 ```
 
 ### `displayStrings`
 
 ```swift
 var displayStrings: [NameValue]
-```
-
-## Methods
-### `init(response:)`
-
-```swift
-init?(response: DeviceResponse)
 ```

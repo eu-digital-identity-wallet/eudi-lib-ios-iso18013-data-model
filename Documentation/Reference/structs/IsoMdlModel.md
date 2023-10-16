@@ -5,7 +5,13 @@
 **Contents**
 
 - [Properties](#properties)
+  - `docType`
+  - `nameSpaces`
+  - `title`
+  - `isoDocType`
+  - `isoNamespace`
   - `response`
+  - `devicePrivateKey`
   - `exp`
   - `iat`
   - `familyName`
@@ -45,9 +51,6 @@
   - `biometricTemplateSignatureSign`
   - `webapiInfo`
   - `oidcInfo`
-  - `namespace`
-  - `docType`
-  - `title`
   - `mandatoryKeys`
   - `isoMandatoryKeys`
 
@@ -56,10 +59,46 @@ public struct IsoMdlModel: Decodable, MdocDecodable
 ```
 
 ## Properties
+### `docType`
+
+```swift
+public var docType: String = Self.isoDocType
+```
+
+### `nameSpaces`
+
+```swift
+public var nameSpaces: [NameSpace]?
+```
+
+### `title`
+
+```swift
+public var title = String("mdl_doctype_name")
+```
+
+### `isoDocType`
+
+```swift
+public static var isoDocType: String
+```
+
+### `isoNamespace`
+
+```swift
+public static var isoNamespace: String
+```
+
 ### `response`
 
 ```swift
 public var response: DeviceResponse?
+```
+
+### `devicePrivateKey`
+
+```swift
+public var devicePrivateKey: CoseKeyPrivate?
 ```
 
 ### `exp`
@@ -137,7 +176,7 @@ public let administrativeNumber: String?
 ### `drivingPrivileges`
 
 ```swift
-let drivingPrivileges: DrivingPrivileges?
+public let drivingPrivileges: DrivingPrivileges?
 ```
 
 ### `nationality`
@@ -294,24 +333,6 @@ let webapiInfo: ServerRetrievalOption?
 
 ```swift
 let oidcInfo: ServerRetrievalOption?
-```
-
-### `namespace`
-
-```swift
-public static var namespace: String
-```
-
-### `docType`
-
-```swift
-public static var docType: String
-```
-
-### `title`
-
-```swift
-public static let title = String("mdl_doctype_name")
 ```
 
 ### `mandatoryKeys`

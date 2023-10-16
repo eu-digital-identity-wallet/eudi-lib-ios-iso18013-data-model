@@ -8,6 +8,7 @@
   - `versionImpl`
   - `version`
   - `security`
+  - `originInfos`
   - `deviceRetrievalMethods`
   - `serverRetrievalOptions`
   - `d`
@@ -56,16 +57,22 @@ var version: String = Self.versionImpl
 let security: Security
 ```
 
+### `originInfos`
+
+```swift
+public var originInfos: [OriginInfoWebsite]? = nil
+```
+
 ### `deviceRetrievalMethods`
 
 ```swift
-var deviceRetrievalMethods: [DeviceRetrievalMethod]? = nil
+public var deviceRetrievalMethods: [DeviceRetrievalMethod]? = nil
 ```
 
 ### `serverRetrievalOptions`
 
 ```swift
-var serverRetrievalOptions: ServerRetrievalOptions? = nil
+public var serverRetrievalOptions: ServerRetrievalOptions? = nil
 ```
 
 ### `d`

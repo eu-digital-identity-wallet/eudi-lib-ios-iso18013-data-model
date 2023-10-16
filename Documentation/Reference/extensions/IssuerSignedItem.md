@@ -12,6 +12,12 @@ extension IssuerSignedItem: CustomStringConvertible
 public var description: String
 ```
 
+### `debugDescription`
+
+```swift
+public var debugDescription: String
+```
+
 ## Methods
 ### `init(data:)`
 

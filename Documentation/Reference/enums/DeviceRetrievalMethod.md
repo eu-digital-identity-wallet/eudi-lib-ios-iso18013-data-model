@@ -15,7 +15,7 @@
   - `getRandomBleUuid()`
 
 ```swift
-enum DeviceRetrievalMethod: Equatable
+public enum DeviceRetrievalMethod: Equatable
 ```
 
 A `DeviceRetrievalMethod` holds two mandatory values (type and version). The first element defines the type and the second element the version for the transfer method.

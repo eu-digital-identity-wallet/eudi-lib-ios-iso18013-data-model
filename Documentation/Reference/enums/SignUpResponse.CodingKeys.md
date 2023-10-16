@@ -5,15 +5,29 @@
 **Contents**
 
 - [Cases](#cases)
-  - `data`
+  - `response`
+  - `pin`
+  - `privateKey`
 
 ```swift
 enum CodingKeys: String, CodingKey
 ```
 
 ## Cases
-### `data`
+### `response`
 
 ```swift
-case data = "Data"
+case response
+```
+
+### `pin`
+
+```swift
+case pin
+```
+
+### `privateKey`
+
+```swift
+case privateKey
 ```

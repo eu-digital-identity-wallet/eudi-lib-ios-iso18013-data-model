@@ -1,8 +1,8 @@
 **EXTENSION**
 
-# `DeviceRetrievalMethod`
+# `OriginInfoWebsite`
 ```swift
-extension DeviceRetrievalMethod: CBOREncodable
+extension OriginInfoWebsite: CBOREncodable
 ```
 
 ## Methods

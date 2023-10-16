@@ -1,8 +1,8 @@
 **EXTENSION**
 
-# `DeviceRetrievalMethod`
+# `ServerRetrievalOptions`
 ```swift
-extension DeviceRetrievalMethod: CBOREncodable
+extension ServerRetrievalOptions: CBOREncodable
 ```
 
 ## Methods

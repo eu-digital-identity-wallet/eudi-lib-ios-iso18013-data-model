@@ -26,5 +26,5 @@ public let nameSpaces: [NameSpace: [IssuerSignedItem]]
 ### `init(nameSpaces:)`
 
 ```swift
-public init(nameSpaces: [NameSpace : [IssuerSignedItem]])
+public init(nameSpaces: [NameSpace: [IssuerSignedItem]])
 ```
