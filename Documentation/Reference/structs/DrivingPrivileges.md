@@ -8,7 +8,7 @@
   - `drivingPrivileges`
 
 ```swift
-struct DrivingPrivileges: Codable
+public struct DrivingPrivileges: Codable
 ```
 
 The DrivingPrivileges structure can be an empty array.
@@ -17,5 +17,5 @@ The DrivingPrivileges structure can be an empty array.
 ### `drivingPrivileges`
 
 ```swift
-let drivingPrivileges: [DrivingPrivilege]
+public let drivingPrivileges: [DrivingPrivilege]
 ```

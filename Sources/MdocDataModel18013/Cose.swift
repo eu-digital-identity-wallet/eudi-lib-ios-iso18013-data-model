@@ -18,7 +18,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
-import Security
+//
 
 extension Cose {
 	/// COSE Message Identification

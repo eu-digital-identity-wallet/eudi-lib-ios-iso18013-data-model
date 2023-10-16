@@ -6,8 +6,9 @@
 
 - [Properties](#properties)
   - `response`
-  - `namespace`
+  - `devicePrivateKey`
   - `docType`
+  - `nameSpaces`
   - `title`
   - `family_name`
   - `given_name`
@@ -51,22 +52,28 @@ public struct EuPidModel: Codable, MdocDecodable
 public var response: DeviceResponse?
 ```
 
-### `namespace`
+### `devicePrivateKey`
 
 ```swift
-public static let namespace = "eu.europa.ec.eudiw.pid.1"
+public var devicePrivateKey: CoseKeyPrivate?
 ```
 
 ### `docType`
 
 ```swift
-public static let docType = "eu.europa.ec.eudiw.pid.1"
+public var docType = "eu.europa.ec.eudiw.pid.1"
+```
+
+### `nameSpaces`
+
+```swift
+public var nameSpaces: [NameSpace]?
 ```
 
 ### `title`
 
 ```swift
-public static let title = String("eu_pid_doctype_name")
+public var title = String("eu_pid_doctype_name")
 ```
 
 ### `family_name`

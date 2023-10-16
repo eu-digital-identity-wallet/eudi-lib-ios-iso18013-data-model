@@ -10,7 +10,7 @@
   - `isEmpty`
 
 ```swift
-struct ServerRetrievalOptions: Equatable
+public struct ServerRetrievalOptions: Equatable
 ```
 
 Optional information on the server retrieval methods supported by the mdoc
@@ -19,17 +19,17 @@ Optional information on the server retrieval methods supported by the mdoc
 ### `webAPI`
 
 ```swift
-var webAPI: ServerRetrievalOption?
+public var webAPI: ServerRetrievalOption?
 ```
 
 ### `oIDC`
 
 ```swift
-var oIDC: ServerRetrievalOption?
+public var oIDC: ServerRetrievalOption?
 ```
 
 ### `isEmpty`
 
 ```swift
-var isEmpty:Bool
+public var isEmpty:Bool
 ```

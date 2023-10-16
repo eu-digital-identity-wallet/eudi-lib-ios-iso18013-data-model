@@ -11,7 +11,7 @@
   - `token`
 
 ```swift
-struct ServerRetrievalOption: Codable, Equatable
+public struct ServerRetrievalOption: Codable, Equatable
 ```
 
 Server retrieval information
@@ -32,11 +32,11 @@ var version: UInt64 = Self.versionImpl
 ### `url`
 
 ```swift
-var url: String
+public var url: String
 ```
 
 ### `token`
 
 ```swift
-var token: String
+public var token: String
 ```

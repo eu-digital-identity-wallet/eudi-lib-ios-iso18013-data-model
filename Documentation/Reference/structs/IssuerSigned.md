@@ -26,12 +26,12 @@ public let issuerNameSpaces: IssuerNameSpaces?
 ### `issuerAuth`
 
 ```swift
-public let issuerAuth: IssuerAuth?
+public let issuerAuth: IssuerAuth
 ```
 
 ## Methods
 ### `init(issuerNameSpaces:issuerAuth:)`
 
 ```swift
-public init(issuerNameSpaces: IssuerNameSpaces? = nil, issuerAuth: IssuerAuth? = nil)
+public init(issuerNameSpaces: IssuerNameSpaces?, issuerAuth: IssuerAuth)
 ```

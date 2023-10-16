@@ -12,6 +12,12 @@ extension CBOR
 public var description: String
 ```
 
+### `debugDescription`
+
+```swift
+public var debugDescription: String
+```
+
 ## Methods
 ### `decodeTaggedBytes()`
 
@@ -97,14 +103,14 @@ public func asCose() -> (CBOR.Tag, [CBOR])?
 public func decodeBytestring() -> CBOR?
 ```
 
-### `decodeList(_:)`
+### `decodeList(_:unwrap:)`
 
 ```swift
-public static func decodeList(_ list: [CBOR]) -> [Any]
+public static func decodeList(_ list: [CBOR], unwrap: Bool = true) -> [Any]
 ```
 
-### `decodeDictionary(_:)`
+### `decodeDictionary(_:unwrap:)`
 
 ```swift
-public static func decodeDictionary(_ dictionary: [CBOR:CBOR]) -> [String: Any]
+public static func decodeDictionary(_ dictionary: [CBOR:CBOR], unwrap: Bool = true) -> [String: Any]
 ```

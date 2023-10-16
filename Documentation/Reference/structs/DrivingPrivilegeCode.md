@@ -10,7 +10,7 @@
   - `value`
 
 ```swift
-struct DrivingPrivilegeCode: Codable
+public struct DrivingPrivilegeCode: Codable
 ```
 
 Driving privilege code
@@ -19,17 +19,17 @@ Driving privilege code
 ### `code`
 
 ```swift
-let code: String
+public let code: String
 ```
 
 ### `sign`
 
 ```swift
-let sign: String?
+public let sign: String?
 ```
 
 ### `value`
 
 ```swift
-let value: String?
+public let value: String?
 ```

@@ -12,6 +12,12 @@ extension CoseKeyPrivate
 public init(crv: ECCurveType)
 ```
 
+### `init(base64:)`
+
+```swift
+public init?(base64: String)
+```
+
 ### `init(x:y:d:crv:)`
 
 ```swift

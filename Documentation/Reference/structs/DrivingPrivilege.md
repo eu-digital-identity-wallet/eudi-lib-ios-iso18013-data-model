@@ -11,7 +11,7 @@
   - `codes`
 
 ```swift
-struct DrivingPrivilege: Codable
+public struct DrivingPrivilege: Codable
 ```
 
 The categories of vehicles/restrictions/conditions contain information describing the driving privileges of the mDL holder
@@ -20,7 +20,7 @@ The categories of vehicles/restrictions/conditions contain information describin
 ### `vehicleCategoryCode`
 
 ```swift
-let vehicleCategoryCode: String
+public let vehicleCategoryCode: String
 ```
 
 Vehicle category code as per ISO/IEC 18013-1
@@ -28,7 +28,7 @@ Vehicle category code as per ISO/IEC 18013-1
 ### `issueDate`
 
 ```swift
-let issueDate: String?
+public let issueDate: String?
 ```
 
 Date of issue encoded as full-date
@@ -36,7 +36,7 @@ Date of issue encoded as full-date
 ### `expiryDate`
 
 ```swift
-let expiryDate: String?
+public let expiryDate: String?
 ```
 
 Date of expiry encoded as full-date
@@ -44,7 +44,7 @@ Date of expiry encoded as full-date
 ### `codes`
 
 ```swift
-let codes: [DrivingPrivilegeCode]?
+public let codes: [DrivingPrivilegeCode]?
 ```
 
 Array of code info

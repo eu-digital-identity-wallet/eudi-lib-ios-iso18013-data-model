@@ -28,11 +28,29 @@ public func findDoc(name: String) -> Document?
 ### `findDoc(name:)`
 
 ```swift
-public func findDoc(name: String) -> ItemsRequest?
+public func findDoc(name: String) -> DocRequest?
+```
+
+### `findNameValue(name:)`
+
+```swift
+public func findNameValue(name: String) -> NameValue?
 ```
 
 ### `findItem(name:)`
 
 ```swift
 public func findItem(name: String) -> IssuerSignedItem?
+```
+
+### `findMap(name:)`
+
+```swift
+public func findMap(name: String) -> [CBOR:CBOR]?
+```
+
+### `findArray(name:)`
+
+```swift
+public func findArray(name: String) -> [CBOR]?
 ```
