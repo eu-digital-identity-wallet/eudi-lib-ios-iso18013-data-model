@@ -149,4 +149,34 @@ final class MdocDataModel18013Tests: XCTestCase {
 	let str = df.string(from: Date())
 	print(str)
   }
+
+  struct SimpleAgeAttest : AgeAttest {
+      var ageOverXX = [Int : Bool]()
+	  init(ageOver1: Int, isOver1: Bool, ageOver2: Int, isOver2: Bool) {
+		  ageOverXX[ageOver1] = isOver1
+		  ageOverXX[ageOver2] = isOver2
+	  }
+  } // end struct
+
+	let ageAttestIs19 = SimpleAgeAttest(ageOver1: 21, isOver1: false, ageOver2: 60, isOver2: false)
+	let ageAttestIs21 = SimpleAgeAttest(ageOver1: 21, isOver1: true, ageOver2: 60, isOver2: false)
+	let ageAttestIs30 = SimpleAgeAttest(ageOver1: 21, isOver1: true, ageOver2: 60, isOver2: false)
+	let ageAttestIs60 = SimpleAgeAttest(ageOver1: 21, isOver1: true, ageOver2: 60, isOver2: true)
+	let ageAttestIs64 = SimpleAgeAttest(ageOver1: 21, isOver1: true, ageOver2: 60, isOver2: true)
+
+
+	// test for FDIS ISO 18013-5 Table D.1 — Situations for answers to age_over_nn requests mDL holder actual age 19, 21, 30, 60, 64
+  func testAgeAttest() throws {
+	let testAges = [18, 19, 20, 21, 25, 30, 50, 60, 63, 64, 65]
+	XCTAssertEqual(testAges.map { ageAttestIs19.isOver(age: $0)?.value }, [nil, nil, nil, false, false, false, false, false, false, false, false], "ageAttestIs19")
+	XCTAssertEqual(testAges.map { ageAttestIs21.isOver(age: $0)?.value }, [true, true, true, true, nil, nil, nil, false, false, false, false], "ageAttestIs21")
+	XCTAssertEqual(testAges.map { ageAttestIs30.isOver(age: $0)?.value }, [true, true, true, true, nil, nil, nil, false, false, false, false], "ageAttestIs30")
+	XCTAssertEqual(testAges.map { ageAttestIs60.isOver(age: $0)?.value }, [true, true, true, true, true, true, true, true, nil, nil, nil], "ageAttestIs60")
+	XCTAssertEqual(testAges.map { ageAttestIs64.isOver(age: $0)?.value }, [true, true, true, true, true, true, true, true, nil, nil, nil], "ageAttestIs64")
+  }
+
+  func testMax2AgesOver() throws {
+	let testAges = [18, 19, 20, 21, 25, 30, 50, 60, 63, 64, 65]
+	XCTAssertEqual(ageAttestIs19.max2AgesOverFiltered(ages: testAges), [21,25])
+  }
 }

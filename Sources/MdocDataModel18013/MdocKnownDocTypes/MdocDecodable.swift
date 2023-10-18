@@ -72,7 +72,7 @@ extension MdocDecodable {
 		for (ns,items) in nameSpaces {
 			for item in items {
 				let name = item.elementIdentifier
-				if name.hasPrefix("age_over_") { continue }
+				if !bDebugDisplay && name.hasPrefix("age_over_") { continue }
 				var value = bDebugDisplay ? item.debugDescription : item.description
 				if name == "sex", let isex = Int(value), isex <= 2 {
 					value = NSLocalizedString(isex == 1 ? "male" : "female", comment: "")

@@ -32,4 +32,21 @@ extension AgeAttest {
 	{ return overFalse}
 	return nil
   }
+
+	public func max2AgesOver(ages: [Int]) -> [Int:Bool] {
+		guard ages.count > 2 else { return Dictionary(grouping: ages, by: { $0 }).mapValues { _ in true } }
+		let sortedAges = ages.sorted()
+		var res = Dictionary(grouping: sortedAges, by: { $0 }).mapValues { _ in false }
+		var numAges = 0
+		for age in sortedAges {
+			if isOver(age: age) != nil, numAges < 2 {
+				numAges += 1
+				res[age] = true
+			}
+		}
+		return res
+	}
+	
+	public func max2AgesOverFiltered(ages: [Int]) -> [Int] { Array(max2AgesOver(ages: ages).filter { $1 }.keys).sorted() }
+	
 }
