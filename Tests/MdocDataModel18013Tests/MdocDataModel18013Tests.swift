@@ -64,7 +64,7 @@ final class MdocDataModel18013Tests: XCTestCase {
 	func testDecodeIssuerAuth() throws {
 		let ia = try XCTUnwrap(IssuerAuth(data: AnnexdTestData.d52.bytes))
 		XCTAssertEqual(ia.mso.digestAlgorithm, "SHA-256")
-		XCTAssertEqual(ia.mso.valueDigests["org.iso.18013.5.1"]?.digestIDs.count, 13)
+		XCTAssertEqual(ia.mso.valueDigests[IsoMdlModel.isoNamespace]?.digestIDs.count, 13)
 		XCTAssertEqual(ia.mso.valueDigests["org.iso.18013.5.1.US"]?.digestIDs.count, 4)
 		XCTAssertEqual(ia.mso.validityInfo.signed, "2020-10-01T13:30:02Z")
 	}
@@ -79,7 +79,7 @@ final class MdocDataModel18013Tests: XCTestCase {
 		let cborDr = dr.toCBOR(options: CBOROptions())
 		// test if successfully encoded
 		let dr2 = try XCTUnwrap(DeviceRequest(cbor: cborDr))
-		XCTAssertEqual(dr2.docRequests.first?.itemsRequest.requestNameSpaces["org.iso.18013.5.1"]?.elementIdentifiers.sorted(), testItems)
+		XCTAssertEqual(dr2.docRequests.first?.itemsRequest.requestNameSpaces[IsoMdlModel.isoNamespace]?.elementIdentifiers.sorted(), testItems)
 		// test iso make request
 		let isoKeys: [IsoMdlModel.CodingKeys] = [.familyName, .documentNumber, .drivingPrivileges, .issueDate, .expiryDate, .portrait]
 		let dr3 = DeviceRequest(mdl: isoKeys, agesOver: [], intentToRetain: true)
@@ -104,17 +104,17 @@ final class MdocDataModel18013Tests: XCTestCase {
 		XCTAssertEqual(dr.version, "1.0")
 		let docs = try XCTUnwrap(dr.documents)
 		let doc = try XCTUnwrap(docs.first)
-		XCTAssertEqual(doc.docType, "org.iso.18013.5.1.mDL")
-		let isoNS = try XCTUnwrap(doc.issuerSigned.issuerNameSpaces?["org.iso.18013.5.1"])
+		XCTAssertEqual(doc.docType, IsoMdlModel.isoDocType)
+		let isoNS = try XCTUnwrap(doc.issuerSigned.issuerNameSpaces?[IsoMdlModel.isoNamespace])
 		let fnItem = try XCTUnwrap(isoNS.findItem(name: "family_name"))
 		XCTAssertEqual(fnItem.elementValue.asString()!, "Doe")
 		XCTAssertEqual(fnItem.digestID, 0)
 		XCTAssertEqual(fnItem.random.toHexString().localizedUppercase, "8798645B20EA200E19FFABAC92624BEE6AEC63ACEEDECFB1B80077D22BFC20E9")
 		let issuerAuth = doc.issuerSigned.issuerAuth
 		XCTAssertEqual(issuerAuth.mso.deviceKeyInfo.deviceKey.x.toHexString().uppercased(), "96313D6C63E24E3372742BFDB1A33BA2C897DCD68AB8C753E4FBD48DCA6B7F9A")
-		XCTAssertEqual(issuerAuth.mso.docType, "org.iso.18013.5.1.mDL")
+		XCTAssertEqual(issuerAuth.mso.docType, IsoMdlModel.isoDocType)
 		XCTAssertEqual(issuerAuth.mso.validityInfo.validUntil, "2021-10-01T13:30:02Z")
-		let valueDigests1 = try XCTUnwrap(issuerAuth.mso.valueDigests["org.iso.18013.5.1"])
+		let valueDigests1 = try XCTUnwrap(issuerAuth.mso.valueDigests[IsoMdlModel.isoNamespace])
 		let valueDigests2 = try XCTUnwrap(issuerAuth.mso.valueDigests["org.iso.18013.5.1.US"])
 		XCTAssertEqual(valueDigests1.digestIDs.count, 13)
 		XCTAssertEqual(valueDigests1[0]!.toHexString().localizedUppercase, "75167333B47B6C2BFB86ECCC1F438CF57AF055371AC55E1E359E20F254ADCEBF")
@@ -158,17 +158,26 @@ final class MdocDataModel18013Tests: XCTestCase {
 
 
 	// test for FDIS ISO 18013-5 Table D.1 — Situations for answers to age_over_nn requests mDL holder actual age 19, 21, 30, 60, 64
-  func testAgeAttest() throws {
-	let testAges = [18, 19, 20, 21, 25, 30, 50, 60, 63, 64, 65]
-	XCTAssertEqual(testAges.map { ageAttestIs19.isOver(age: $0)?.value }, [nil, nil, nil, false, false, false, false, false, false, false, false], "ageAttestIs19")
-	XCTAssertEqual(testAges.map { ageAttestIs21.isOver(age: $0)?.value }, [true, true, true, true, nil, nil, nil, false, false, false, false], "ageAttestIs21")
-	XCTAssertEqual(testAges.map { ageAttestIs30.isOver(age: $0)?.value }, [true, true, true, true, nil, nil, nil, false, false, false, false], "ageAttestIs30")
-	XCTAssertEqual(testAges.map { ageAttestIs60.isOver(age: $0)?.value }, [true, true, true, true, true, true, true, true, nil, nil, nil], "ageAttestIs60")
-	XCTAssertEqual(testAges.map { ageAttestIs64.isOver(age: $0)?.value }, [true, true, true, true, true, true, true, true, nil, nil, nil], "ageAttestIs64")
-  }
-
-  func testMax2AgesOver() throws {
-	let testAges = [18, 19, 20, 21, 25, 30, 50, 60, 63, 64, 65]
-	XCTAssertEqual(ageAttestIs19.max2AgesOverFiltered(ages: testAges), [21,25])
-  }
+	func testAgeAttest() throws {
+		let testAges = [18, 19, 20, 21, 25, 30, 50, 60, 63, 64, 65]
+		XCTAssertEqual(testAges.map { ageAttestIs19.isOver(age: $0)?.value }, [nil, nil, nil, false, false, false, false, false, false, false, false], "ageAttestIs19")
+		XCTAssertEqual(testAges.map { ageAttestIs21.isOver(age: $0)?.value }, [true, true, true, true, nil, nil, nil, false, false, false, false], "ageAttestIs21")
+		XCTAssertEqual(testAges.map { ageAttestIs30.isOver(age: $0)?.value }, [true, true, true, true, nil, nil, nil, false, false, false, false], "ageAttestIs30")
+		XCTAssertEqual(testAges.map { ageAttestIs60.isOver(age: $0)?.value }, [true, true, true, true, true, true, true, true, nil, nil, nil], "ageAttestIs60")
+		XCTAssertEqual(testAges.map { ageAttestIs64.isOver(age: $0)?.value }, [true, true, true, true, true, true, true, true, nil, nil, nil], "ageAttestIs64")
+	}
+	
+	func testMax2AgesOver() throws {
+		let testAges = [18, 19, 20, 21, 25, 30, 50, 60, 63, 64, 65]
+		XCTAssertEqual(ageAttestIs19.max2AgesOverFiltered(ages: testAges), [21,25])
+	}
+	
+	func testFilterMoreThan2AgeOverElementRequests() throws {
+		let dr = try XCTUnwrap(DeviceResponse(data: AnnexdTestData.d412.bytes))
+		let docs = try XCTUnwrap(dr.documents); let doc = try XCTUnwrap(docs.first)
+		XCTAssertEqual(doc.docType, IsoMdlModel.isoDocType)
+		let isoNS = try XCTUnwrap(doc.issuerSigned.issuerNameSpaces)
+		let tmp = IsoMdlModel.self.moreThan2AgeOverElementIdentifiers(IsoMdlModel.isoDocType, IsoMdlModel.isoNamespace, ageAttestIs19, ["birth_date", "age_over_18", "age_over_21", "age_over_60"])
+		XCTAssertEqual(tmp, ["age_over_18"])
+	}
 }

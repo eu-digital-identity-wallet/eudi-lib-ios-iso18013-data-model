@@ -65,6 +65,14 @@ extension MdocDecodable {
 			}
 		}
 	}
+	
+	public static func moreThan2AgeOverElementIdentifiers(_ reqDocType: DocType, _ reqNamespace: NameSpace, _ ageAttest: any AgeAttest, _ reqElementIdentifiers: [DataElementIdentifier]) -> Set<String> {
+		// special case for maximum two age_over_NN data elements shall be returned
+		guard reqDocType == IsoMdlModel.isoDocType, reqNamespace == IsoMdlModel.isoNamespace else { return Set() }
+		let ages =	reqElementIdentifiers.filter { $0.hasPrefix("age_over_")}.compactMap { k in Int(k.suffix(k.count - 9)) }
+		let agesDict = ageAttest.max2AgesOver(ages: ages)
+		return Set(	agesDict.filter { $1 == false }.keys.map { "age_over_\($0)" })
+	}
 		
 	public static func extractDisplayStrings(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ displayStrings: inout [NameValue]) {
 		let bDebugDisplay = UserDefaults.standard.bool(forKey: "DebugDisplay")
