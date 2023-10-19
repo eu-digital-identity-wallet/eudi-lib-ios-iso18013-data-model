@@ -39,7 +39,7 @@ extension MdocDecodable {
 		return Self.getItemValue(nameSpaceItems, string: s)
 	}
 		
-	static func getItemValue<T>(_ nameSpaceItems: [String: [IssuerSignedItem]], string s: String) -> T? {
+	static func getItemValue<T>(_ nameSpaceItems: [NameSpace: [IssuerSignedItem]], string s: String) -> T? {
 		for (_,v) in nameSpaceItems {
 			if let item = v.first(where: { s == $0.elementIdentifier }) { return item.getTypedValue() }
 		}
@@ -53,7 +53,7 @@ extension MdocDecodable {
 		return nameSpaces
 	}
 	
-	public static func extractAgeOverValues(_ nameSpaces: [String: [IssuerSignedItem]], _ ageOverXX: inout [Int: Bool]) {
+	public static func extractAgeOverValues(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ ageOverXX: inout [Int: Bool]) {
 		for (_, items) in nameSpaces {
 			for item in items {
 				let k = item.elementIdentifier
@@ -66,7 +66,7 @@ extension MdocDecodable {
 		}
 	}
 		
-	public static func extractDisplayStrings(_ nameSpaces: [String: [IssuerSignedItem]], _ displayStrings: inout [NameValue]) {
+	public static func extractDisplayStrings(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ displayStrings: inout [NameValue]) {
 		let bDebugDisplay = UserDefaults.standard.bool(forKey: "DebugDisplay")
 		var order = 0
 		for (ns,items) in nameSpaces {

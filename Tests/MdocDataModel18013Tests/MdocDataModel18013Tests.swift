@@ -150,14 +150,6 @@ final class MdocDataModel18013Tests: XCTestCase {
 	print(str)
   }
 
-  struct SimpleAgeAttest : AgeAttest {
-      var ageOverXX = [Int : Bool]()
-	  init(ageOver1: Int, isOver1: Bool, ageOver2: Int, isOver2: Bool) {
-		  ageOverXX[ageOver1] = isOver1
-		  ageOverXX[ageOver2] = isOver2
-	  }
-  } // end struct
-
 	let ageAttestIs19 = SimpleAgeAttest(ageOver1: 21, isOver1: false, ageOver2: 60, isOver2: false)
 	let ageAttestIs21 = SimpleAgeAttest(ageOver1: 21, isOver1: true, ageOver2: 60, isOver2: false)
 	let ageAttestIs30 = SimpleAgeAttest(ageOver1: 21, isOver1: true, ageOver2: 60, isOver2: false)

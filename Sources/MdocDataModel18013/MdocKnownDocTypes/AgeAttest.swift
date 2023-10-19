@@ -50,3 +50,16 @@ extension AgeAttest {
 	public func max2AgesOverFiltered(ages: [Int]) -> [Int] { Array(max2AgesOver(ages: ages).filter { $1 }.keys).sorted() }
 	
 }
+
+public struct SimpleAgeAttest: AgeAttest {
+	public var ageOverXX = [Int: Bool]()
+	
+	public init(ageOver1: Int, isOver1: Bool, ageOver2: Int, isOver2: Bool) {
+		ageOverXX[ageOver1] = isOver1
+		ageOverXX[ageOver2] = isOver2
+	}
+	
+	public init(namespaces: [NameSpace: [IssuerSignedItem]]) {
+		GenericMdocModel.self.extractAgeOverValues(namespaces, &ageOverXX)
+	}
+} // end struct
