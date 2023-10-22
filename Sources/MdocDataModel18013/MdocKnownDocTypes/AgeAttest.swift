@@ -14,17 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-//  AgeAttest.swift
+//  AgeAttesting.swift
 
 import Foundation
 
 /// A conforming type contains age attestation values
-public protocol AgeAttest {
+public protocol AgeAttesting {
   var ageOverXX: [Int: Bool] { get }
 }
 
 /// Age attestation: Nearest “true” attestation above request (7.2.5 of iso document)
-extension AgeAttest {
+extension AgeAttesting {
   func isOver(age: Int) -> (key: Int, value: Bool)? {
 	if let overTrue = ageOverXX.filter({ (key, value) in value == true && key >= age}).sorted(by: { $0.key < $1.key}).first
 	{ return overTrue}
@@ -51,7 +51,7 @@ extension AgeAttest {
 	
 }
 
-public struct SimpleAgeAttest: AgeAttest {
+public struct SimpleAgeAttest: AgeAttesting {
 	public var ageOverXX = [Int: Bool]()
 	
 	public init(ageOver1: Int, isOver1: Bool, ageOver2: Int, isOver2: Bool) {

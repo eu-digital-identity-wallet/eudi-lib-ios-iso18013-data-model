@@ -21,7 +21,7 @@ import Foundation
 /// A conforming type represents mdoc data.
 ///
 /// Can be decoded by a CBOR device response
-public protocol MdocDecodable: AgeAttest {
+public protocol MdocDecodable: AgeAttesting {
 	var response: DeviceResponse? { get set}
 	var devicePrivateKey: CoseKeyPrivate? { get set}
 	var docType: String { get set}
@@ -66,7 +66,7 @@ extension MdocDecodable {
 		}
 	}
 	
-	public static func moreThan2AgeOverElementIdentifiers(_ reqDocType: DocType, _ reqNamespace: NameSpace, _ ageAttest: any AgeAttest, _ reqElementIdentifiers: [DataElementIdentifier]) -> Set<String> {
+	public static func moreThan2AgeOverElementIdentifiers(_ reqDocType: DocType, _ reqNamespace: NameSpace, _ ageAttest: any AgeAttesting, _ reqElementIdentifiers: [DataElementIdentifier]) -> Set<String> {
 		// special case for maximum two age_over_NN data elements shall be returned
 		guard reqDocType == IsoMdlModel.isoDocType, reqNamespace == IsoMdlModel.isoNamespace else { return Set() }
 		let ages =	reqElementIdentifiers.filter { $0.hasPrefix("age_over_")}.compactMap { k in Int(k.suffix(k.count - 9)) }

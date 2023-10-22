@@ -3,7 +3,7 @@
 # `MdocDecodable`
 
 ```swift
-public protocol MdocDecodable: AgeAttest
+public protocol MdocDecodable: AgeAttesting
 ```
 
 A conforming type represents mdoc data.
