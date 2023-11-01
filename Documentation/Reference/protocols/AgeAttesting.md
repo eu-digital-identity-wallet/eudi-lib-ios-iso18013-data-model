@@ -1,9 +1,9 @@
 **PROTOCOL**
 
-# `AgeAttest`
+# `AgeAttesting`
 
 ```swift
-public protocol AgeAttest
+public protocol AgeAttesting
 ```
 
 A conforming type contains age attestation values

@@ -21,7 +21,7 @@ import Foundation
 /// A conforming type represents mdoc data.
 ///
 /// Can be decoded by a CBOR device response
-public protocol MdocDecodable: AgeAttest {
+public protocol MdocDecodable: AgeAttesting {
 	var response: DeviceResponse? { get set}
 	var devicePrivateKey: CoseKeyPrivate? { get set}
 	var docType: String { get set}
@@ -39,7 +39,7 @@ extension MdocDecodable {
 		return Self.getItemValue(nameSpaceItems, string: s)
 	}
 		
-	static func getItemValue<T>(_ nameSpaceItems: [String: [IssuerSignedItem]], string s: String) -> T? {
+	static func getItemValue<T>(_ nameSpaceItems: [NameSpace: [IssuerSignedItem]], string s: String) -> T? {
 		for (_,v) in nameSpaceItems {
 			if let item = v.first(where: { s == $0.elementIdentifier }) { return item.getTypedValue() }
 		}
@@ -53,7 +53,7 @@ extension MdocDecodable {
 		return nameSpaces
 	}
 	
-	public static func extractAgeOverValues(_ nameSpaces: [String: [IssuerSignedItem]], _ ageOverXX: inout [Int: Bool]) {
+	public static func extractAgeOverValues(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ ageOverXX: inout [Int: Bool]) {
 		for (_, items) in nameSpaces {
 			for item in items {
 				let k = item.elementIdentifier
@@ -65,14 +65,22 @@ extension MdocDecodable {
 			}
 		}
 	}
+	
+	public static func moreThan2AgeOverElementIdentifiers(_ reqDocType: DocType, _ reqNamespace: NameSpace, _ ageAttest: any AgeAttesting, _ reqElementIdentifiers: [DataElementIdentifier]) -> Set<String> {
+		// special case for maximum two age_over_NN data elements shall be returned
+		guard reqDocType == IsoMdlModel.isoDocType, reqNamespace == IsoMdlModel.isoNamespace else { return Set() }
+		let ages =	reqElementIdentifiers.filter { $0.hasPrefix("age_over_")}.compactMap { k in Int(k.suffix(k.count - 9)) }
+		let agesDict = ageAttest.max2AgesOver(ages: ages)
+		return Set(	agesDict.filter { $1 == false }.keys.map { "age_over_\($0)" })
+	}
 		
-	public static func extractDisplayStrings(_ nameSpaces: [String: [IssuerSignedItem]], _ displayStrings: inout [NameValue]) {
+	public static func extractDisplayStrings(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ displayStrings: inout [NameValue]) {
 		let bDebugDisplay = UserDefaults.standard.bool(forKey: "DebugDisplay")
 		var order = 0
 		for (ns,items) in nameSpaces {
 			for item in items {
 				let name = item.elementIdentifier
-				if name.hasPrefix("age_over_") { continue }
+				if !bDebugDisplay && name.hasPrefix("age_over_") { continue }
 				var value = bDebugDisplay ? item.debugDescription : item.description
 				if name == "sex", let isex = Int(value), isex <= 2 {
 					value = NSLocalizedString(isex == 1 ? "male" : "female", comment: "")

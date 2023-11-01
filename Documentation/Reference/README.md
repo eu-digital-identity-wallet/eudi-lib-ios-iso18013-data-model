@@ -2,7 +2,7 @@
 
 ## Protocols
 
--   [AgeAttest](protocols/AgeAttest.md)
+-   [AgeAttesting](protocols/AgeAttesting.md)
 -   [CBORDecodable](protocols/CBORDecodable.md)
 -   [MdocDecodable](protocols/MdocDecodable.md)
 
