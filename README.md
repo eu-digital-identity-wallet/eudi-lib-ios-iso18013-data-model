@@ -54,6 +54,33 @@ In mdoc holder initialize from CBOR data received from server (registration)
 let dr = DeviceResponse(data: bytes)
 ```
 
+The device response has the following structure:
+
+Data = {
+ "documents" : [+Document] 
+}
+
+[Document](Documentation/Reference/structs/Document.md) = {
+ "docType" : DocType, 
+ "issuerSigned" : IssuerSigned 
+}
+
+[IssuerSigned](Documentation/Reference/structs/IssuerSigned.md) = {
+ "nameSpaces" : IssuerNameSpaces, 
+}
+
+[IssuerNameSpaces](Documentation/Reference/structs/IssuerNameSpaces.md) = { 
+ + NameSpace => [ + IssuerSignedItemBytes ]
+}
+
+[IssuerSignedItem](Documentation/Reference/structs/IssuerSignedItem.md) = {
+ "digestID" : uint, 
+ "random" : bstr, 
+ "elementIdentifier" : DataElementIdentifier, 
+ "elementValue" : DataElementValue 
+}
+
+
 ## Reference
 Detailed documentation is provided [here](Documentation/Reference/README.md) 
 
