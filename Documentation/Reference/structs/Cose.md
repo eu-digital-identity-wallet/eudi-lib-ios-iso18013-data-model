@@ -6,13 +6,10 @@
 
 - [Properties](#properties)
   - `type`
-  - `protectedHeader`
-  - `unprotectedHeader`
   - `payload`
   - `signature`
   - `verifyAlgorithm`
   - `macAlgorithm`
-  - `keyId`
   - `signatureStruct`
 
 ```swift
@@ -26,18 +23,6 @@ Struct which describes  a representation for cryptographic keys;  how to create 
 
 ```swift
 public let type: CoseType
-```
-
-### `protectedHeader`
-
-```swift
-let protectedHeader : CoseHeader
-```
-
-### `unprotectedHeader`
-
-```swift
-let unprotectedHeader : CoseHeader?
 ```
 
 ### `payload`
@@ -62,12 +47,6 @@ public var verifyAlgorithm: VerifyAlgorithm?
 
 ```swift
 public var macAlgorithm: MacAlgorithm?
-```
-
-### `keyId`
-
-```swift
-var keyId : Data?
 ```
 
 ### `signatureStruct`

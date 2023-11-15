@@ -6,7 +6,6 @@
 
 - [Properties](#properties)
   - `version`
-  - `defaultVersion`
   - `documents`
   - `documentErrors`
   - `status`
@@ -31,12 +30,6 @@ let dr = DeviceResponse(data: bytes)
 
 ```swift
 public let version: String
-```
-
-### `defaultVersion`
-
-```swift
-static let defaultVersion = "1.0"
 ```
 
 ### `documents`

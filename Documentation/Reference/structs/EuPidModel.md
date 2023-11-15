@@ -7,6 +7,7 @@
 - [Properties](#properties)
   - `response`
   - `devicePrivateKey`
+  - `EuPidDocType`
   - `docType`
   - `nameSpaces`
   - `title`
@@ -58,10 +59,16 @@ public var response: DeviceResponse?
 public var devicePrivateKey: CoseKeyPrivate?
 ```
 
+### `EuPidDocType`
+
+```swift
+public static var EuPidDocType: String = "eu.europa.ec.eudiw.pid.1"
+```
+
 ### `docType`
 
 ```swift
-public var docType = "eu.europa.ec.eudiw.pid.1"
+public var docType = Self.EuPidDocType
 ```
 
 ### `nameSpaces`

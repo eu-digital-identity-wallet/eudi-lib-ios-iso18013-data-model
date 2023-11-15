@@ -6,8 +6,6 @@
 
 - [Properties](#properties)
   - `deviceKey`
-  - `keyAuthorizations`
-  - `keyInfo`
 - [Methods](#methods)
   - `init(deviceKey:)`
 
@@ -22,18 +20,6 @@ mdoc authentication public key and information related to this key.
 
 ```swift
 public let deviceKey: CoseKey
-```
-
-### `keyAuthorizations`
-
-```swift
-let keyAuthorizations: KeyAuthorizations?
-```
-
-### `keyInfo`
-
-```swift
-let keyInfo: CBOR?
 ```
 
 ## Methods

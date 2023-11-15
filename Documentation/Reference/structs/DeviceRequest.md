@@ -5,7 +5,6 @@
 **Contents**
 
 - [Properties](#properties)
-  - `currentVersion`
   - `version`
   - `docRequests`
 
@@ -25,14 +24,6 @@ let dr3 = DeviceRequest(mdl: isoKeys, agesOver: [18,21], intentToRetain: true)
 ```
 
 ## Properties
-### `currentVersion`
-
-```swift
-static let currentVersion = "1.0"
-```
-
-The current version
-
 ### `version`
 
 ```swift

@@ -5,8 +5,6 @@
 **Contents**
 
 - [Properties](#properties)
-  - `versionImpl`
-  - `version`
   - `url`
   - `token`
 
@@ -17,18 +15,6 @@ public struct ServerRetrievalOption: Codable, Equatable
 Server retrieval information
 
 ## Properties
-### `versionImpl`
-
-```swift
-static var versionImpl: UInt64
-```
-
-### `version`
-
-```swift
-var version: UInt64 = Self.versionImpl
-```
-
 ### `url`
 
 ```swift

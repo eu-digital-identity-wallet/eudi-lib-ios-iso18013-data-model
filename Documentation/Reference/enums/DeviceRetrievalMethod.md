@@ -8,11 +8,6 @@
   - `qr`
   - `nfc(maxLenCommand:maxLenResponse:)`
   - `ble(isBleServer:uuid:)`
-- [Properties](#properties)
-  - `version`
-  - `BASE_UUID_SUFFIX_SERVICE`
-- [Methods](#methods)
-  - `getRandomBleUuid()`
 
 ```swift
 public enum DeviceRetrievalMethod: Equatable
@@ -38,24 +33,4 @@ case nfc(maxLenCommand: UInt64, maxLenResponse: UInt64)
 
 ```swift
 case ble(isBleServer: Bool, uuid: String)
-```
-
-## Properties
-### `version`
-
-```swift
-static var version: UInt64
-```
-
-### `BASE_UUID_SUFFIX_SERVICE`
-
-```swift
-static let BASE_UUID_SUFFIX_SERVICE = "-0000-1000-8000-00805F9B34FB".replacingOccurrences(of: "-", with: "")
-```
-
-## Methods
-### `getRandomBleUuid()`
-
-```swift
-static func getRandomBleUuid() -> String
 ```

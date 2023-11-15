@@ -5,19 +5,14 @@
 **Contents**
 
 - [Properties](#properties)
-  - `versionImpl`
-  - `version`
-  - `security`
   - `originInfos`
   - `deviceRetrievalMethods`
   - `serverRetrievalOptions`
-  - `d`
   - `qrCoded`
   - `privateKey`
   - `isBleServer`
   - `ble_uuid`
 - [Methods](#methods)
-  - `setD(d:)`
   - `init(isBleServer:crv:)`
   - `init(data:)`
 
@@ -39,24 +34,6 @@ let de = DeviceEngagement(data: bytes)
 ```
 
 ## Properties
-### `versionImpl`
-
-```swift
-static let versionImpl: String = "1.0"
-```
-
-### `version`
-
-```swift
-var version: String = Self.versionImpl
-```
-
-### `security`
-
-```swift
-let security: Security
-```
-
 ### `originInfos`
 
 ```swift
@@ -73,12 +50,6 @@ public var deviceRetrievalMethods: [DeviceRetrievalMethod]? = nil
 
 ```swift
 public var serverRetrievalOptions: ServerRetrievalOptions? = nil
-```
-
-### `d`
-
-```swift
-var d: [UInt8]?
 ```
 
 ### `qrCoded`
@@ -106,12 +77,6 @@ public var ble_uuid: String?
 ```
 
 ## Methods
-### `setD(d:)`
-
-```swift
-mutating func setD(d: [UInt8])
-```
-
 ### `init(isBleServer:crv:)`
 
 ```swift
