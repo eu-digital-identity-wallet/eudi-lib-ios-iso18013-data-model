@@ -7,8 +7,6 @@
 - [Cases](#cases)
   - `sign1`
   - `mac0`
-- [Methods](#methods)
-  - `from(data:)`
 
 ```swift
 public enum CoseType : String
@@ -31,12 +29,3 @@ Only one signature is applied on the message payload
 ```swift
 case mac0 = "MAC0"
 ```
-
-## Methods
-### `from(data:)`
-
-```swift
-static func from(data: Data) -> CoseType?
-```
-
-Idenntifies Cose Message Type from input data

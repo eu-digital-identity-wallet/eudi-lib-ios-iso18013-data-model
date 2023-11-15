@@ -10,7 +10,6 @@
   - `digestAlgorithm`
   - `defaultDigestAlgorithmKind`
   - `valueDigests`
-  - `deviceKeyInfo`
   - `docType`
   - `validityInfo`
 - [Methods](#methods)
@@ -56,14 +55,6 @@ public let valueDigests: ValueDigests
 ```
 
 Value digests
-
-### `deviceKeyInfo`
-
-```swift
-let deviceKeyInfo: DeviceKeyInfo
-```
-
-device key info
 
 ### `docType`
 

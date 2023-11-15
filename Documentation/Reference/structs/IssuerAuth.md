@@ -6,7 +6,6 @@
 
 - [Properties](#properties)
   - `mso`
-  - `msoRawData`
   - `verifyAlgorithm`
   - `signature`
   - `iaca`
@@ -22,12 +21,6 @@ public struct IssuerAuth
 
 ```swift
 public let mso: MobileSecurityObject
-```
-
-### `msoRawData`
-
-```swift
-let msoRawData: [UInt8]
 ```
 
 ### `verifyAlgorithm`

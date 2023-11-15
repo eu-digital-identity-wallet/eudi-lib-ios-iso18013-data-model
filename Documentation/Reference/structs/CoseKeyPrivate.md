@@ -6,7 +6,6 @@
 
 - [Properties](#properties)
   - `key`
-  - `d`
 - [Methods](#methods)
   - `init(key:d:)`
 
@@ -21,12 +20,6 @@ COSE_Key + private key
 
 ```swift
 public let key: CoseKey
-```
-
-### `d`
-
-```swift
-let d: [UInt8]
 ```
 
 ## Methods

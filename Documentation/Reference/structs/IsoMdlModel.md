@@ -12,8 +12,6 @@
   - `isoNamespace`
   - `response`
   - `devicePrivateKey`
-  - `exp`
-  - `iat`
   - `familyName`
   - `givenName`
   - `birthDate`
@@ -49,8 +47,6 @@
   - `signatureUsualMark`
   - `biometricTemplateFace`
   - `biometricTemplateSignatureSign`
-  - `webapiInfo`
-  - `oidcInfo`
   - `mandatoryKeys`
   - `isoMandatoryKeys`
 
@@ -99,18 +95,6 @@ public var response: DeviceResponse?
 
 ```swift
 public var devicePrivateKey: CoseKeyPrivate?
-```
-
-### `exp`
-
-```swift
-let exp: UInt64?
-```
-
-### `iat`
-
-```swift
-let iat: UInt64?
 ```
 
 ### `familyName`
@@ -321,18 +305,6 @@ public let biometricTemplateFace: String?
 
 ```swift
 public let biometricTemplateSignatureSign: String?
-```
-
-### `webapiInfo`
-
-```swift
-let webapiInfo: ServerRetrievalOption?
-```
-
-### `oidcInfo`
-
-```swift
-let oidcInfo: ServerRetrievalOption?
 ```
 
 ### `mandatoryKeys`

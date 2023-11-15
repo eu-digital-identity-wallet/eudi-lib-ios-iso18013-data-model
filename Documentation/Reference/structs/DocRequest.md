@@ -7,7 +7,6 @@
 - [Properties](#properties)
   - `itemsRequest`
   - `itemsRequestRawData`
-  - `readerAuth`
   - `readerAuthRawCBOR`
 
 ```swift
@@ -26,14 +25,6 @@ public let itemsRequest: ItemsRequest
 ```swift
 public let itemsRequestRawData: [UInt8]?
 ```
-
-### `readerAuth`
-
-```swift
-let readerAuth: ReaderAuth?
-```
-
-Used for mdoc reader authentication
 
 ### `readerAuthRawCBOR`
 

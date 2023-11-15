@@ -33,7 +33,7 @@ let qrCodeImage = de.getQrCodeImage()
 
 ### `DeviceRequest`
 
-Device retrieval mdoc request structure
+Device retrieval [mdoc request](Documentation/Reference/structs/DeviceRequest.md) structure
 In mDoc holder initialize a ``DeviceRequest`` with incoming CBOR bytes (decoding)
 ```swift
 let dr = DeviceRequest(data: bytes)
@@ -45,7 +45,7 @@ let dr3 = DeviceRequest(mdl: isoKeys, agesOver: [18,21], intentToRetain: true)
 ```
 ### `DeviceResponse`
 
-Device retrieval mdoc response. It is CBOR encoded
+Device retrieval [mdoc response](Documentation/Reference/structs/DeviceResponse.md). It is CBOR encoded
 
 In mdoc reader initialize from CBOR data received from holder (data exchange)
 In mdoc holder initialize from CBOR data received from server (registration)

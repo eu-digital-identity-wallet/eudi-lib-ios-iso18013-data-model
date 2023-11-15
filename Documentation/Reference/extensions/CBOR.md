@@ -1,9 +1,6 @@
 **EXTENSION**
 
 # `CBOR`
-```swift
-extension CBOR
-```
 
 ## Properties
 ### `description`
