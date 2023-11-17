@@ -46,4 +46,7 @@ extension Array where Element == IssuerSignedItem {
 	public func findItem(name: String) -> IssuerSignedItem? { first(where: { $0.elementIdentifier == name} ) }
 	public func findMap(name: String) -> [CBOR:CBOR]? { first(where: { $0.elementIdentifier == name} )?.getTypedValue() }
 	public func findArray(name: String) -> [CBOR]? { first(where: { $0.elementIdentifier == name} )?.getTypedValue() }
+	public func toJson() -> [String: Any] {
+		CBOR.decodeDictionary(Dictionary(grouping: self, by: { CBOR.utf8String($0.elementIdentifier) }).mapValues { $0.first!.elementValue }, base64: true)
+	}
 }

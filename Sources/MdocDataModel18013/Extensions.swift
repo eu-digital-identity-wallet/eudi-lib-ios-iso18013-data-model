@@ -49,9 +49,10 @@ extension String {
 		CBOR.tagged(CBOR.Tag(rawValue: 1004), .utf8String(self))
 	}
 	
-	public func usPosixDate() -> String {
-		// todo: use iso-date formatter for localized display
+	public func usPosixDate(useIsoFormat: Bool = true) -> String {
 		guard let ds = self.split(separator: "T").first else { return "" }
+		if useIsoFormat { return String(ds)}
+		// todo: use iso-date formatter for localized display
 		let dc = ds.split(separator: "-")
 		guard dc.count >= 3 else { return "" }
 		return "\(dc[1])/\(dc[2])/\(dc[0])"
@@ -199,6 +200,14 @@ extension CBOR {
 		return Data(self.encode())
 	}
 	
+	public static func asDateString(_ tag: Tag, _ value: CBOR) -> Any {
+		if tag.rawValue == 1004 || tag == .standardDateTimeString, let strDate = value.unwrap() as? String {
+			return strDate.usPosixDate()
+		} else {
+			return value.unwrap() ?? ""
+		}
+	}
+	
 	public func asCose() -> (CBOR.Tag, [CBOR])? {
 		guard let rawCose =  self.unwrap() as? (CBOR.Tag, CBOR),
 			  let cosePayload = rawCose.1.asList() else {
@@ -225,7 +234,7 @@ extension CBOR {
 	
 	// MARK: - Public Properties
 	
-	public static func decodeList(_ list: [CBOR], unwrap: Bool = true) -> [Any] {
+	public static func decodeList(_ list: [CBOR], unwrap: Bool = true, base64: Bool = false) -> [Any] {
 		var result = [Any]()
 		
 		for val in list {
@@ -235,11 +244,9 @@ extension CBOR {
 			} else if let unwrappedValue = unwrappedValue as? [CBOR] {
 				result.append(decodeList(unwrappedValue, unwrap: unwrap))
 			} else if let unwrappedValue = unwrappedValue as? (CBOR.Tag, CBOR) {
-				if unwrappedValue.0.rawValue == 1004 || unwrappedValue.0 == .standardDateTimeString, let strDate = unwrappedValue.1.unwrap() as? String {
-					result.append(strDate.usPosixDate())
-				} else {
-					result.append(unwrappedValue.1.unwrap() ?? "")
-				}
+				result.append(CBOR.asDateString(unwrappedValue.0, unwrappedValue.1))
+			} else if let bytes = unwrappedValue as? [UInt8] {
+				result.append(base64 ? Data(bytes).base64EncodedString() : bytes)
 			} else if let unwrappedValue {
 				result.append(unwrappedValue)
 			}
@@ -247,7 +254,7 @@ extension CBOR {
 		return result
 	}
 	
-	public static func decodeDictionary(_ dictionary: [CBOR:CBOR], unwrap: Bool = true) -> [String: Any] {
+	public static func decodeDictionary(_ dictionary: [CBOR:CBOR], unwrap: Bool = true, base64: Bool = false) -> [String: Any] {
 		var payload = [String: Any]()
 		for (key, val) in dictionary {
 			if let key = key.asString() {
@@ -257,11 +264,9 @@ extension CBOR {
 				} else if let unwrappedValue = unwrappedValue as? [CBOR] {
 					payload[key] = decodeList(unwrappedValue, unwrap: unwrap)
 				} else if let unwrappedValue = unwrappedValue as? (CBOR.Tag, CBOR) {
-					if unwrappedValue.0.rawValue == 1004 || unwrappedValue.0 == .standardDateTimeString, let strDate = unwrappedValue.1.unwrap() as? String {
-						payload[key] = strDate.usPosixDate()
-					} else {
-						payload[key] = unwrappedValue.1.unwrap()
-					}
+					payload[key] = CBOR.asDateString(unwrappedValue.0, unwrappedValue.1)
+				} else if let bytes = unwrappedValue as? [UInt8] {
+					payload[key] = base64 ? Data(bytes).base64EncodedString() : bytes
 				} else if let unwrappedValue {
 					payload[key] = unwrappedValue
 				}
