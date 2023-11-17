@@ -176,8 +176,20 @@ final class MdocDataModel18013Tests: XCTestCase {
 		let dr = try XCTUnwrap(DeviceResponse(data: AnnexdTestData.d412.bytes))
 		let docs = try XCTUnwrap(dr.documents); let doc = try XCTUnwrap(docs.first)
 		XCTAssertEqual(doc.docType, IsoMdlModel.isoDocType)
-		let isoNS = try XCTUnwrap(doc.issuerSigned.issuerNameSpaces)
+		_ = try XCTUnwrap(doc.issuerSigned.issuerNameSpaces)
 		let tmp = IsoMdlModel.self.moreThan2AgeOverElementIdentifiers(IsoMdlModel.isoDocType, IsoMdlModel.isoNamespace, ageAttestIs19, ["birth_date", "age_over_18", "age_over_21", "age_over_60"])
 		XCTAssertEqual(tmp, ["age_over_18"])
+	}
+	
+	func testToJsonConverter() throws {
+		let dr = try XCTUnwrap(DeviceResponse(data: AnnexdTestData.d412.bytes))
+		let model = try XCTUnwrap(IsoMdlModel(response: dr, devicePrivateKey: CoseKeyPrivate(crv: .p256)))
+		var jsonObj = try XCTUnwrap(model.toJson()[IsoMdlModel.isoNamespace] as? [String:Any])
+		XCTAssertEqual(model.docType, IsoMdlModel.isoDocType)
+		XCTAssertEqual(jsonObj["family_name"] as! String, "Doe")
+		XCTAssertEqual(jsonObj["issue_date"] as! String, "2019-10-20")
+		let jsonData = try JSONSerialization.data(withJSONObject: jsonObj)
+		let jsonStr = try XCTUnwrap(String(data: jsonData, encoding: .utf8))
+		print(jsonStr)
 	}
 }

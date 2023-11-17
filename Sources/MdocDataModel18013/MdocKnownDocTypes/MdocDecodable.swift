@@ -17,6 +17,7 @@ limitations under the License.
 //  MdocDecodable.swift
 
 import Foundation
+import SwiftCBOR
 
 /// A conforming type represents mdoc data.
 ///
@@ -28,6 +29,7 @@ public protocol MdocDecodable: AgeAttesting {
 	var nameSpaces: [NameSpace]? { get set}
 	var title: String { get set}
 	var displayStrings: [NameValue] { get }
+	func toJson() -> [String: Any]
 } // end protocol
 
 extension MdocDecodable {
@@ -51,6 +53,11 @@ extension MdocDecodable {
 		guard var nameSpaces = doc.issuerSigned.issuerNameSpaces?.nameSpaces else { return nil }
 		if let ns { nameSpaces = nameSpaces.filter { ns.contains($0.key) } }
 		return nameSpaces
+	}
+	
+	public func toJson() -> [String: Any] {
+		guard let response, let nameSpaceItems = Self.getSignedItems(response, docType) else { return [:] }
+		return nameSpaceItems.mapValues { $0.toJson() }
 	}
 	
 	public static func extractAgeOverValues(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ ageOverXX: inout [Int: Bool]) {

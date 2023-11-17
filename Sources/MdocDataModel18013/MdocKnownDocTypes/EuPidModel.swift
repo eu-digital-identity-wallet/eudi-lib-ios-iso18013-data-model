@@ -29,7 +29,6 @@ public struct EuPidModel: Codable, MdocDecodable {
 	public let family_name: String?
 	public let given_name: String?
 	public let birth_date: String?
-	public let unique_id: String?
 	public let family_name_birth: String?
 	public let given_name_birth: String?
 	public let birth_place: String?
@@ -59,7 +58,6 @@ public struct EuPidModel: Codable, MdocDecodable {
 		case family_name
 		case given_name
 		case birth_date
-		case unique_id
 		case family_name_birth
 		case given_name_birth
 		case birth_place
@@ -100,7 +98,6 @@ extension EuPidModel {
 		family_name = getValue(key: .family_name)
 		given_name = getValue(key: .given_name)
 		birth_date = getValue(key: .birth_date)
-		unique_id = getValue(key: .unique_id)
 		family_name_birth = getValue(key: .family_name_birth)
 		given_name_birth = getValue(key: .given_name_birth)
 		birth_place = getValue(key: .birth_place)
