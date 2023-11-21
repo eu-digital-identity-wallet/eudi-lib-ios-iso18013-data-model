@@ -22,7 +22,11 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-			name: "MdocDataModel18013", dependencies: ["SwiftCBOR"]),
+			name: "MdocDataModel18013", 
+            dependencies: [
+                "SwiftCBOR",
+                .product(name: "Logging", package: "swift-log")
+                ]),
         .testTarget(
             name: "MdocDataModel18013Tests",
             dependencies: ["MdocDataModel18013"]),
