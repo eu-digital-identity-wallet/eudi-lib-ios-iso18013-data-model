@@ -14,8 +14,9 @@ let package = Package(
             targets: ["MdocDataModel18013"]),
     ],
     dependencies: [ 
-        .package(url: "https://github.com/valpackett/SwiftCBOR.git", branch: "master"),
-    ],
+        .package(url: "https://github.com/valpackett/SwiftCBOR.git", from: "0.4.6"),
+        .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
+     ],
 
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
