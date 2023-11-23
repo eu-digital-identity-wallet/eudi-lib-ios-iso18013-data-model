@@ -42,10 +42,12 @@ public struct CoseKeyPrivate  {
 	
 	public let key: CoseKey
 	let d: [UInt8]
+	let secureEnclaveData: Data?
 	
 	public init(key: CoseKey, d: [UInt8]) {
 		self.key = key
 		self.d = d
+		self.secureEnclaveData = nil
 	}
 }
 
@@ -64,6 +66,10 @@ extension CoseKeyPrivate {
 			let key = P521.Signing.PrivateKey(compactRepresentable: false)
 			privateKeyx963Data = key.x963Representation
 		}
+		self.init(privateKeyx963Data: privateKeyx963Data, crv: crv)
+	}
+			
+	public init(privateKeyx963Data: Data, crv: ECCurveType = .p256) {
 		let xyk = privateKeyx963Data.advanced(by: 1) //Data(privateKeyx963Data[1...])
 		let klen = xyk.count / 3
 		let xdata: Data = Data(xyk[0..<klen])
@@ -71,6 +77,13 @@ extension CoseKeyPrivate {
 		let ddata: Data = Data(xyk[2 * klen..<3 * klen])
 		key = CoseKey(crv: crv, x: xdata.bytes, y: ydata.bytes)
 		d = ddata.bytes
+		secureEnclaveData = nil
+	}
+	
+	public init(publicKeyx963Data: Data, secureEnclaveData: Data) {
+		key = CoseKey(crv: .p256, x963Representation: publicKeyx963Data)
+		d = [] // not used
+		self.secureEnclaveData = secureEnclaveData
 	}
 	
 	// decode cbor string
@@ -134,6 +147,7 @@ extension CoseKeyPrivate {
 	public init(x: [UInt8], y: [UInt8], d: [UInt8], crv: ECCurveType = .p256) {
 		self.key = CoseKey(x: x, y: y, crv: crv)
 		self.d = d
+		self.secureEnclaveData = nil
 	}
 
 	/// An ANSI x9.63 representation of the private key.

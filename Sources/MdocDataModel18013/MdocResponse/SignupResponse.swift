@@ -56,14 +56,14 @@ public struct SignUpResponse: Codable {
 	/// A data file may contain signup responses with many documents (doc.types).
 	/// - Parameter data: Data from file or memory
 	/// - Returns:  separate json serialized signup response objects for each doc.type
-	public static func decomposeCBORSignupResponse(data: Data) -> [(docType: String, jsonData: Data)]? {
+	public static func decomposeCBORSignupResponse(data: Data) -> [(docType: String, jsonData: Data, drData: Data, pkData: Data?)]? {
 		guard let sr = data.decodeJSON(type: SignUpResponse.self), let drs = decomposeCBORDeviceResponse(data: data) else { return nil }
 		return drs.compactMap {
-			let response = Data(CBOR.encode($0.dr.toCBOR(options: CBOROptions()))).base64EncodedString()
-			var jsonObj = ["response": response]
+			let drData = Data(CBOR.encode($0.dr.toCBOR(options: CBOROptions())))
+			var jsonObj = ["response": drData.base64EncodedString()]
 			if let pk = sr.privateKey { jsonObj["privateKey"] = pk }
 			guard let jsonData = try? JSONSerialization.data(withJSONObject: jsonObj) else { return nil }
-			return (docType: $0.docType, jsonData: jsonData)
+			return (docType: $0.docType, jsonData: jsonData, drData: drData, pkData: sr.devicePrivateKey?.getx963Representation())
 		}
 	}
 }
