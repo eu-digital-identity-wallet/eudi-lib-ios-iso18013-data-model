@@ -38,6 +38,7 @@ public struct DeviceEngagement {
 	public var originInfos: [OriginInfoWebsite]? = nil
 	public var deviceRetrievalMethods: [DeviceRetrievalMethod]? = nil
 	public var serverRetrievalOptions: ServerRetrievalOptions? = nil
+	var rfus: [String]?
 	// private key data for holder only
 	var d: [UInt8]?
 	public var qrCoded: [UInt8]?
@@ -49,13 +50,12 @@ public struct DeviceEngagement {
 	/// - Parameters
 	///    - isBleServer: true for BLE mdoc peripheral server mode, false for BLE mdoc central client mode
 	///    - crv: The EC curve type used in the mdoc ephemeral private key
-	public init(isBleServer: Bool?, crv: ECCurveType = .p256) {
+	public init(isBleServer: Bool?, crv: ECCurveType = .p256, rfus: [String]? = nil) {
 		let pk = CoseKeyPrivate(crv: crv)
 		security = Security(deviceKey: pk.key)
 		d = pk.d
-		if let isBleServer {
-			deviceRetrievalMethods = [.ble(isBleServer: isBleServer, uuid: DeviceRetrievalMethod.getRandomBleUuid())]
-		}
+		self.rfus = rfus
+		if let isBleServer { deviceRetrievalMethods = [.ble(isBleServer: isBleServer, uuid: DeviceRetrievalMethod.getRandomBleUuid())] }
 	}
 	/// initialize from cbor data
 	public init?(data: [UInt8]) {
@@ -91,10 +91,11 @@ extension DeviceEngagement: CBOREncodable {
 		if let drms = deviceRetrievalMethods { res[2] = .array(drms.map { $0.toCBOR(options: options)}) }
 		if let sro = serverRetrievalOptions { res[3] = sro.toCBOR(options: options) }
 		if let oi = originInfos { 	res[5] = .array(oi.map {$0.toCBOR(options: CBOROptions()) }) }
+		if let rfus = self.rfus { for (i,r) in rfus.enumerated() { res[.negativeInt(UInt64(i))] = .utf8String(r) } }
+		logger.debug("DE: \(res.encode().toHexString())")
 		return res
 	}
 }
-
 
 extension DeviceEngagement: CBORDecodable {
 	public init?(cbor: CBOR) {
