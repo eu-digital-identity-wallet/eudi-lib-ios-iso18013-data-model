@@ -335,8 +335,8 @@ extension IssuerSignedItem {
 	func getTypedValue<T>() -> T? { elementValue.getTypedValue() }
 }
 
-public typealias DocType = String
-public typealias NameSpace = String
+public typealias DocType = String // Document type
+public typealias NameSpace = String // Name space
 public typealias DataElementIdentifier = String // Data element identifier
 public typealias DataElementValue = CBOR
 public typealias ErrorCode = UInt64

@@ -42,7 +42,7 @@ public struct ConferenceBadgeModel: Codable, MdocDecodable {
 	}
 	public var ageOverXX = [Int: Bool]()
 	public var displayStrings = [NameValue]()
-	
+    public var mandatoryElementKeys: [DataElementIdentifier] { [] }	
 }
 
 extension ConferenceBadgeModel {
