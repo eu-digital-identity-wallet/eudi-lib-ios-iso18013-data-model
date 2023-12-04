@@ -184,7 +184,7 @@ final class MdocDataModel18013Tests: XCTestCase {
 	func testToJsonConverter() throws {
 		let dr = try XCTUnwrap(DeviceResponse(data: AnnexdTestData.d412.bytes))
 		let model = try XCTUnwrap(IsoMdlModel(response: dr, devicePrivateKey: CoseKeyPrivate(crv: .p256)))
-		var jsonObj = try XCTUnwrap(model.toJson()[IsoMdlModel.isoNamespace] as? [String:Any])
+		let jsonObj = try XCTUnwrap(model.toJson()[IsoMdlModel.isoNamespace] as? [String:Any])
 		XCTAssertEqual(model.docType, IsoMdlModel.isoDocType)
 		XCTAssertEqual(jsonObj["family_name"] as! String, "Doe")
 		XCTAssertEqual(jsonObj["issue_date"] as! String, "2019-10-20")

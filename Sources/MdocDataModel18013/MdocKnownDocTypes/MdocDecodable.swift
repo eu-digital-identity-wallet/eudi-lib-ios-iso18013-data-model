@@ -28,6 +28,7 @@ public protocol MdocDecodable: AgeAttesting {
 	var docType: String { get set}
 	var nameSpaces: [NameSpace]? { get set}
 	var title: String { get set}
+	var mandatoryElementKeys: [DataElementIdentifier] { get}
 	var displayStrings: [NameValue] { get }
 	func toJson() -> [String: Any]
 } // end protocol
