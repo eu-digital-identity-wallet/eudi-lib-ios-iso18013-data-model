@@ -83,13 +83,13 @@ public struct EuPidModel: Codable, MdocDecodable {
 		case issuing_country
 		case issuing_jurisdiction
 	}
-	var mandatoryElementCodingKeys: [CodingKeys] {
+	static var mandatoryElementCodingKeys: [CodingKeys] {
 		[.family_name, .given_name, .birth_date]
 	}
 	public var ageOverXX = [Int: Bool]()
 	public var displayStrings = [NameValue]()
-    public var mandatoryElementKeys: [DataElementIdentifier] { ["age_over_18"] + mandatoryElementCodingKeys.map(\.rawValue) }
-
+    public static var pidMandatoryElementKeys: [DataElementIdentifier] { ["age_over_18"] + mandatoryElementCodingKeys.map(\.rawValue) }
+	public var mandatoryElementKeys: [DataElementIdentifier] { Self.pidMandatoryElementKeys }
 }
 
 extension EuPidModel {

@@ -107,11 +107,12 @@ public struct IsoMdlModel: Decodable, MdocDecodable {
 		case oidcInfo = "oidc_info"
 	}
 
-    public var mandatoryElementKeys: [DataElementIdentifier] { Self.isoMandatoryKeys.map(\.rawValue ) }
+    public static var isoMandatoryElementKeys: [DataElementIdentifier] { Self.isoMandatoryKeys.map(\.rawValue ) }
 
 	public static var isoMandatoryKeys: [CodingKeys] {
 		[.familyName, .givenName, .birthDate, .issueDate, .expiryDate, .issuingCountry, .issuingAuthority, .documentNumber, .portrait, .drivingPrivileges, .unDistinguishingSign ]
 	}
+	public var mandatoryElementKeys: [DataElementIdentifier] { Self.isoMandatoryElementKeys }
 }
 
 
