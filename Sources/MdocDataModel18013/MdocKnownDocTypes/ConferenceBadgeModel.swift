@@ -42,14 +42,15 @@ public struct ConferenceBadgeModel: Codable, MdocDecodable {
 	}
 	public var ageOverXX = [Int: Bool]()
 	public var displayStrings = [NameValue]()
-    public var mandatoryElementKeys: [DataElementIdentifier] { [] }	
+	public var displayImages = [NameImage]()
+    public var mandatoryElementKeys: [DataElementIdentifier] { [] }
 }
 
 extension ConferenceBadgeModel {
 	public init?(response: DeviceResponse, devicePrivateKey: CoseKeyPrivate) {
 		self.response = response; self.devicePrivateKey = devicePrivateKey
 		guard let nameSpaces = Self.getSignedItems(response, docType) else { return nil }
-		Self.extractDisplayStrings(nameSpaces, &displayStrings)
+		Self.extractDisplayStrings(nameSpaces, &displayStrings, &displayImages)
 		Self.extractAgeOverValues(nameSpaces, &ageOverXX)
 		func getValue<T>(key: ConferenceBadgeModel.CodingKeys) -> T? { Self.getItemValue(nameSpaces, string: key.rawValue) }
 		family_name = getValue(key: .family_name)

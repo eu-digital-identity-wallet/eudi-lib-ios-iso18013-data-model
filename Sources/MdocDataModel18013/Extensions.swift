@@ -322,6 +322,13 @@ extension Dictionary where Key == String, Value == Any {
 		return ""
 	}
 	
+	public func decodeJSON<T: Decodable>(type: T.Type = T.self) -> T? {
+			 let decoder = JSONDecoder()
+		guard let data = try? JSONSerialization.data(withJSONObject: self) else { return nil }
+			 guard let response = try? decoder.decode(type.self, from: data) else { return nil }
+			 return response
+	 }
+	
 	public subscript<Index: RawRepresentable>(index: Index) -> String where Index.RawValue == String {
 		getInnerValue(index.rawValue)
 	}

@@ -88,6 +88,7 @@ public struct EuPidModel: Codable, MdocDecodable {
 	}
 	public var ageOverXX = [Int: Bool]()
 	public var displayStrings = [NameValue]()
+	public var displayImages = [NameImage]()
     public static var pidMandatoryElementKeys: [DataElementIdentifier] { ["age_over_18"] + mandatoryElementCodingKeys.map(\.rawValue) }
 	public var mandatoryElementKeys: [DataElementIdentifier] { Self.pidMandatoryElementKeys }
 }
@@ -96,7 +97,7 @@ extension EuPidModel {
 	public init?(response: DeviceResponse, devicePrivateKey: CoseKeyPrivate) {
 		self.response = response; self.devicePrivateKey = devicePrivateKey
 		guard let nameSpaces = Self.getSignedItems(response, docType) else { return nil }
-		Self.extractDisplayStrings(nameSpaces, &displayStrings)
+		Self.extractDisplayStrings(nameSpaces, &displayStrings, &displayImages)
 		Self.extractAgeOverValues(nameSpaces, &ageOverXX)
 		func getValue<T>(key: EuPidModel.CodingKeys) -> T? { Self.getItemValue(nameSpaces, string: key.rawValue) }
 		family_name = getValue(key: .family_name)
