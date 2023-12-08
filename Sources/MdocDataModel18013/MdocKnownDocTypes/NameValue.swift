@@ -18,16 +18,32 @@ limitations under the License.
 import Foundation
 
 public struct NameValue: Equatable, CustomStringConvertible {
-	
-	public init(name: String, value: String, ns: String? = nil, order: Int = 0) {
+	public init(name: String, value: String, ns: String? = nil, order: Int = 0, children: [NameValue]? = nil) {
 		self.name = name
 		self.value = value
 		self.ns = ns
 		self.order = order
+		self.children = children
 	}
 	public let ns: String?
 	public let name: String
 	public var value: String
 	public var order: Int = 0
+	public var children: [NameValue]?
 	public var description: String { "\(name): \(value)" }
+	public mutating func add(child: NameValue) {
+		if children == nil { children = [] }
+		children!.append(child)
+	}
+}
+
+public struct NameImage {
+	public init(name: String, image: Data, ns: String? = nil) {
+		self.name = name
+		self.image = image
+		self.ns = ns
+	}
+	public let ns: String?
+	public let name: String
+	public let image: Data
 }

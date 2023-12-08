@@ -24,7 +24,7 @@ extension Data {
         try? self.init(contentsOf: url, options: .mappedIfSafe)
     }
 
-   public func decodeJSON<T: Decodable>(type: T.Type) -> T? {
+		public func decodeJSON<T: Decodable>(type: T.Type = T.self) -> T? {
         let decoder = JSONDecoder()
         guard let response = try? decoder.decode(type.self, from: self) else { return nil }
         return response

@@ -30,6 +30,7 @@ public protocol MdocDecodable: AgeAttesting {
 	var title: String { get set}
 	var mandatoryElementKeys: [DataElementIdentifier] { get}
 	var displayStrings: [NameValue] { get }
+	var displayImages: [NameImage] { get }
 	func toJson() -> [String: Any]
 } // end protocol
 
@@ -82,22 +83,43 @@ extension MdocDecodable {
 		return Set(	agesDict.filter { $1 == false }.keys.map { "age_over_\($0)" })
 	}
 		
-	public static func extractDisplayStrings(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ displayStrings: inout [NameValue]) {
+	static func extractDisplayStrings(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ displayStrings: inout [NameValue], _ displayImages: inout [NameImage]) {
 		let bDebugDisplay = UserDefaults.standard.bool(forKey: "DebugDisplay")
 		var order = 0
 		for (ns,items) in nameSpaces {
 			for item in items {
 				let name = item.elementIdentifier
-				if !bDebugDisplay && name.hasPrefix("age_over_") { continue }
 				var value = bDebugDisplay ? item.debugDescription : item.description
 				if name == "sex", let isex = Int(value), isex <= 2 {
 					value = NSLocalizedString(isex == 1 ? "male" : "female", comment: "")
 				}
-				if !bDebugDisplay, value.count == 0 { continue }
-				displayStrings.append(NameValue(name: name, value: value, ns: ns, order: order))
+				if case let .byteString(bs) = item.elementValue { displayImages.append(NameImage(name: name, image: Data(bs), ns: ns)) }
+				//else if !bDebugDisplay, value.count == 0 { continue }
+				var node = NameValue(name: name, value: value, ns: ns, order: order)
+				if case let .map(m) = item.elementValue {
+					let innerJson = CBOR.decodeDictionary(m)
+					addJsonDict(innerJson, to: &node)
+				}
 				order = order + 1
+				displayStrings.append(node)
 			}
 		}
 	}
+	
+	static func addJsonDict(_ json: [String:Any], to: inout NameValue) {
+		var order = 0
+		for (k,v) in json {
+			if let d = v as? [String:Any] {
+				var n = NameValue(name: k, value: "")
+				addJsonDict(d, to: &n)
+				to.add(child: n)
+			} else {
+				to.add(child: NameValue(name: k, value: "\(v)", order: order))
+				order = order + 1
+			}
+			
+		}
+	}
+	
 } // end extension
 								

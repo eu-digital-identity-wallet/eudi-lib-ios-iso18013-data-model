@@ -54,6 +54,7 @@ public struct IsoMdlModel: Decodable, MdocDecodable {
 	public let ageInYears: UInt64?
 	public var ageOverXX = [Int: Bool]()
 	public var displayStrings = [NameValue]()
+	public var displayImages = [NameImage]()
 	public let ageBirthYear: UInt64?
 	public let portrait: [UInt8]?
 	public let unDistinguishingSign: String?
@@ -120,7 +121,7 @@ extension IsoMdlModel {
 	public init?(response: DeviceResponse, devicePrivateKey: CoseKeyPrivate, nameSpaces: [NameSpace]? = nil) {
 		self.response = response; self.devicePrivateKey = devicePrivateKey; self.nameSpaces = nameSpaces
   	guard let nameSpaceItems = Self.getSignedItems(response, docType, nameSpaces) else { return nil }
-		Self.extractDisplayStrings(nameSpaceItems, &displayStrings)
+		Self.extractDisplayStrings(nameSpaceItems, &displayStrings, &displayImages)
 		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getItemValue(nameSpaceItems, string: key.rawValue) }
 		Self.extractAgeOverValues(nameSpaceItems, &ageOverXX)
 		exp = getValue(key: .exp)
