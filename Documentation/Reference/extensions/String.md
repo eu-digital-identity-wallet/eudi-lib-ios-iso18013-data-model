@@ -59,10 +59,10 @@ Converts a base64 encoded string to a base64-url encoded string.
 
 https://tools.ietf.org/html/rfc4648#page-7
 
-### `usPosixDate()`
+### `usPosixDate(useIsoFormat:)`
 
 ```swift
-public func usPosixDate() -> String
+public func usPosixDate(useIsoFormat: Bool = true) -> String
 ```
 
 ### `toBytes()`

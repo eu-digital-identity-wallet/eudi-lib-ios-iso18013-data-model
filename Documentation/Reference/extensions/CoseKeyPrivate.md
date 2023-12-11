@@ -12,6 +12,18 @@ extension CoseKeyPrivate
 public init(crv: ECCurveType)
 ```
 
+### `init(privateKeyx963Data:crv:)`
+
+```swift
+public init(privateKeyx963Data: Data, crv: ECCurveType = .p256)
+```
+
+### `init(publicKeyx963Data:secureEnclaveData:)`
+
+```swift
+public init(publicKeyx963Data: Data, secureEnclaveData: Data)
+```
+
 ### `init(base64:)`
 
 ```swift

@@ -54,3 +54,9 @@ public func findMap(name: String) -> [CBOR:CBOR]?
 ```swift
 public func findArray(name: String) -> [CBOR]?
 ```
+
+### `toJson()`
+
+```swift
+public func toJson() -> [String: Any]
+```

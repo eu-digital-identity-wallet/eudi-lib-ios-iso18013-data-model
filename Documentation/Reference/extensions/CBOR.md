@@ -88,6 +88,12 @@ public func asBytes() -> [UInt8]?
 public func asData() -> Data
 ```
 
+### `asDateString(_:_:)`
+
+```swift
+public static func asDateString(_ tag: Tag, _ value: CBOR) -> Any
+```
+
 ### `asCose()`
 
 ```swift
@@ -100,14 +106,14 @@ public func asCose() -> (CBOR.Tag, [CBOR])?
 public func decodeBytestring() -> CBOR?
 ```
 
-### `decodeList(_:unwrap:)`
+### `decodeList(_:unwrap:base64:)`
 
 ```swift
-public static func decodeList(_ list: [CBOR], unwrap: Bool = true) -> [Any]
+public static func decodeList(_ list: [CBOR], unwrap: Bool = true, base64: Bool = false) -> [Any]
 ```
 
-### `decodeDictionary(_:unwrap:)`
+### `decodeDictionary(_:unwrap:base64:)`
 
 ```swift
-public static func decodeDictionary(_ dictionary: [CBOR:CBOR], unwrap: Bool = true) -> [String: Any]
+public static func decodeDictionary(_ dictionary: [CBOR:CBOR], unwrap: Bool = true, base64: Bool = false) -> [String: Any]
 ```

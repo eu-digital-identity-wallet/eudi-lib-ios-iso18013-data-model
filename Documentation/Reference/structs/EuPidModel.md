@@ -14,7 +14,6 @@
   - `family_name`
   - `given_name`
   - `birth_date`
-  - `unique_id`
   - `family_name_birth`
   - `given_name_birth`
   - `birth_place`
@@ -41,6 +40,9 @@
   - `issuing_jurisdiction`
   - `ageOverXX`
   - `displayStrings`
+  - `displayImages`
+  - `pidMandatoryElementKeys`
+  - `mandatoryElementKeys`
 
 ```swift
 public struct EuPidModel: Codable, MdocDecodable
@@ -99,12 +101,6 @@ public let given_name: String?
 
 ```swift
 public let birth_date: String?
-```
-
-### `unique_id`
-
-```swift
-public let unique_id: String?
 ```
 
 ### `family_name_birth`
@@ -261,4 +257,22 @@ public var ageOverXX = [Int: Bool]()
 
 ```swift
 public var displayStrings = [NameValue]()
+```
+
+### `displayImages`
+
+```swift
+public var displayImages = [NameImage]()
+```
+
+### `pidMandatoryElementKeys`
+
+```swift
+public static var pidMandatoryElementKeys: [DataElementIdentifier]
+```
+
+### `mandatoryElementKeys`
+
+```swift
+public var mandatoryElementKeys: [DataElementIdentifier]
 ```

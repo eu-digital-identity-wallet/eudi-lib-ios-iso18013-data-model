@@ -21,7 +21,7 @@ init from local file
 ### `decodeJSON(type:)`
 
 ```swift
-public func decodeJSON<T: Decodable>(type: T.Type) -> T?
+public func decodeJSON<T: Decodable>(type: T.Type = T.self) -> T?
 ```
 
 ### `init(base64URLEncoded:options:)`

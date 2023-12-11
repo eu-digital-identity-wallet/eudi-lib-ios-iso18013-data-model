@@ -18,6 +18,12 @@ public func getItemValue<T>(_ s: String) -> T?
 public static func getSignedItems(_ response: DeviceResponse, _ docType: String, _ ns: [NameSpace]? = nil) -> [String: [IssuerSignedItem]]?
 ```
 
+### `toJson()`
+
+```swift
+public func toJson() -> [String: Any]
+```
+
 ### `extractAgeOverValues(_:_:)`
 
 ```swift
@@ -28,10 +34,4 @@ public static func extractAgeOverValues(_ nameSpaces: [NameSpace: [IssuerSignedI
 
 ```swift
 public static func moreThan2AgeOverElementIdentifiers(_ reqDocType: DocType, _ reqNamespace: NameSpace, _ ageAttest: any AgeAttesting, _ reqElementIdentifiers: [DataElementIdentifier]) -> Set<String>
-```
-
-### `extractDisplayStrings(_:_:)`
-
-```swift
-public static func extractDisplayStrings(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ displayStrings: inout [NameValue])
 ```
