@@ -77,7 +77,7 @@ A data file may contain signup responses with many documents (doc.types).
 ### `decomposeCBORSignupResponse(data:)`
 
 ```swift
-public static func decomposeCBORSignupResponse(data: Data) -> [(docType: String, jsonData: Data)]?
+public static func decomposeCBORSignupResponse(data: Data) -> [(docType: String, jsonData: Data, drData: Data, pkData: Data?)]?
 ```
 
 Decompose CBOR signup responses from data

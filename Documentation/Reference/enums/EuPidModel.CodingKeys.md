@@ -8,7 +8,6 @@
   - `family_name`
   - `given_name`
   - `birth_date`
-  - `unique_id`
   - `family_name_birth`
   - `given_name_birth`
   - `birth_place`
@@ -55,12 +54,6 @@ case given_name
 
 ```swift
 case birth_date
-```
-
-### `unique_id`
-
-```swift
-case unique_id
 ```
 
 ### `family_name_birth`

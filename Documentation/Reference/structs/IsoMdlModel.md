@@ -37,6 +37,7 @@
   - `ageInYears`
   - `ageOverXX`
   - `displayStrings`
+  - `displayImages`
   - `ageBirthYear`
   - `portrait`
   - `unDistinguishingSign`
@@ -47,8 +48,9 @@
   - `signatureUsualMark`
   - `biometricTemplateFace`
   - `biometricTemplateSignatureSign`
-  - `mandatoryKeys`
+  - `isoMandatoryElementKeys`
   - `isoMandatoryKeys`
+  - `mandatoryElementKeys`
 
 ```swift
 public struct IsoMdlModel: Decodable, MdocDecodable
@@ -247,6 +249,12 @@ public var ageOverXX = [Int: Bool]()
 public var displayStrings = [NameValue]()
 ```
 
+### `displayImages`
+
+```swift
+public var displayImages = [NameImage]()
+```
+
 ### `ageBirthYear`
 
 ```swift
@@ -307,14 +315,20 @@ public let biometricTemplateFace: String?
 public let biometricTemplateSignatureSign: String?
 ```
 
-### `mandatoryKeys`
+### `isoMandatoryElementKeys`
 
 ```swift
-public static var mandatoryKeys: [String]
+public static var isoMandatoryElementKeys: [DataElementIdentifier]
 ```
 
 ### `isoMandatoryKeys`
 
 ```swift
 public static var isoMandatoryKeys: [CodingKeys]
+```
+
+### `mandatoryElementKeys`
+
+```swift
+public var mandatoryElementKeys: [DataElementIdentifier]
 ```

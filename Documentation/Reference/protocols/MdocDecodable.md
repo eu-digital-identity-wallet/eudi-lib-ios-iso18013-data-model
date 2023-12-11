@@ -41,8 +41,27 @@ var nameSpaces: [NameSpace]?
 var title: String
 ```
 
+### `mandatoryElementKeys`
+
+```swift
+var mandatoryElementKeys: [DataElementIdentifier]
+```
+
 ### `displayStrings`
 
 ```swift
 var displayStrings: [NameValue]
+```
+
+### `displayImages`
+
+```swift
+var displayImages: [NameImage]
+```
+
+## Methods
+### `toJson()`
+
+```swift
+func toJson() -> [String: Any]
 ```

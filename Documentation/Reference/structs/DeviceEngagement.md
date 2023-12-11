@@ -13,7 +13,7 @@
   - `isBleServer`
   - `ble_uuid`
 - [Methods](#methods)
-  - `init(isBleServer:crv:)`
+  - `init(isBleServer:crv:rfus:)`
   - `init(data:)`
 
 ```swift
@@ -77,10 +77,10 @@ public var ble_uuid: String?
 ```
 
 ## Methods
-### `init(isBleServer:crv:)`
+### `init(isBleServer:crv:rfus:)`
 
 ```swift
-public init(isBleServer: Bool?, crv: ECCurveType = .p256)
+public init(isBleServer: Bool?, crv: ECCurveType = .p256, rfus: [String]? = nil)
 ```
 
 Generate device engagement
