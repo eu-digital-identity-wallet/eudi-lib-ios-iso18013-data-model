@@ -8,11 +8,12 @@
   - `ns`
   - `name`
   - `value`
+  - `mdocDataType`
   - `order`
   - `children`
   - `description`
 - [Methods](#methods)
-  - `init(name:value:ns:order:children:)`
+  - `init(name:value:ns:mdocDataType:order:children:)`
   - `add(child:)`
 
 ```swift
@@ -38,6 +39,12 @@ public let name: String
 public var value: String
 ```
 
+### `mdocDataType`
+
+```swift
+public var mdocDataType: MdocDataType?
+```
+
 ### `order`
 
 ```swift
@@ -57,10 +64,10 @@ public var description: String
 ```
 
 ## Methods
-### `init(name:value:ns:order:children:)`
+### `init(name:value:ns:mdocDataType:order:children:)`
 
 ```swift
-public init(name: String, value: String, ns: String? = nil, order: Int = 0, children: [NameValue]? = nil)
+public init(name: String, value: String, ns: String? = nil, mdocDataType: MdocDataType? = nil, order: Int = 0, children: [NameValue]? = nil)
 ```
 
 ### `add(child:)`

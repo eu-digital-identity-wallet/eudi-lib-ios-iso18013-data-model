@@ -1,6 +1,9 @@
 **EXTENSION**
 
 # `CBOR`
+```swift
+extension CBOR
+```
 
 ## Properties
 ### `description`
@@ -13,6 +16,12 @@ public var description: String
 
 ```swift
 public var debugDescription: String
+```
+
+### `mdocDataType`
+
+```swift
+public var mdocDataType: MdocDataType?
 ```
 
 ## Methods
@@ -116,4 +125,10 @@ public static func decodeList(_ list: [CBOR], unwrap: Bool = true, base64: Bool 
 
 ```swift
 public static func decodeDictionary(_ dictionary: [CBOR:CBOR], unwrap: Bool = true, base64: Bool = false) -> [String: Any]
+```
+
+### `decodeCborVal(_:unwrap:base64:)`
+
+```swift
+public static func decodeCborVal(_ val: CBOR, unwrap: Bool, base64: Bool) -> Any
 ```

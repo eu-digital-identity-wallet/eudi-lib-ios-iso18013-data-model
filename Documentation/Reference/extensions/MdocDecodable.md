@@ -18,10 +18,10 @@ public func getItemValue<T>(_ s: String) -> T?
 public static func getSignedItems(_ response: DeviceResponse, _ docType: String, _ ns: [NameSpace]? = nil) -> [String: [IssuerSignedItem]]?
 ```
 
-### `toJson()`
+### `toJson(base64:)`
 
 ```swift
-public func toJson() -> [String: Any]
+public func toJson(base64: Bool = false) -> [String: Any]
 ```
 
 ### `extractAgeOverValues(_:_:)`

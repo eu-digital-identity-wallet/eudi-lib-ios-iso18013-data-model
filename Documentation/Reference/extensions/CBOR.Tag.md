@@ -1,6 +1,9 @@
 **EXTENSION**
 
 # `CBOR.Tag`
+```swift
+extension CBOR.Tag
+```
 
 ## Properties
 ### `coseSign1Item`

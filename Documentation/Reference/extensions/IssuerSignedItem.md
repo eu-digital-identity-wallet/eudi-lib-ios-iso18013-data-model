@@ -18,6 +18,12 @@ public var description: String
 public var debugDescription: String
 ```
 
+### `mdocDataType`
+
+```swift
+public var mdocDataType: MdocDataType?
+```
+
 ## Methods
 ### `init(data:)`
 
