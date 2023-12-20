@@ -60,8 +60,8 @@ var displayImages: [NameImage]
 ```
 
 ## Methods
-### `toJson()`
+### `toJson(base64:)`
 
 ```swift
-func toJson() -> [String: Any]
+func toJson(base64: Bool) -> [String: Any]
 ```

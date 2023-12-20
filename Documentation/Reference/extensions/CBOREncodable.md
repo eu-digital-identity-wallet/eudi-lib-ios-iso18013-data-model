@@ -1,6 +1,9 @@
 **EXTENSION**
 
 # `CBOREncodable`
+```swift
+extension CBOREncodable
+```
 
 ## Properties
 ### `taggedEncoded`

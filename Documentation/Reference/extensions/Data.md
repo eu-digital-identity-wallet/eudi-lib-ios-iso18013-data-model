@@ -1,6 +1,9 @@
 **EXTENSION**
 
 # `Data`
+```swift
+extension Data
+```
 
 ## Properties
 ### `bytes`
