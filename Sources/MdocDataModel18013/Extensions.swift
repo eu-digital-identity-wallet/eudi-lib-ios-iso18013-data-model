@@ -235,46 +235,35 @@ extension CBOR {
 	// MARK: - Public Properties
 	
 	public static func decodeList(_ list: [CBOR], unwrap: Bool = true, base64: Bool = false) -> [Any] {
-		var result = [Any]()
-		
-		for val in list {
-			let unwrappedValue: Any? = unwrap ? val.unwrap() : val
-			if let unwrappedValue = unwrappedValue as? [CBOR:CBOR] {
-				result.append(decodeDictionary(unwrappedValue, unwrap: unwrap))
-			} else if let unwrappedValue = unwrappedValue as? [CBOR] {
-				result.append(decodeList(unwrappedValue, unwrap: unwrap))
-			} else if let unwrappedValue = unwrappedValue as? (CBOR.Tag, CBOR) {
-				result.append(CBOR.asDateString(unwrappedValue.0, unwrappedValue.1))
-			} else if let bytes = unwrappedValue as? [UInt8] {
-				result.append(base64 ? Data(bytes).base64EncodedString() : bytes)
-			} else if let unwrappedValue {
-				result.append(unwrappedValue)
-			}
-		}
-		return result
+		list.map { val in decodeCborVal(val, unwrap: unwrap, base64: base64) }
 	}
 	
 	public static func decodeDictionary(_ dictionary: [CBOR:CBOR], unwrap: Bool = true, base64: Bool = false) -> [String: Any] {
 		var payload = [String: Any]()
 		for (key, val) in dictionary {
 			if let key = key.asString() {
-				let unwrappedValue: Any? = unwrap ? val.unwrap() : val
-				if let unwrappedValue = unwrappedValue as? [CBOR:CBOR] {
-					payload[key] = decodeDictionary(unwrappedValue, unwrap: unwrap)
-				} else if let unwrappedValue = unwrappedValue as? [CBOR] {
-					payload[key] = decodeList(unwrappedValue, unwrap: unwrap)
-				} else if let unwrappedValue = unwrappedValue as? (CBOR.Tag, CBOR) {
-					payload[key] = CBOR.asDateString(unwrappedValue.0, unwrappedValue.1)
-				} else if let bytes = unwrappedValue as? [UInt8] {
-					payload[key] = base64 ? Data(bytes).base64EncodedString() : bytes
-				} else if let unwrappedValue {
-					payload[key] = unwrappedValue
-				}
+				payload[key] = decodeCborVal(val, unwrap: unwrap, base64: base64)
 			}
 		}
 		return payload
 	}
 	
+	public static func decodeCborVal(_ val: CBOR, unwrap: Bool, base64: Bool) -> Any {
+		if unwrap, case .map(let d) = val {
+			return decodeDictionary(d, unwrap: unwrap)
+		} else if unwrap, case .array(let a) = val {
+			return decodeList(a, unwrap: unwrap)
+		} else if unwrap, case .tagged(let t, let v) = val {
+			return CBOR.asDateString(t, v)
+		} else if unwrap, case .byteString(let bytes) = val {
+			return if base64 { Data(bytes).base64EncodedString() } else { bytes }
+		} else if unwrap, let unwrappedValue = val.unwrap() {
+			return unwrappedValue
+		} else {
+			return val
+		}
+	}
+ 
 	func getTypedValue<T>() -> T? {
 		if T.self == ServerRetrievalOption.self { return ServerRetrievalOption(cbor: self) as? T }
 		else if T.self == DrivingPrivileges.self { return DrivingPrivileges(cbor: self) as? T }

@@ -92,10 +92,18 @@ final class MdocDataModel18013Tests: XCTestCase {
 		XCTAssertEqual(pidObj.family_name, "ANDERSSON")
 		let mdlObj = try XCTUnwrap(IsoMdlModel(response: dr, devicePrivateKey: Self.pk))
 		XCTAssertEqual(mdlObj.familyName, "ANDERSSON")
+		printDisplayStrings(mdlObj.displayStrings)
 	}
 	
-	func testMakeIsoMdlRequest() throws {
-		
+	func printDisplayStrings(_ displayStrings: [NameValue], level: Int = 0) {
+		for ns in displayStrings {
+			for _ in 0..<level { print(" ", terminator: "") }
+			print(ns.order, ":", ns.name, ns.value, "(\(ns.mdocDataType?.rawValue ?? ""))")
+			// display children
+			if let children = ns.children {
+				printDisplayStrings(children, level: level + 1)
+			}
+		}
 	}
 
 	// test based on D.4.1.2 mdoc response section of the ISO/IEC FDIS 18013-5 document
@@ -184,7 +192,7 @@ final class MdocDataModel18013Tests: XCTestCase {
 	func testToJsonConverter() throws {
 		let dr = try XCTUnwrap(DeviceResponse(data: AnnexdTestData.d412.bytes))
 		let model = try XCTUnwrap(IsoMdlModel(response: dr, devicePrivateKey: CoseKeyPrivate(crv: .p256)))
-		let jsonObj = try XCTUnwrap(model.toJson()[IsoMdlModel.isoNamespace] as? [String:Any])
+		let jsonObj = try XCTUnwrap(model.toJson(base64: true)[IsoMdlModel.isoNamespace] as? [String:Any])
 		XCTAssertEqual(model.docType, IsoMdlModel.isoDocType)
 		XCTAssertEqual(jsonObj["family_name"] as! String, "Doe")
 		XCTAssertEqual(jsonObj["issue_date"] as! String, "2019-10-20")

@@ -31,7 +31,7 @@ public protocol MdocDecodable: AgeAttesting {
 	var mandatoryElementKeys: [DataElementIdentifier] { get}
 	var displayStrings: [NameValue] { get }
 	var displayImages: [NameImage] { get }
-	func toJson() -> [String: Any]
+	func toJson(base64: Bool) -> [String: Any]
 } // end protocol
 
 extension MdocDecodable {
@@ -57,9 +57,9 @@ extension MdocDecodable {
 		return nameSpaces
 	}
 	
-	public func toJson() -> [String: Any] {
+	public func toJson(base64: Bool = false) -> [String: Any] {
 		guard let response, let nameSpaceItems = Self.getSignedItems(response, docType) else { return [:] }
-		return nameSpaceItems.mapValues { $0.toJson() }
+		return nameSpaceItems.mapValues { $0.toJson(base64: base64) }
 	}
 	
 	public static func extractAgeOverValues(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ ageOverXX: inout [Int: Bool]) {
@@ -83,43 +83,45 @@ extension MdocDecodable {
 		return Set(	agesDict.filter { $1 == false }.keys.map { "age_over_\($0)" })
 	}
 		
+	static func extractDisplayStringOrImage(_ name: String, _ cborValue: CBOR, _ bDebugDisplay: Bool, _ displayImages: inout [NameImage], _ ns: NameSpace, _ order: Int) -> NameValue {
+		var value = bDebugDisplay ? cborValue.debugDescription : cborValue.description
+		var dt = cborValue.mdocDataType
+		if name == "sex", let isex = Int(value), isex <= 2 {
+			value = NSLocalizedString(isex == 1 ? "male" : "female", comment: ""); dt = .string
+		}
+		if case let .byteString(bs) = cborValue {
+			displayImages.append(NameImage(name: name, image: Data(bs), ns: ns))
+		}
+		var node = NameValue(name: name, value: value, ns: ns, mdocDataType: dt, order: order)
+		if case let .map(m) = cborValue {
+			let innerJsonMap = CBOR.decodeDictionary(m, unwrap: false)
+			for (o2,(k,v)) in innerJsonMap.enumerated() {
+				guard let cv = v as? CBOR else { continue }
+				node.add(child: extractDisplayStringOrImage(k, cv, bDebugDisplay, &displayImages, ns, o2))
+			}
+		} else if case let .array(a) = cborValue {
+			let innerJsonArray = CBOR.decodeList(a, unwrap: false)
+			for (o2,v) in innerJsonArray.enumerated() {
+				guard let cv = v as? CBOR else { continue }
+				let k = "\(name)[\(o2)]"
+				node.add(child: extractDisplayStringOrImage(k, cv, bDebugDisplay, &displayImages, ns, o2))
+			}
+		}
+		return node
+	}
+	
 	static func extractDisplayStrings(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ displayStrings: inout [NameValue], _ displayImages: inout [NameImage]) {
 		let bDebugDisplay = UserDefaults.standard.bool(forKey: "DebugDisplay")
 		var order = 0
 		for (ns,items) in nameSpaces {
 			for item in items {
-				let name = item.elementIdentifier
-				var value = bDebugDisplay ? item.debugDescription : item.description
-				if name == "sex", let isex = Int(value), isex <= 2 {
-					value = NSLocalizedString(isex == 1 ? "male" : "female", comment: "")
-				}
-				if case let .byteString(bs) = item.elementValue { displayImages.append(NameImage(name: name, image: Data(bs), ns: ns)) }
-				//else if !bDebugDisplay, value.count == 0 { continue }
-				var node = NameValue(name: name, value: value, ns: ns, order: order)
-				if case let .map(m) = item.elementValue {
-					let innerJson = CBOR.decodeDictionary(m)
-					addJsonDict(innerJson, to: &node)
-				}
+				let n = extractDisplayStringOrImage(item.elementIdentifier, item.elementValue, bDebugDisplay, &displayImages, ns, order)
+				displayStrings.append(n)
 				order = order + 1
-				displayStrings.append(node)
 			}
 		}
 	}
-	
-	static func addJsonDict(_ json: [String:Any], to: inout NameValue) {
-		var order = 0
-		for (k,v) in json {
-			if let d = v as? [String:Any] {
-				var n = NameValue(name: k, value: "")
-				addJsonDict(d, to: &n)
-				to.add(child: n)
-			} else {
-				to.add(child: NameValue(name: k, value: "\(v)", order: order))
-				order = order + 1
-			}
-			
-		}
-	}
+
 	
 } // end extension
 								

@@ -71,12 +71,35 @@ extension CBOR: CustomDebugStringConvertible {
 		}
 }
 
+extension CBOR {
+	public var mdocDataType: MdocDataType? {
+		switch self {
+		case .utf8String(_), .null: return .string
+		case .byteString(_): return .bytes
+		case .map(_): return .dictionary
+		case .array(_): return .array
+		case .boolean(_): return .boolean
+		case .tagged(.standardDateTimeString, _): return .date
+		case .tagged(Tag(rawValue: 1004), _): return .date
+		case .tagged(_, .utf8String(_)): return .string
+		case .simple(_), .unsignedInt(_): return .integer
+		case .float(_), .double(_): return .double
+		default:
+			return nil
+		}
+	}
+}
+
 extension IssuerSignedItem: CustomStringConvertible {
 	public var description: String { elementValue.description }
 }
 
 extension IssuerSignedItem: CustomDebugStringConvertible {
 	public var debugDescription: String { elementValue.debugDescription }
+}
+
+extension IssuerSignedItem {
+	public var mdocDataType: MdocDataType? { elementValue.mdocDataType }
 }
 
 extension IssuerSignedItem: CBORDecodable {
