@@ -18,6 +18,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 typealias AuthorizedNameSpaces = [NameSpace]
 typealias DataElementsArray = [DataElementIdentifier]
@@ -52,7 +53,7 @@ extension DeviceKeyInfo: CBORDecodable {
 
 extension DeviceKeyInfo: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		var m = [CBOR: CBOR]()
+		var m = OrderedDictionary<CBOR, CBOR>()
 		m[.utf8String(Keys.deviceKey.rawValue)] = deviceKey.toCBOR(options: options)
 		if let keyAuthorizations { m[.utf8String(Keys.keyAuthorizations.rawValue)] = keyAuthorizations.toCBOR(options: options) }
 		if let keyInfo { m[.utf8String(Keys.keyInfo.rawValue)] = keyInfo }
@@ -95,12 +96,12 @@ extension KeyAuthorizations: CBORDecodable {
 
 extension KeyAuthorizations: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		var m = [CBOR: CBOR]()
+		var m = OrderedDictionary<CBOR, CBOR>()
 		if let nameSpaces {
 			m[.utf8String(Keys.nameSpaces.rawValue)] = .array(nameSpaces.map { .utf8String($0) })
 		}
 		if let dataElements {
-			var d = [CBOR: CBOR]()
+			var d = OrderedDictionary<CBOR, CBOR>()
 			for (k,v) in dataElements { d[.utf8String(k)] = .array(v.map { .utf8String($0) }) }
 			m[.utf8String(Keys.dataElements.rawValue)] = .map(d)
 		}

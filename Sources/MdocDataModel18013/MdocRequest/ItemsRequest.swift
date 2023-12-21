@@ -16,6 +16,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 public struct ItemsRequest {
 	/// Requested document type.
@@ -45,7 +46,7 @@ extension ItemsRequest: CBORDecodable {
 
 extension ItemsRequest: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		var m = [CBOR: CBOR]()
+		var m = OrderedDictionary<CBOR, CBOR>()
         m[.utf8String(Keys.docType.rawValue)] = .utf8String(docType)
         m[.utf8String(Keys.nameSpaces.rawValue)] = requestNameSpaces.toCBOR(options: options)
         if let requestInfo { m[.utf8String(Keys.requestInfo.rawValue)] = requestInfo }

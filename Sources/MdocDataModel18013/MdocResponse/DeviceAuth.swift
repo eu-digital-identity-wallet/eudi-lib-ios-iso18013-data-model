@@ -16,6 +16,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 /// contains either the DeviceSignature or the DeviceMac element
 public struct DeviceAuth {
@@ -43,7 +44,7 @@ extension DeviceAuth: CBORDecodable {
 
 extension DeviceAuth: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		var m: [CBOR: CBOR] = [:]
+		var m = OrderedDictionary<CBOR, CBOR>()
 		let cborMS = coseMacOrSignature.toCBOR(options: options)
 		switch coseMacOrSignature.type {
 		case .sign1: m[.utf8String(Keys.deviceSignature.rawValue)] = cborMS

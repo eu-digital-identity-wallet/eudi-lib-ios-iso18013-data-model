@@ -20,6 +20,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 /// Optional information on the server retrieval methods supported by the mdoc
 public struct ServerRetrievalOptions: Equatable  {
@@ -35,7 +36,7 @@ public struct ServerRetrievalOptions: Equatable  {
 
 extension ServerRetrievalOptions: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-        var cborMap = [CBOR: CBOR]()
+        var cborMap = OrderedDictionary<CBOR, CBOR>()
         if let webAPI { cborMap[.utf8String(Keys.webApi.rawValue)] = webAPI.toCBOR(options: options) }
         if let oIDC { cborMap[.utf8String(Keys.oidc.rawValue)] = oIDC.toCBOR(options: options) }
         return .map(cborMap)

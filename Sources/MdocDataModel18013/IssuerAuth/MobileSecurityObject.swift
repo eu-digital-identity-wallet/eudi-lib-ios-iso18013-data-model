@@ -18,6 +18,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 /// Mobile security object (MSO)
 public struct MobileSecurityObject {
@@ -82,7 +83,7 @@ extension MobileSecurityObject: CBORDecodable {
 
 extension MobileSecurityObject: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		var m = [CBOR: CBOR]()
+		var m = OrderedDictionary<CBOR, CBOR>()
 		m[.utf8String(Keys.version.rawValue)] = .utf8String(version)
 		m[.utf8String(Keys.digestAlgorithm.rawValue)] = .utf8String(digestAlgorithm)
 		m[.utf8String(Keys.valueDigests.rawValue)] = valueDigests.toCBOR(options: options)

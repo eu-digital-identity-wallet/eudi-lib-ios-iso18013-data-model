@@ -14,7 +14,7 @@ let package = Package(
             targets: ["MdocDataModel18013"]),
     ],
     dependencies: [ 
-        .package(url: "https://github.com/valpackett/SwiftCBOR.git", from: "0.4.6"),
+        .package(url: "https://github.com/scytales-com/SwiftCBOR.git", from: "0.5.0"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
      ],
 

@@ -16,6 +16,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 public typealias IntentToRetain = Bool
 
@@ -45,6 +46,6 @@ extension RequestDataElements: CBOREncodable {
 		let m = dataElements.map { (dei: DataElementIdentifier, ir: IntentToRetain) -> (CBOR, CBOR) in
 			(.utf8String(dei), .boolean(ir))
 		}
-		return .map(Dictionary(m, uniquingKeysWith: { (d, _) in d }))
+		return .map(OrderedDictionary(m, uniquingKeysWith: { (d, _) in d }))
 	}
 }

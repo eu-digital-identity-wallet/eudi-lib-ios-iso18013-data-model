@@ -16,6 +16,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 /// contains the requested data elements and the namespace they belong to.
 public struct RequestNameSpaces {
@@ -43,6 +44,6 @@ extension RequestNameSpaces: CBOREncodable {
 		let m = nameSpaces.map { (ns: NameSpace, rde: RequestDataElements) -> (CBOR, CBOR) in
 			(.utf8String(ns), rde.toCBOR(options: options))
 		}
-		return .map(Dictionary(m, uniquingKeysWith: { (d, _) in d }))
+		return .map(OrderedDictionary(m, uniquingKeysWith: { (d, _) in d }))
 	}
 }

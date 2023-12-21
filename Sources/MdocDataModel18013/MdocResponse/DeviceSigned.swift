@@ -16,6 +16,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 /// Contains the mdoc authentication structure and the data elements protected by mdoc authentication
 public struct DeviceSigned {
@@ -48,7 +49,7 @@ extension DeviceSigned: CBORDecodable {
 
 extension DeviceSigned: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		var cbor = [CBOR: CBOR]()
+		var cbor = OrderedDictionary<CBOR, CBOR>()
 		cbor[.utf8String(Keys.nameSpaces.rawValue)] = nameSpacesRawData.taggedEncoded
 		cbor[.utf8String(Keys.deviceAuth.rawValue)] = deviceAuth.toCBOR(options: options)
 		return .map(cbor)

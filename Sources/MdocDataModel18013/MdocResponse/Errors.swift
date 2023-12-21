@@ -16,7 +16,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
-
+import OrderedCollections
 public typealias ErrorItems = [DataElementIdentifier: ErrorCode]
 
 /// Error codes for each namespace for items that are not returned
@@ -57,9 +57,9 @@ extension Errors: CBOREncodable {
             let mei = ei.map { (dei: DataElementIdentifier, ec: ErrorCode) -> (CBOR, CBOR) in
                 (.utf8String(dei), .unsignedInt(ec))
             }
-            return (kns, .map(Dictionary(mei, uniquingKeysWith: { (d, _) in d })))
+            return (kns, .map(OrderedDictionary(mei, uniquingKeysWith: { (d, _) in d })))
         }
-        let cborMap = Dictionary(map1, uniquingKeysWith: { (ns, _) in ns })
+        let cborMap = OrderedDictionary(map1, uniquingKeysWith: { (ns, _) in ns })
         return .map(cborMap)
     }
 }

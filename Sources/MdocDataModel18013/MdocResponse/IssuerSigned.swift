@@ -16,6 +16,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 /// Contains the mobile security object for issuer data authentication and the data elements protected by issuer data authentication.
 public struct IssuerSigned {
@@ -43,7 +44,7 @@ extension IssuerSigned: CBORDecodable {
 
 extension IssuerSigned: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		var cbor = [CBOR: CBOR]()
+		var cbor = OrderedDictionary<CBOR, CBOR>()
 		if let ns = issuerNameSpaces { cbor[.utf8String(Keys.nameSpaces.rawValue)] = ns.toCBOR(options: options) }
 		cbor[.utf8String(Keys.issuerAuth.rawValue)] = issuerAuth.toCBOR(options: options)
 		return .map(cbor)

@@ -18,6 +18,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 /// The categories of vehicles/restrictions/conditions contain information describing the driving privileges of the mDL holder
 public struct DrivingPrivilege: Codable {
@@ -50,7 +51,7 @@ extension DrivingPrivilege: CBORDecodable {
 
 extension DrivingPrivilege: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-        var cborMap = [CBOR: CBOR]()
+        var cborMap = OrderedDictionary<CBOR, CBOR>()
         cborMap[.utf8String(CodingKeys.vehicleCategoryCode.rawValue)] = .utf8String(vehicleCategoryCode)
         if let issueDate { cborMap[.utf8String(CodingKeys.issueDate.rawValue)] = issueDate.fullDateEncoded }
         if let expiryDate { cborMap[.utf8String(CodingKeys.expiryDate.rawValue)] = expiryDate.fullDateEncoded }
