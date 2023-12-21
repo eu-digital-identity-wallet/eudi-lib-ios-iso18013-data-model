@@ -16,6 +16,7 @@ limitations under the License.
 
 import XCTest
 import SwiftCBOR
+import OrderedCollections
 @testable import MdocDataModel18013
 
 final class MdocDataModel18013Tests: XCTestCase {
@@ -192,12 +193,9 @@ final class MdocDataModel18013Tests: XCTestCase {
 	func testToJsonConverter() throws {
 		let dr = try XCTUnwrap(DeviceResponse(data: AnnexdTestData.d412.bytes))
 		let model = try XCTUnwrap(IsoMdlModel(response: dr, devicePrivateKey: CoseKeyPrivate(crv: .p256)))
-		let jsonObj = try XCTUnwrap(model.toJson(base64: true)[IsoMdlModel.isoNamespace] as? [String:Any])
+		let jsonObj = try XCTUnwrap(model.toJson(base64: true)[IsoMdlModel.isoNamespace] as? OrderedDictionary<String, Any>)
 		XCTAssertEqual(model.docType, IsoMdlModel.isoDocType)
 		XCTAssertEqual(jsonObj["family_name"] as! String, "Doe")
 		XCTAssertEqual(jsonObj["issue_date"] as! String, "2019-10-20")
-		let jsonData = try JSONSerialization.data(withJSONObject: jsonObj)
-		let jsonStr = try XCTUnwrap(String(data: jsonData, encoding: .utf8))
-		print(jsonStr)
 	}
 }
