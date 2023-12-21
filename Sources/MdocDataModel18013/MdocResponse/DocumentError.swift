@@ -16,6 +16,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 /// Error codes for documents that are not returned
 public struct DocumentError {
@@ -47,6 +48,6 @@ extension DocumentError: CBOREncodable {
 		let m = docErrors.map { (dt: DocType, ec: ErrorCode) -> (CBOR, CBOR) in
 			(.utf8String(dt), .unsignedInt(ec))
 		}
-		return .map(Dictionary(m, uniquingKeysWith: { (d, _) in d }))
+		return .map(OrderedDictionary(m, uniquingKeysWith: { (d, _) in d }))
 	}
 }

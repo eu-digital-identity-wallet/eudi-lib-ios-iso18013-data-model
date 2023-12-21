@@ -16,6 +16,8 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import Logging
+import OrderedCollections
 
 /// Contains a returned cocument. The document type of the returned document is indicated by the docType element.
 public struct Document {
@@ -56,7 +58,7 @@ extension Document: CBORDecodable {
 
 extension Document: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		var cbor = [CBOR: CBOR]()
+		var cbor = OrderedDictionary<CBOR, CBOR>()
 		cbor[.utf8String(Keys.docType.rawValue)] = .utf8String(docType)
 		cbor[.utf8String(Keys.issuerSigned.rawValue)] = issuerSigned.toCBOR(options: options)
 		if let dsign = deviceSigned { cbor[.utf8String(Keys.deviceSigned.rawValue)] = dsign.toCBOR(options: options) }

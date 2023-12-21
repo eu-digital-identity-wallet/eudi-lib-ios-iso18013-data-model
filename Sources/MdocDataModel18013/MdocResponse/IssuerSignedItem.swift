@@ -16,6 +16,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 /// Data item signed by issuer
 public struct IssuerSignedItem {
@@ -131,7 +132,7 @@ extension IssuerSignedItem: CBOREncodable {
     }
     
 	public func toCBOR(options: CBOROptions) -> CBOR {
-        var cbor = [CBOR: CBOR]()
+        var cbor = OrderedDictionary<CBOR, CBOR>()
         cbor[.utf8String(Keys.digestID.rawValue)] = .unsignedInt(digestID)
         cbor[.utf8String(Keys.random.rawValue)] = .byteString(random)
         cbor[.utf8String(Keys.elementIdentifier.rawValue)] = .utf8String(elementIdentifier)

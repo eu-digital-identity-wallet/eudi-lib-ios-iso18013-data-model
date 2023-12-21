@@ -18,6 +18,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 /// Digests of all data elements per namespace
 public struct ValueDigests {
@@ -43,7 +44,7 @@ extension ValueDigests: CBORDecodable {
 
 extension ValueDigests: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		var m = [CBOR: CBOR]()
+		var m = OrderedDictionary<CBOR, CBOR>()
 		for (k,v) in valueDigests {
 			m[.utf8String(k)] = v.toCBOR(options: CBOROptions())
 		}

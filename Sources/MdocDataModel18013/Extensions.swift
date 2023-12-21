@@ -18,6 +18,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 extension String {
 	public var hex_decimal: Int {
@@ -188,8 +189,8 @@ extension CBOR {
 		return self.unwrap() as? [CBOR]
 	}
 	
-	public func asMap() -> [CBOR:CBOR]? {
-		return self.unwrap() as? [CBOR:CBOR]
+	public func asMap() -> OrderedDictionary<CBOR, CBOR>? {
+		return self.unwrap() as? OrderedDictionary<CBOR, CBOR>
 	}
 	
 	public func asBytes() -> [UInt8]? {
@@ -238,8 +239,8 @@ extension CBOR {
 		list.map { val in decodeCborVal(val, unwrap: unwrap, base64: base64) }
 	}
 	
-	public static func decodeDictionary(_ dictionary: [CBOR:CBOR], unwrap: Bool = true, base64: Bool = false) -> [String: Any] {
-		var payload = [String: Any]()
+	public static func decodeDictionary(_ dictionary: OrderedDictionary<CBOR, CBOR>, unwrap: Bool = true, base64: Bool = false) -> OrderedDictionary<String, Any> {
+		var payload = OrderedDictionary<String, Any>()
 		for (key, val) in dictionary {
 			if let key = key.asString() {
 				payload[key] = decodeCborVal(val, unwrap: unwrap, base64: base64)
@@ -298,6 +299,17 @@ extension Dictionary where Key == CBOR {
 	}
 }
 
+extension OrderedDictionary where Key == CBOR {
+	public subscript<Index: RawRepresentable>(index: Index) -> Value? where Index.RawValue == String {
+		self[CBOR(stringLiteral: index.rawValue)]
+	}
+	
+	public subscript<Index: RawRepresentable>(index: Index) -> Value? where Index.RawValue == Int {
+		self[CBOR(integerLiteral: index.rawValue)]
+	}
+}
+
+
 extension Dictionary where Key == String, Value == Any {
 	/// get inner string value from dictionary decoded by ``decodeDictionary``
 	func getInnerValue(_ path: String) -> String {
@@ -307,6 +319,31 @@ extension Dictionary where Key == String, Value == Any {
 			guard dict != nil else { return "" }
 			if i == pathComponents.count - 1, let v = dict?[k] { return "\(v)" }
 			dict = dict?[k] as? [String:Any]
+		}
+		return ""
+	}
+	
+	public func decodeJSON<T: Decodable>(type: T.Type = T.self) -> T? {
+			 let decoder = JSONDecoder()
+		guard let data = try? JSONSerialization.data(withJSONObject: self) else { return nil }
+			 guard let response = try? decoder.decode(type.self, from: data) else { return nil }
+			 return response
+	 }
+	
+	public subscript<Index: RawRepresentable>(index: Index) -> String where Index.RawValue == String {
+		getInnerValue(index.rawValue)
+	}
+}
+
+extension OrderedDictionary where Key == String, Value == Any {
+	/// get inner string value from dictionary decoded by ``decodeDictionary``
+	func getInnerValue(_ path: String) -> String {
+		var dict: OrderedDictionary<String, Any>? = self
+		let pathComponents = path.components(separatedBy: ".")
+		for (i,k) in pathComponents.enumerated() {
+			guard dict != nil else { return "" }
+			if i == pathComponents.count - 1, let v = dict?[k] { return "\(v)" }
+			dict = dict?[k] as? OrderedDictionary<String, Any>
 		}
 		return ""
 	}

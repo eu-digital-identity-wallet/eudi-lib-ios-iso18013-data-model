@@ -16,6 +16,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 /// Returned data elements for each namespace
 public struct IssuerNameSpaces {
@@ -47,7 +48,7 @@ extension IssuerNameSpaces: CBORDecodable {
 
 extension IssuerNameSpaces: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		var cbor = [CBOR: CBOR]()
+		var cbor = OrderedDictionary<CBOR, CBOR>()
 		for (n, items) in nameSpaces {
 			cbor[.utf8String(n)] = .array(items.map { .tagged(.encodedCBORDataItem, .byteString($0.encode(options: options))) })
 		}
@@ -57,9 +58,9 @@ extension IssuerNameSpaces: CBOREncodable {
 
 extension Array where Element == IssuerSignedItem {
 	public func findItem(name: String) -> IssuerSignedItem? { first(where: { $0.elementIdentifier == name} ) }
-	public func findMap(name: String) -> [CBOR:CBOR]? { first(where: { $0.elementIdentifier == name} )?.getTypedValue() }
+	public func findMap(name: String) -> OrderedDictionary<CBOR, CBOR>? { first(where: { $0.elementIdentifier == name} )?.getTypedValue() }
 	public func findArray(name: String) -> [CBOR]? { first(where: { $0.elementIdentifier == name} )?.getTypedValue() }
-	public func toJson(base64: Bool = false) -> [String: Any] {
-		CBOR.decodeDictionary(Dictionary(grouping: self, by: { CBOR.utf8String($0.elementIdentifier) }).mapValues { $0.first!.elementValue }, base64: base64)
+	public func toJson(base64: Bool = false) -> OrderedDictionary<String, Any> {
+		CBOR.decodeDictionary(OrderedDictionary(grouping: self, by: { CBOR.utf8String($0.elementIdentifier) }).mapValues { $0.first!.elementValue }, base64: base64)
 	}
 }

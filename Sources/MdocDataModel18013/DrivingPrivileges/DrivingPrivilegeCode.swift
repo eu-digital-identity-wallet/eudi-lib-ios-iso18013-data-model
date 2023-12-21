@@ -18,6 +18,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 /// Driving privilege code
 public struct DrivingPrivilegeCode: Codable {
@@ -43,7 +44,7 @@ extension DrivingPrivilegeCode: CBORDecodable {
 
 extension DrivingPrivilegeCode: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-        var cborMap = [CBOR: CBOR]()
+        var cborMap = OrderedDictionary<CBOR, CBOR>()
         cborMap[.utf8String(CodingKeys.code.rawValue)] = .utf8String(code)
         if let sign { cborMap[.utf8String(CodingKeys.sign.rawValue)] = .utf8String(sign) }
         if let value { cborMap[.utf8String(CodingKeys.value.rawValue)] = .utf8String(value) }

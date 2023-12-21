@@ -17,6 +17,7 @@ limitations under the License.
 //  ValidityInfo.swift
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 /// The `ValidityInfo` structure contains information related to the validity of the MSO and its signature
 public struct ValidityInfo {
@@ -55,7 +56,7 @@ extension ValidityInfo: CBORDecodable {
 
 extension ValidityInfo: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		var m = [CBOR: CBOR]()
+		var m = OrderedDictionary<CBOR, CBOR>()
 		m[.utf8String(Keys.signed.rawValue)] = .tagged(.standardDateTimeString, .utf8String(signed))
 		m[.utf8String(Keys.validFrom.rawValue)] = .tagged(.standardDateTimeString, .utf8String(validFrom))
 		m[.utf8String(Keys.validUntil.rawValue)] = .tagged(.standardDateTimeString, .utf8String(validUntil))

@@ -16,7 +16,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
-
+import OrderedCollections
 /// Device retrieval mdoc request structure
 
 /// In mDoc holder initialize a ``DeviceRequest`` with incoming CBOR bytes (decoding)
@@ -60,7 +60,7 @@ extension DeviceRequest: CBOREncodable {
     public func encode(options: CBOROptions) -> [UInt8] { toCBOR(options: options).encode(options: options) }
     
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		var m = [CBOR: CBOR]()
+		var m = OrderedDictionary<CBOR, CBOR>()
         m[.utf8String(Keys.version.rawValue)] = .utf8String(version)
         m[.utf8String(Keys.docRequests.rawValue)] = .array(docRequests.map { $0.toCBOR(options: options) })
 		return .map(m)

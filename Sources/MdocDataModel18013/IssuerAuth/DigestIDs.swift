@@ -18,6 +18,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OrderedCollections
 
 public struct DigestIDs {
 	public let digestIDs: [DigestID: [UInt8]]
@@ -43,7 +44,7 @@ extension DigestIDs: CBORDecodable {
 
 extension DigestIDs: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		var m = [CBOR: CBOR]()
+		var m = OrderedDictionary<CBOR, CBOR>()
 		for (k,v) in digestIDs {
 			m[.unsignedInt(k)] = .byteString(v)
 		}
