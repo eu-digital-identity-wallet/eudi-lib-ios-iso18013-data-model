@@ -83,7 +83,7 @@ extension MdocDecodable {
 		return Set(	agesDict.filter { $1 == false }.keys.map { "age_over_\($0)" })
 	}
 		
-	static func extractDisplayStringOrImage(_ name: String, _ cborValue: CBOR, _ bDebugDisplay: Bool, _ displayImages: inout [NameImage], _ ns: NameSpace, _ order: Int) -> NameValue {
+	public static func extractDisplayStringOrImage(_ name: String, _ cborValue: CBOR, _ bDebugDisplay: Bool, _ displayImages: inout [NameImage], _ ns: NameSpace, _ order: Int) -> NameValue {
 		var value = bDebugDisplay ? cborValue.debugDescription : cborValue.description
 		var dt = cborValue.mdocDataType
 		if name == "sex", let isex = Int(value), isex <= 2 {
@@ -110,7 +110,7 @@ extension MdocDecodable {
 		return node
 	}
 	
-	static func extractDisplayStrings(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ displayStrings: inout [NameValue], _ displayImages: inout [NameImage]) {
+	public static func extractDisplayStrings(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ displayStrings: inout [NameValue], _ displayImages: inout [NameImage]) {
 		let bDebugDisplay = UserDefaults.standard.bool(forKey: "DebugDisplay")
 		var order = 0
 		for (ns,items) in nameSpaces {
