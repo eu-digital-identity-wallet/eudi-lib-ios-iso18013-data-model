@@ -21,8 +21,8 @@ import Foundation
 public struct EuPidModel: Codable, MdocDecodable {
 	public var response: DeviceResponse?
 	public var devicePrivateKey: CoseKeyPrivate?
-	public static var EuPidDocType: String = "eu.europa.ec.eudiw.pid.1"
-	public var docType = Self.EuPidDocType
+	public static var euPidDocType: String = "eu.europa.ec.eudiw.pid.1"
+	public var docType = Self.euPidDocType
 	public var nameSpaces: [NameSpace]?
 	public var title = String("eu_pid_doctype_name")
 	
