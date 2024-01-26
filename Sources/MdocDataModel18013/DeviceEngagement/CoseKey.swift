@@ -42,12 +42,12 @@ public struct CoseKeyPrivate  {
 	
 	public let key: CoseKey
 	let d: [UInt8]
-	let secureEnclaveData: Data?
+	public let secureEnclaveKeyID: Data?
 	
 	public init(key: CoseKey, d: [UInt8]) {
 		self.key = key
 		self.d = d
-		self.secureEnclaveData = nil
+		self.secureEnclaveKeyID = nil
 	}
 }
 
@@ -57,13 +57,13 @@ extension CoseKeyPrivate {
 		var privateKeyx963Data: Data
 		switch crv {
 		case .p256:
-			let key = P256.Signing.PrivateKey(compactRepresentable: false)
+			let key = P256.KeyAgreement.PrivateKey(compactRepresentable: false)
 			privateKeyx963Data = key.x963Representation
 		case .p384:
-			let key = P384.Signing.PrivateKey(compactRepresentable: false)
+			let key = P384.KeyAgreement.PrivateKey(compactRepresentable: false)
 			privateKeyx963Data = key.x963Representation
 		case .p521:
-			let key = P521.Signing.PrivateKey(compactRepresentable: false)
+			let key = P521.KeyAgreement.PrivateKey(compactRepresentable: false)
 			privateKeyx963Data = key.x963Representation
 		}
 		self.init(privateKeyx963Data: privateKeyx963Data, crv: crv)
@@ -77,13 +77,13 @@ extension CoseKeyPrivate {
 		let ddata: Data = Data(xyk[2 * klen..<3 * klen])
 		key = CoseKey(crv: crv, x: xdata.bytes, y: ydata.bytes)
 		d = ddata.bytes
-		secureEnclaveData = nil
+		secureEnclaveKeyID = nil
 	}
 	
-	public init(publicKeyx963Data: Data, secureEnclaveData: Data) {
+	public init(publicKeyx963Data: Data, secureEnclaveKeyID: Data) {
 		key = CoseKey(crv: .p256, x963Representation: publicKeyx963Data)
 		d = [] // not used
-		self.secureEnclaveData = secureEnclaveData
+		self.secureEnclaveKeyID = secureEnclaveKeyID
 	}
 	
 	// decode cbor string
@@ -118,9 +118,9 @@ extension CoseKey: CBORDecodable {
 
 extension CoseKey {
 	public init(crv: ECCurveType, x963Representation: Data) {
-		let keyData = x963Representation.dropFirst()
+		let keyData = x963Representation.dropFirst().bytes
 		let count = keyData.count/2
-		self.init(x: keyData[0..<count].bytes, y: keyData[count...].bytes, crv: crv)
+		self.init(x: Array(keyData[0..<count]), y: Array(keyData[count...]), crv: crv)
 	}
 
 	public init(x: [UInt8], y: [UInt8], crv: ECCurveType = .p256) {
@@ -147,7 +147,7 @@ extension CoseKeyPrivate {
 	public init(x: [UInt8], y: [UInt8], d: [UInt8], crv: ECCurveType = .p256) {
 		self.key = CoseKey(x: x, y: y, crv: crv)
 		self.d = d
-		self.secureEnclaveData = nil
+		self.secureEnclaveKeyID = nil
 	}
 
 	/// An ANSI x9.63 representation of the private key.
