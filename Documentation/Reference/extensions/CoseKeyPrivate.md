@@ -18,10 +18,10 @@ public init(crv: ECCurveType)
 public init(privateKeyx963Data: Data, crv: ECCurveType = .p256)
 ```
 
-### `init(publicKeyx963Data:secureEnclaveData:)`
+### `init(publicKeyx963Data:secureEnclaveKeyID:)`
 
 ```swift
-public init(publicKeyx963Data: Data, secureEnclaveData: Data)
+public init(publicKeyx963Data: Data, secureEnclaveKeyID: Data)
 ```
 
 ### `init(base64:)`

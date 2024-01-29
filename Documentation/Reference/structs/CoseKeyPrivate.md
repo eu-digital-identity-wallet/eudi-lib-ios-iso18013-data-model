@@ -6,6 +6,7 @@
 
 - [Properties](#properties)
   - `key`
+  - `secureEnclaveKeyID`
 - [Methods](#methods)
   - `init(key:d:)`
 
@@ -20,6 +21,12 @@ COSE_Key + private key
 
 ```swift
 public let key: CoseKey
+```
+
+### `secureEnclaveKeyID`
+
+```swift
+public let secureEnclaveKeyID: Data?
 ```
 
 ## Methods

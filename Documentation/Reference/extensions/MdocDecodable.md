@@ -35,3 +35,15 @@ public static func extractAgeOverValues(_ nameSpaces: [NameSpace: [IssuerSignedI
 ```swift
 public static func moreThan2AgeOverElementIdentifiers(_ reqDocType: DocType, _ reqNamespace: NameSpace, _ ageAttest: any AgeAttesting, _ reqElementIdentifiers: [DataElementIdentifier]) -> Set<String>
 ```
+
+### `extractDisplayStringOrImage(_:_:_:_:_:_:)`
+
+```swift
+public static func extractDisplayStringOrImage(_ name: String, _ cborValue: CBOR, _ bDebugDisplay: Bool, _ displayImages: inout [NameImage], _ ns: NameSpace, _ order: Int) -> NameValue
+```
+
+### `extractDisplayStrings(_:_:_:)`
+
+```swift
+public static func extractDisplayStrings(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ displayStrings: inout [NameValue], _ displayImages: inout [NameImage])
+```

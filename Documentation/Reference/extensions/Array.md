@@ -46,7 +46,7 @@ public func findItem(name: String) -> IssuerSignedItem?
 ### `findMap(name:)`
 
 ```swift
-public func findMap(name: String) -> [CBOR:CBOR]?
+public func findMap(name: String) -> OrderedDictionary<CBOR, CBOR>?
 ```
 
 ### `findArray(name:)`
@@ -58,5 +58,5 @@ public func findArray(name: String) -> [CBOR]?
 ### `toJson(base64:)`
 
 ```swift
-public func toJson(base64: Bool = false) -> [String: Any]
+public func toJson(base64: Bool = false) -> OrderedDictionary<String, Any>
 ```

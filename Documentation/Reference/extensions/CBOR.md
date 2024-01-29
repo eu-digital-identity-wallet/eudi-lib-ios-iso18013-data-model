@@ -82,7 +82,7 @@ public func asList() -> [CBOR]?
 ### `asMap()`
 
 ```swift
-public func asMap() -> [CBOR:CBOR]?
+public func asMap() -> OrderedDictionary<CBOR, CBOR>?
 ```
 
 ### `asBytes()`
@@ -124,7 +124,7 @@ public static func decodeList(_ list: [CBOR], unwrap: Bool = true, base64: Bool 
 ### `decodeDictionary(_:unwrap:base64:)`
 
 ```swift
-public static func decodeDictionary(_ dictionary: [CBOR:CBOR], unwrap: Bool = true, base64: Bool = false) -> [String: Any]
+public static func decodeDictionary(_ dictionary: OrderedDictionary<CBOR, CBOR>, unwrap: Bool = true, base64: Bool = false) -> OrderedDictionary<String, Any>
 ```
 
 ### `decodeCborVal(_:unwrap:base64:)`
