@@ -81,6 +81,11 @@ Data = {
  "elementValue" : DataElementValue 
 }
 
+## Dependencies (to other libs)
+
+* A CBOR implementation for Swift [SwiftCBOR](https://github.com/niscy-eudiw/SwiftCBOR)
+* A Logging API for Swift: [swift-log](https://github.com/apple/swift-log)
+* Commonly used data structures for Swift [swift-collections](https://github.com/apple/swift-collections)
 
 ## Reference
 Detailed documentation is provided [here](Documentation/Reference/README.md) 
