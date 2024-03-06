@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "MdocDataModel18013",
     defaultLocalization: "en",
-	platforms: [.macOS(.v12), .iOS(.v13), .watchOS(.v9)],
+	platforms: [.macOS(.v10_15), .iOS(.v14), .tvOS(.v12), .watchOS(.v9)],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
@@ -14,7 +14,7 @@ let package = Package(
             targets: ["MdocDataModel18013"]),
     ],
     dependencies: [ 
-        .package(url: "https://github.com/scytales-com/SwiftCBOR.git", from: "0.5.0"),
+        .package(url: "https://github.com/niscy-eudiw/SwiftCBOR.git", from: "0.5.1"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
      ],
 
