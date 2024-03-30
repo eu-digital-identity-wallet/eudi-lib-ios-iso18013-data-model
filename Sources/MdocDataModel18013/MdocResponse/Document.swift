@@ -68,7 +68,10 @@ extension Document: CBOREncodable {
 }
 
 extension Array where Element == Document {
-	public func findDoc(name: String) -> Document? { first(where: { $0.docType == name} ) }
+	public func findDoc(name: String) -> (Document, Int)? {
+		guard let index = firstIndex(where: { $0.docType == name} ) else { return nil }
+		return (self[index], index)
+	}
 }
 
 extension Array where Element == DocRequest {

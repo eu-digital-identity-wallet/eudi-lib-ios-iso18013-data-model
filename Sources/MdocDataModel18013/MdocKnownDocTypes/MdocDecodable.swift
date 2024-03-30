@@ -51,7 +51,7 @@ extension MdocDecodable {
 	}
 	
 	public static func getSignedItems(_ response: DeviceResponse, _ docType: String, _ ns: [NameSpace]? = nil) -> [String: [IssuerSignedItem]]? {
-		guard let doc = response.documents?.findDoc(name: docType) else { return nil }
+		guard let (doc,_) = response.documents?.findDoc(name: docType) else { return nil }
 		guard var nameSpaces = doc.issuerSigned.issuerNameSpaces?.nameSpaces else { return nil }
 		if let ns { nameSpaces = nameSpaces.filter { ns.contains($0.key) } }
 		return nameSpaces
