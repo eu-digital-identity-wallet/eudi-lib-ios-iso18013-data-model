@@ -22,6 +22,8 @@ public struct EuPidModel: Codable, MdocDecodable {
 	public var response: DeviceResponse?
 	public var devicePrivateKey: CoseKeyPrivate?
 	public static var euPidDocType: String = "eu.europa.ec.eudiw.pid.1"
+	public var id: String = UUID().uuidString
+	public var createdAt: Date = Date()
 	public var docType = Self.euPidDocType
 	public var nameSpaces: [NameSpace]?
 	public var title = String("eu_pid_doctype_name")
@@ -94,8 +96,11 @@ public struct EuPidModel: Codable, MdocDecodable {
 }
 
 extension EuPidModel {
-	public init?(response: DeviceResponse, devicePrivateKey: CoseKeyPrivate) {
-		self.response = response; self.devicePrivateKey = devicePrivateKey
+	public init?(id: String, createdAt: Date, response: DeviceResponse, devicePrivateKey: CoseKeyPrivate) {
+		self.id = id
+		self.createdAt = createdAt
+		self.response = response
+		self.devicePrivateKey = devicePrivateKey
 		guard let nameSpaces = Self.getSignedItems(response, docType) else { return nil }
 		Self.extractDisplayStrings(nameSpaces, &displayStrings, &displayImages)
 		Self.extractAgeOverValues(nameSpaces, &ageOverXX)

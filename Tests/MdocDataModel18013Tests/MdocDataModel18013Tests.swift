@@ -89,9 +89,9 @@ final class MdocDataModel18013Tests: XCTestCase {
 	
 	func testDecodeSampleDataResponse() throws {
 		let dr = try XCTUnwrap(DeviceResponse(data: OtherTestData.sampleCborData.bytes))
-		let pidObj = try XCTUnwrap(EuPidModel(response: dr, devicePrivateKey: Self.pk))
+		let pidObj = try XCTUnwrap(EuPidModel(id: UUID().uuidString, createdAt: Date(), response: dr, devicePrivateKey: Self.pk))
 		XCTAssertEqual(pidObj.family_name, "ANDERSSON")
-		let mdlObj = try XCTUnwrap(IsoMdlModel(response: dr, devicePrivateKey: Self.pk))
+		let mdlObj = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), response: dr, devicePrivateKey: Self.pk))
 		XCTAssertEqual(mdlObj.familyName, "ANDERSSON")
 		printDisplayStrings(mdlObj.displayStrings)
 	}
@@ -132,7 +132,7 @@ final class MdocDataModel18013Tests: XCTestCase {
 		XCTAssertEqual(doc.deviceSigned?.nameSpacesRawData.count, 1); XCTAssertEqual(doc.deviceSigned?.nameSpacesRawData[0], 160) // {} A0 empty dic
 		XCTAssertEqual(doc.deviceSigned?.deviceAuth.coseMacOrSignature.macAlgorithm, Cose.MacAlgorithm.hmac256)
 		XCTAssertEqual(doc.deviceSigned?.deviceAuth.coseMacOrSignature.signature.bytes.toHexString().uppercased(), "E99521A85AD7891B806A07F8B5388A332D92C189A7BF293EE1F543405AE6824D")
-		let model = try XCTUnwrap(IsoMdlModel(response: dr, devicePrivateKey: Self.pk))
+		let model = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), response: dr, devicePrivateKey: Self.pk))
 		XCTAssertEqual(model.familyName, "Doe")
 	}
 
@@ -192,7 +192,7 @@ final class MdocDataModel18013Tests: XCTestCase {
 	
 	func testToJsonConverter() throws {
 		let dr = try XCTUnwrap(DeviceResponse(data: AnnexdTestData.d412.bytes))
-		let model = try XCTUnwrap(IsoMdlModel(response: dr, devicePrivateKey: CoseKeyPrivate(crv: .p256)))
+		let model = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), response: dr, devicePrivateKey: CoseKeyPrivate(crv: .p256)))
 		let jsonObj = try XCTUnwrap(model.toJson(base64: true)[IsoMdlModel.isoNamespace] as? OrderedDictionary<String, Any>)
 		XCTAssertEqual(model.docType, IsoMdlModel.isoDocType)
 		XCTAssertEqual(jsonObj["family_name"] as! String, "Doe")

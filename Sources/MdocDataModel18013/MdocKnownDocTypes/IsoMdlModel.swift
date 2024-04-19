@@ -19,6 +19,8 @@ limitations under the License.
 import Foundation
 
 public struct IsoMdlModel: Decodable, MdocDecodable {
+	public var id: String = UUID().uuidString
+	public var createdAt: Date = Date()
 	public var docType: String = Self.isoDocType
 	public var nameSpaces: [NameSpace]?
 	public var title = String("mdl_doctype_name")
@@ -118,7 +120,8 @@ public struct IsoMdlModel: Decodable, MdocDecodable {
 
 
 extension IsoMdlModel {
-	public init?(response: DeviceResponse, devicePrivateKey: CoseKeyPrivate, nameSpaces: [NameSpace]? = nil) {
+	public init?(id: String, createdAt: Date, response: DeviceResponse, devicePrivateKey: CoseKeyPrivate, nameSpaces: [NameSpace]? = nil) {
+		self.id = id; self.createdAt = createdAt
 		self.response = response; self.devicePrivateKey = devicePrivateKey; self.nameSpaces = nameSpaces
   	guard let nameSpaceItems = Self.getSignedItems(response, docType, nameSpaces) else { return nil }
 		Self.extractDisplayStrings(nameSpaceItems, &displayStrings, &displayImages)
