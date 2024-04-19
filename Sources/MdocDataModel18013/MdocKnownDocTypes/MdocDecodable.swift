@@ -23,9 +23,11 @@ import SwiftCBOR
 ///
 /// Can be decoded by a CBOR device response
 public protocol MdocDecodable: AgeAttesting {
+	var id: String { get }
+	var createdAt: Date { get }
+	var docType: String { get set }
 	var response: DeviceResponse? { get set}
 	var devicePrivateKey: CoseKeyPrivate? { get set}
-	var docType: String { get set}
 	var nameSpaces: [NameSpace]? { get set}
 	var title: String { get set}
 	var mandatoryElementKeys: [DataElementIdentifier] { get}
