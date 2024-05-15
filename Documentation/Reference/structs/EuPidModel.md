@@ -67,6 +67,18 @@ public var devicePrivateKey: CoseKeyPrivate?
 public static var euPidDocType: String = "eu.europa.ec.eudiw.pid.1"
 ```
 
+### `id`
+
+```swift
+public var id: String = UUID().uuidString
+```
+
+### `createdAt`
+
+```swift
+public var createdAt: Date = Date()
+```
+
 ### `docType`
 
 ```swift

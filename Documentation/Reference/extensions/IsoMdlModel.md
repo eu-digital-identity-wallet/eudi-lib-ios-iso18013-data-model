@@ -6,8 +6,8 @@ extension IsoMdlModel
 ```
 
 ## Methods
-### `init(response:devicePrivateKey:nameSpaces:)`
+### `init(id:createdAt:response:devicePrivateKey:nameSpaces:)`
 
 ```swift
-public init?(response: DeviceResponse, devicePrivateKey: CoseKeyPrivate, nameSpaces: [NameSpace]? = nil)
+public init?(id: String, createdAt: Date, response: DeviceResponse, devicePrivateKey: CoseKeyPrivate, nameSpaces: [NameSpace]? = nil)
 ```

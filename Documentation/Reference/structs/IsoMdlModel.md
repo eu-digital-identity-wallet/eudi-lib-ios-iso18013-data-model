@@ -57,6 +57,18 @@ public struct IsoMdlModel: Decodable, MdocDecodable
 ```
 
 ## Properties
+### `id`
+
+```swift
+public var id: String = UUID().uuidString
+```
+
+### `createdAt`
+
+```swift
+public var createdAt: Date = Date()
+```
+
 ### `docType`
 
 ```swift

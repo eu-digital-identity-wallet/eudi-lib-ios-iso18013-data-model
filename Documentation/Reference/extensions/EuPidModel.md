@@ -6,8 +6,8 @@ extension EuPidModel
 ```
 
 ## Methods
-### `init(response:devicePrivateKey:)`
+### `init(id:createdAt:response:devicePrivateKey:)`
 
 ```swift
-public init?(response: DeviceResponse, devicePrivateKey: CoseKeyPrivate)
+public init?(id: String, createdAt: Date, response: DeviceResponse, devicePrivateKey: CoseKeyPrivate)
 ```
