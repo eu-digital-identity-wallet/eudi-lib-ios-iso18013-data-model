@@ -20,6 +20,18 @@ public struct GenericMdocModel: MdocDecodable
 ```
 
 ## Properties
+### `id`
+
+```swift
+public var id: String = UUID().uuidString
+```
+
+### `createdAt`
+
+```swift
+public var createdAt: Date = Date()
+```
+
 ### `response`
 
 ```swift

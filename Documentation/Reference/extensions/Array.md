@@ -22,7 +22,7 @@ public func toHexString() -> String
 ### `findDoc(name:)`
 
 ```swift
-public func findDoc(name: String) -> Document?
+public func findDoc(name: String) -> (Document, Int)?
 ```
 
 ### `findDoc(name:)`

@@ -61,5 +61,11 @@ extension DeviceEngagement {
         let uiImage = UIImage(cgImage: cgimg)
         return uiImage
     }
+	
+    /// Create QR string payload
+    public mutating func getQrCodePayload() -> String {
+	qrCoded = encode(options: CBOROptions())
+	return qrCode
+    }
 #endif
 }

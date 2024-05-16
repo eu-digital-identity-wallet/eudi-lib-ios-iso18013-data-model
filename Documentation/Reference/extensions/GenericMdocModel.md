@@ -6,8 +6,8 @@ extension GenericMdocModel
 ```
 
 ## Methods
-### `init(response:devicePrivateKey:docType:title:)`
+### `init(id:createdAt:response:devicePrivateKey:docType:title:)`
 
 ```swift
-public init?(response: DeviceResponse, devicePrivateKey: CoseKeyPrivate, docType: String, title: String)
+public init?(id: String, createdAt: Date, response: DeviceResponse, devicePrivateKey: CoseKeyPrivate, docType: String, title: String)
 ```

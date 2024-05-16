@@ -10,6 +10,10 @@ extension DeviceEngagement
 
 Create QR CIImage
 
+### `getQrCodePayload()`
+
+Create QR string payload
+
 ### `toCBOR(options:)`
 
 ```swift

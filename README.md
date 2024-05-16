@@ -23,11 +23,13 @@ At present, device engagement using QR code and data retrieval using Bluetooth l
 
 #### Initialization
 To initialize a new instance of the `DeviceEngagement` structure, supply BLE mode and optionally EC Curve type.
-You can then retrieve a QR code image, as the following code shows:
+You can then retrieve a QR code, as the following code shows:
 ```swift
 let de = DeviceEngagement(isBleServer: isBleServer, crv: .p256)
 // get a UIKit image
 let qrCodeImage = de.getQrCodeImage()
+// get a string payload
+let qrCodePayload = de.getQrCodePayload()
 // to use in SwiftUI, use the Image(uiImage:) initializer
 ...
 ```

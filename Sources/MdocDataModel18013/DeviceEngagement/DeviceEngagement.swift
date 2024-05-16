@@ -25,7 +25,10 @@ import CryptoKit
 /// in mdoc holder generate an mdoc ephemeral private key
 /// ```swift
 /// let de = DeviceEngagement(isBleServer: isBleServer, crv: .p256)
+/// // get a UIKit image
 /// qrCodeImage = de.getQrCodeImage()
+/// // get a string payload
+/// qrCodePayload = de.getQrCodePayload()
 /// ```
 ///
 /// In mdoc reader decode device engagement CBOR bytes (e.g. from QR code)

@@ -11,6 +11,24 @@ A conforming type represents mdoc data.
 Can be decoded by a CBOR device response
 
 ## Properties
+### `id`
+
+```swift
+var id: String
+```
+
+### `createdAt`
+
+```swift
+var createdAt: Date
+```
+
+### `docType`
+
+```swift
+var docType: String
+```
+
 ### `response`
 
 ```swift
@@ -21,12 +39,6 @@ var response: DeviceResponse?
 
 ```swift
 var devicePrivateKey: CoseKeyPrivate?
-```
-
-### `docType`
-
-```swift
-var docType: String
 ```
 
 ### `nameSpaces`
