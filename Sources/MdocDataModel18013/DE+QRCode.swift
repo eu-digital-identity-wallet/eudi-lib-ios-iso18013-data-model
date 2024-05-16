@@ -44,7 +44,7 @@ extension DeviceEngagement {
 
 #if os(iOS)
     /// Create QR CIImage
-    public mutating func getQrCodeImage(_ inputCorrectionLevel: InputCorrectionLevel = .m) -> UIImage? {
+    public static func getQrCodeImage(qrCode: String, inputCorrectionLevel: InputCorrectionLevel = .m) -> UIImage? {
 		qrCoded = encode(options: CBOROptions())
         guard let stringData = qrCode.data(using: .utf8) else { return nil}
         let correctionLevel = ["L", "M", "Q", "H"][inputCorrectionLevel.rawValue]
