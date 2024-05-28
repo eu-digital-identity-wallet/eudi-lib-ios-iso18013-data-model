@@ -19,7 +19,7 @@ limitations under the License.
 import Foundation
 
 public struct EuPidModel: Codable, MdocDecodable {
-	public var response: DeviceResponse?
+	public var issuerSigned: IssuerSigned?
 	public var devicePrivateKey: CoseKeyPrivate?
 	public static var euPidDocType: String = "eu.europa.ec.eudiw.pid.1"
 	public var id: String = UUID().uuidString
@@ -96,12 +96,12 @@ public struct EuPidModel: Codable, MdocDecodable {
 }
 
 extension EuPidModel {
-	public init?(id: String, createdAt: Date, response: DeviceResponse, devicePrivateKey: CoseKeyPrivate) {
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, devicePrivateKey: CoseKeyPrivate) {
 		self.id = id
 		self.createdAt = createdAt
-		self.response = response
+		self.issuerSigned = issuerSigned
 		self.devicePrivateKey = devicePrivateKey
-		guard let nameSpaces = Self.getSignedItems(response, docType) else { return nil }
+		guard let nameSpaces = Self.getSignedItems(issuerSigned, docType) else { return nil }
 		Self.extractDisplayStrings(nameSpaces, &displayStrings, &displayImages)
 		Self.extractAgeOverValues(nameSpaces, &ageOverXX)
 		func getValue<T>(key: EuPidModel.CodingKeys) -> T? { Self.getItemValue(nameSpaces, string: key.rawValue) }

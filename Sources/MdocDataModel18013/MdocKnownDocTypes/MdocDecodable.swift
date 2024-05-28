@@ -26,7 +26,7 @@ public protocol MdocDecodable: AgeAttesting {
 	var id: String { get }
 	var createdAt: Date { get }
 	var docType: String { get set }
-	var response: DeviceResponse? { get set}
+	var issuerSigned: IssuerSigned? { get set}
 	var devicePrivateKey: CoseKeyPrivate? { get set}
 	var nameSpaces: [NameSpace]? { get set}
 	var title: String { get set}
@@ -39,8 +39,8 @@ public protocol MdocDecodable: AgeAttesting {
 extension MdocDecodable {
 	
 	public func getItemValue<T>(_ s: String) -> T? {
-		guard let response else { return nil }
-		let nameSpaceItems = Self.getSignedItems(response, docType)
+		guard let issuerSigned else { return nil }
+		let nameSpaceItems = Self.getSignedItems(issuerSigned, docType)
 		guard let nameSpaceItems else { return nil }
 		return Self.getItemValue(nameSpaceItems, string: s)
 	}
@@ -52,15 +52,14 @@ extension MdocDecodable {
 		return nil
 	}
 	
-	public static func getSignedItems(_ response: DeviceResponse, _ docType: String, _ ns: [NameSpace]? = nil) -> [String: [IssuerSignedItem]]? {
-		guard let (doc,_) = response.documents?.findDoc(name: docType) else { return nil }
-		guard var nameSpaces = doc.issuerSigned.issuerNameSpaces?.nameSpaces else { return nil }
+	public static func getSignedItems(_ issuerSigned: IssuerSigned, _ docType: String, _ ns: [NameSpace]? = nil) -> [String: [IssuerSignedItem]]? {
+		guard var nameSpaces = issuerSigned.issuerNameSpaces?.nameSpaces else { return nil }
 		if let ns { nameSpaces = nameSpaces.filter { ns.contains($0.key) } }
 		return nameSpaces
 	}
 	
 	public func toJson(base64: Bool = false) -> [String: Any] {
-		guard let response, let nameSpaceItems = Self.getSignedItems(response, docType) else { return [:] }
+		guard let issuerSigned, let nameSpaceItems = Self.getSignedItems(issuerSigned, docType) else { return [:] }
 		return nameSpaceItems.mapValues { $0.toJson(base64: base64) }
 	}
 	

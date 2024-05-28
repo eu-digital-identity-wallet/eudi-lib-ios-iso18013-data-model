@@ -46,9 +46,9 @@ public struct SignUpResponse: Codable {
 	/// A data file may contain signup responses with many documents (doc.types).
 	/// - Parameter data: Data from file or memory
 	/// - Returns:  separate ``MdocDataModel18013.DeviceResponse`` objects for each doc.type
-	public static func decomposeCBORDeviceResponse(data: Data) -> [(docType: String, dr: MdocDataModel18013.DeviceResponse)]? {
+	public static func decomposeCBORDeviceResponse(data: Data) -> [(docType: String, dr: DeviceResponse, iss: IssuerSigned)]? {
 		guard let sr = data.decodeJSON(type: SignUpResponse.self), let dr = sr.deviceResponse, let docs = dr.documents else { return nil }
-		return docs.map { (docType: $0.docType, dr: DeviceResponse(version: dr.version, documents: [$0], status: dr.status)) }
+		return docs.map { (docType: $0.docType, dr: DeviceResponse(version: dr.version, documents: [$0], status: dr.status), iss: $0.issuerSigned) }
 	}
 	
 	/// Decompose CBOR signup responses from data
@@ -56,14 +56,15 @@ public struct SignUpResponse: Codable {
 	/// A data file may contain signup responses with many documents (doc.types).
 	/// - Parameter data: Data from file or memory
 	/// - Returns:  separate json serialized signup response objects for each doc.type
-	public static func decomposeCBORSignupResponse(data: Data) -> [(docType: String, jsonData: Data, drData: Data, pkData: Data?)]? {
+	public static func decomposeCBORSignupResponse(data: Data) -> [(docType: String, jsonData: Data, drData: Data, issData: Data, pkData: Data?)]? {
 		guard let sr = data.decodeJSON(type: SignUpResponse.self), let drs = decomposeCBORDeviceResponse(data: data) else { return nil }
 		return drs.compactMap {
 			let drData = Data(CBOR.encode($0.dr.toCBOR(options: CBOROptions())))
+			let issData = Data(CBOR.encode($0.iss.toCBOR(options: CBOROptions())))
 			var jsonObj = ["response": drData.base64EncodedString()]
 			if let pk = sr.privateKey { jsonObj["privateKey"] = pk }
 			guard let jsonData = try? JSONSerialization.data(withJSONObject: jsonObj) else { return nil }
-			return (docType: $0.docType, jsonData: jsonData, drData: drData, pkData: sr.devicePrivateKey?.getx963Representation())
+			return (docType: $0.docType, jsonData: jsonData, drData: drData, issData: issData, pkData: sr.devicePrivateKey?.getx963Representation())
 		}
 	}
 }

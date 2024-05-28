@@ -28,7 +28,7 @@ import OrderedCollections
 /// ```
 public struct DeviceResponse {
 	public let version: String
-	static let defaultVersion = "1.0"
+	public static let defaultVersion = "1.0"
 	/// An array of all returned documents
 	public let documents: [Document]?
 	/// An array of all returned document errors

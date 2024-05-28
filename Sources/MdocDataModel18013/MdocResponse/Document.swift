@@ -74,6 +74,13 @@ extension Array where Element == Document {
 	}
 }
 
+extension Array where Element == IssuerSigned {
+	public func findDoc(name: String) -> (IssuerSigned, Int)? {
+		guard let index = firstIndex(where: { $0.issuerAuth.mso.docType == name} ) else { return nil }
+		return (self[index], index)
+	}
+}
+
 extension Array where Element == DocRequest {
 	public func findDoc(name: String) -> DocRequest? { first(where: { $0.itemsRequest.docType == name} ) }
 }
