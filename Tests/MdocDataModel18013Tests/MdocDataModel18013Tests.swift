@@ -85,13 +85,16 @@ final class MdocDataModel18013Tests: XCTestCase {
 		let isoKeys: [IsoMdlModel.CodingKeys] = [.familyName, .documentNumber, .drivingPrivileges, .issueDate, .expiryDate, .portrait]
 		let dr3 = DeviceRequest(mdl: isoKeys, agesOver: [], intentToRetain: true)
 		XCTAssertEqual(dr3.docRequests.first?.itemsRequest.requestNameSpaces[IsoMdlModel.isoNamespace]?.elementIdentifiers.sorted(), testItems)
-    }
+	}
 	
 	func testDecodeSampleDataResponse() throws {
 		let dr = try XCTUnwrap(DeviceResponse(data: OtherTestData.sampleCborData.bytes))
-		let pidObj = try XCTUnwrap(EuPidModel(id: UUID().uuidString, createdAt: Date(), response: dr, devicePrivateKey: Self.pk))
+	  let d1 = dr.documents!.first(where: {$0.docType == "eu.europa.ec.eudiw.pid.1"})!
+		let d2 = dr.documents!.first(where: {$0.docType == IsoMdlModel.isoDocType})!
+		//let ns1 = d1?.issuerSigned.issuerNameSpaces!.nameSpaces.first
+		let pidObj = try XCTUnwrap(EuPidModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d1.issuerSigned, devicePrivateKey: Self.pk))
 		XCTAssertEqual(pidObj.family_name, "ANDERSSON")
-		let mdlObj = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), response: dr, devicePrivateKey: Self.pk))
+		let mdlObj = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d2.issuerSigned, devicePrivateKey: Self.pk))
 		XCTAssertEqual(mdlObj.familyName, "ANDERSSON")
 		printDisplayStrings(mdlObj.displayStrings)
 	}
@@ -132,7 +135,7 @@ final class MdocDataModel18013Tests: XCTestCase {
 		XCTAssertEqual(doc.deviceSigned?.nameSpacesRawData.count, 1); XCTAssertEqual(doc.deviceSigned?.nameSpacesRawData[0], 160) // {} A0 empty dic
 		XCTAssertEqual(doc.deviceSigned?.deviceAuth.coseMacOrSignature.macAlgorithm, Cose.MacAlgorithm.hmac256)
 		XCTAssertEqual(doc.deviceSigned?.deviceAuth.coseMacOrSignature.signature.bytes.toHexString().uppercased(), "E99521A85AD7891B806A07F8B5388A332D92C189A7BF293EE1F543405AE6824D")
-		let model = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), response: dr, devicePrivateKey: Self.pk))
+		let model = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: dr.documents!.first!.issuerSigned, devicePrivateKey: Self.pk))
 		XCTAssertEqual(model.familyName, "Doe")
 	}
 
@@ -149,7 +152,7 @@ final class MdocDataModel18013Tests: XCTestCase {
     func testGenerateBLEengageQRCodeImage() throws {
 		var de = DeviceEngagement(isBleServer: true)
         var strQR = de.qrCode
-        XCTAssertNotNil(de.getQrCodeImage(.m)) 
+			XCTAssertNotNil(DeviceEngagement.getQrCodeImage(qrCode: strQR, inputCorrectionLevel: .m))
     }
 	
     func testGenerateBLEengageQRCodePayload() throws {
@@ -197,7 +200,7 @@ final class MdocDataModel18013Tests: XCTestCase {
 	
 	func testToJsonConverter() throws {
 		let dr = try XCTUnwrap(DeviceResponse(data: AnnexdTestData.d412.bytes))
-		let model = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), response: dr, devicePrivateKey: CoseKeyPrivate(crv: .p256)))
+		let model = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: dr.documents!.first!.issuerSigned, devicePrivateKey: CoseKeyPrivate(crv: .p256)))
 		let jsonObj = try XCTUnwrap(model.toJson(base64: true)[IsoMdlModel.isoNamespace] as? OrderedDictionary<String, Any>)
 		XCTAssertEqual(model.docType, IsoMdlModel.isoDocType)
 		XCTAssertEqual(jsonObj["family_name"] as! String, "Doe")
