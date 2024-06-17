@@ -29,6 +29,6 @@ let package = Package(
                 ]),
         .testTarget(
             name: "MdocDataModel18013Tests",
-            dependencies: ["MdocDataModel18013"]),
+            dependencies: ["MdocDataModel18013"], resources: [.process("Resources")]),
     ]
 )

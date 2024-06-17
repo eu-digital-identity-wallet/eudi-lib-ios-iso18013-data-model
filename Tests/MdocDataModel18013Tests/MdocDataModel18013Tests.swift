@@ -88,9 +88,12 @@ final class MdocDataModel18013Tests: XCTestCase {
 	}
 	
 	func testDecodeSampleDataResponse() throws {
-		let dr = try XCTUnwrap(DeviceResponse(data: OtherTestData.sampleCborData.bytes))
-	  let d1 = dr.documents!.first(where: {$0.docType == "eu.europa.ec.eudiw.pid.1"})!
-		let d2 = dr.documents!.first(where: {$0.docType == IsoMdlModel.isoDocType})!
+		let eudiSampleData = Data(name: "EUDI_sample_data", ext: "json", from: Bundle.module)!
+		let sr = try XCTUnwrap(eudiSampleData.decodeJSON(type: SignUpResponse.self))
+		let dr = try XCTUnwrap(sr.deviceResponse)
+		let docs = try XCTUnwrap(dr.documents)
+	  	let d1 = try XCTUnwrap(docs.first(where: {$0.docType == EuPidModel.euPidDocType}))
+		let d2 = try XCTUnwrap(docs.first(where: {$0.docType == IsoMdlModel.isoDocType}))
 		//let ns1 = d1?.issuerSigned.issuerNameSpaces!.nameSpaces.first
 		let pidObj = try XCTUnwrap(EuPidModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d1.issuerSigned, devicePrivateKey: Self.pk))
 		XCTAssertEqual(pidObj.family_name, "ANDERSSON")
@@ -152,7 +155,7 @@ final class MdocDataModel18013Tests: XCTestCase {
     func testGenerateBLEengageQRCodeImage() throws {
 		var de = DeviceEngagement(isBleServer: true)
         var strQR = de.qrCode
-			XCTAssertNotNil(DeviceEngagement.getQrCodeImage(qrCode: strQR, inputCorrectionLevel: .m))
+		XCTAssertNotNil(DeviceEngagement.getQrCodeImage(qrCode: strQR, inputCorrectionLevel: .m))
     }
 	
     func testGenerateBLEengageQRCodePayload() throws {
@@ -205,5 +208,15 @@ final class MdocDataModel18013Tests: XCTestCase {
 		XCTAssertEqual(model.docType, IsoMdlModel.isoDocType)
 		XCTAssertEqual(jsonObj["family_name"] as! String, "Doe")
 		XCTAssertEqual(jsonObj["issue_date"] as! String, "2019-10-20")
+	}
+
+	func testJoinSampleDeviceResponses() throws {
+		let mdlData = Data(base64Encoded: String(data: Data(name: "mdl_b64", ext: "txt", from: Bundle.module)!, encoding: .utf8)!)!
+		let pidData = Data(base64Encoded: String(data: Data(name: "pid_b64", ext: "txt", from: Bundle.module)!, encoding: .utf8)!)!
+		let drMdl = try XCTUnwrap(DeviceResponse(data: [UInt8](mdlData)))
+		let drPid = try XCTUnwrap(DeviceResponse(data: [UInt8](pidData)))
+		let drSample = DeviceResponse(version: drPid.version, documents: drMdl.documents! + drPid.documents!, 
+			documentErrors: nil, status: drPid.status)
+		print(Data(drSample.encode(options: CBOROptions())).base64EncodedString())
 	}
 }
