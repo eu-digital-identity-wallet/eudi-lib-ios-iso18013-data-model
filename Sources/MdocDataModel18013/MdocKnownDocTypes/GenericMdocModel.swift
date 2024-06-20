@@ -21,7 +21,8 @@ extension GenericMdocModel {
 	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, devicePrivateKey: CoseKeyPrivate, docType: String, title: String) {
 		self.id = id; self.createdAt = createdAt
 		self.issuerSigned = issuerSigned; self.devicePrivateKey = devicePrivateKey; self.docType = docType; self.title = title
-		guard let nameSpaces = Self.getSignedItems(issuerSigned, docType) else { return nil }
-		Self.extractDisplayStrings(nameSpaces, &displayStrings, &displayImages)
+		if let nameSpaces = Self.getSignedItems(issuerSigned, docType) {
+			Self.extractDisplayStrings(nameSpaces, &displayStrings, &displayImages)
+		}
 	}
 } // end extension

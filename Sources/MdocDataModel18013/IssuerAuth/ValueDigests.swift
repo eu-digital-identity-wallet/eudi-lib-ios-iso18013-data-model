@@ -37,7 +37,6 @@ extension ValueDigests: CBORDecodable {
 		for (k,v) in d {
 			if case .utf8String(let ns) = k, let dis = DigestIDs(cbor: v) { temp[ns] = dis}
 		}
-		guard temp.count > 0 else  { return nil }
 		valueDigests = temp
 	}
 }
