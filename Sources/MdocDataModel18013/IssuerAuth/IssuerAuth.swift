@@ -21,7 +21,7 @@ import SwiftCBOR
 
 public struct IssuerAuth {
 	public let mso: MobileSecurityObject
-	let msoRawData: [UInt8]
+	public let msoRawData: [UInt8]
 	/// one or more certificates
 	public let verifyAlgorithm: Cose.VerifyAlgorithm
 	public let signature: Data
