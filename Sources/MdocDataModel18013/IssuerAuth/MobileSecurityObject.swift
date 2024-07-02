@@ -30,7 +30,7 @@ public struct MobileSecurityObject {
 	/// Value digests
 	public let valueDigests: ValueDigests
 	/// device key info
-	let deviceKeyInfo: DeviceKeyInfo
+	public let deviceKeyInfo: DeviceKeyInfo
 	/// docType  as used in Documents
 	public let docType: DocType
 	public let validityInfo: ValidityInfo
