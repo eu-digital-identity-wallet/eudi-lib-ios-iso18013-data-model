@@ -90,7 +90,7 @@ Data = {
 * Commonly used data structures for Swift [swift-collections](https://github.com/apple/swift-collections)
 
 ## Reference
-Detailed documentation is provided [here](Documentation/Reference/README.md) 
+Detailed documentation is provided [here](https://eu-digital-identity-wallet.github.io/eudi-lib-ios-iso18013-data-model/documentation/mdocdatamodel18013/) 
 
 ### Disclaimer
 The released software is a initial development release version: 
