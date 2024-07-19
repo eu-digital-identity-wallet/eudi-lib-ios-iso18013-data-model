@@ -23,7 +23,7 @@ public struct IsoMdlModel: Decodable, MdocDecodable {
 	public var createdAt: Date = Date()
 	public var docType: String = Self.isoDocType
 	public var nameSpaces: [NameSpace]?
-	public var title = String("mdl_doctype_name")
+	public var title: String? = String("mdl_doctype_name")
 	public static var isoDocType: String { "org.iso.18013.5.1.mDL" }
 	public static var isoNamespace: String { "org.iso.18013.5.1" }
 

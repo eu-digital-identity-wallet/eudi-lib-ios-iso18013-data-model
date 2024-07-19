@@ -27,7 +27,7 @@ public struct IssuerSignedItem {
     /// Data element identifier
 	public let elementIdentifier: DataElementIdentifier
     /// Data element value
-    let elementValue: DataElementValue
+	public let elementValue: DataElementValue
     /// Raw CBOR data
 	public var rawData: [UInt8]?
     

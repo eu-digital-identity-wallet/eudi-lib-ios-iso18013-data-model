@@ -26,7 +26,7 @@ public struct EuPidModel: Codable, MdocDecodable {
 	public var createdAt: Date = Date()
 	public var docType = Self.euPidDocType
 	public var nameSpaces: [NameSpace]?
-	public var title = String("eu_pid_doctype_name")
+	public var title: String? = String("eu_pid_doctype_name")
 	
 	public let family_name: String?
 	public let given_name: String?

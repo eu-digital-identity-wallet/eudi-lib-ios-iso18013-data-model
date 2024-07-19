@@ -36,7 +36,7 @@ let qrCodePayload = de.getQrCodePayload()
 
 ### `DeviceRequest`
 
-Device retrieval [mdoc request](Documentation/Reference/structs/DeviceRequest.md) structure
+Device retrieval [mdoc request](https://eu-digital-identity-wallet.github.io/eudi-lib-ios-iso18013-data-model/documentation/mdocdatamodel18013/devicerequest) structure
 In mDoc holder initialize a ``DeviceRequest`` with incoming CBOR bytes (decoding)
 ```swift
 let dr = DeviceRequest(data: bytes)
@@ -48,7 +48,7 @@ let dr3 = DeviceRequest(mdl: isoKeys, agesOver: [18,21], intentToRetain: true)
 ```
 ### `DeviceResponse`
 
-Device retrieval [mdoc response](Documentation/Reference/structs/DeviceResponse.md). It is CBOR encoded
+Device retrieval [mdoc response](https://eu-digital-identity-wallet.github.io/eudi-lib-ios-iso18013-data-model/documentation/mdocdatamodel18013/deviceresponse). It is CBOR encoded
 
 In mdoc reader initialize from CBOR data received from holder (data exchange)
 In mdoc holder initialize from CBOR data received from server (registration)
@@ -90,7 +90,7 @@ Data = {
 * Commonly used data structures for Swift [swift-collections](https://github.com/apple/swift-collections)
 
 ## Reference
-Detailed documentation is provided [here](Documentation/Reference/README.md) 
+Detailed documentation is provided [here](https://eu-digital-identity-wallet.github.io/eudi-lib-ios-iso18013-data-model/documentation/mdocdatamodel18013/) 
 
 ### Disclaimer
 The released software is a initial development release version: 
