@@ -29,7 +29,7 @@ public protocol MdocDecodable: AgeAttesting {
 	var issuerSigned: IssuerSigned? { get set}
 	var devicePrivateKey: CoseKeyPrivate? { get set}
 	var nameSpaces: [NameSpace]? { get set}
-	var title: String { get set}
+	var title: String? { get set}
 	var mandatoryElementKeys: [DataElementIdentifier] { get}
 	var displayStrings: [NameValue] { get }
 	var displayImages: [NameImage] { get }

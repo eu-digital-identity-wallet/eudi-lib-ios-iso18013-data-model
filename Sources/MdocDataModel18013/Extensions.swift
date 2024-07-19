@@ -265,7 +265,7 @@ extension CBOR {
 		}
 	}
  
-	func getTypedValue<T>() -> T? {
+	public func getTypedValue<T>() -> T? {
 		if T.self == ServerRetrievalOption.self { return ServerRetrievalOption(cbor: self) as? T }
 		else if T.self == DrivingPrivileges.self { return DrivingPrivileges(cbor: self) as? T }
 		else if case let .tagged(tag, cbor) = self {
@@ -365,7 +365,7 @@ public protocol CBORDecodable {
 }
 
 extension IssuerSignedItem {
-	func getTypedValue<T>() -> T? { elementValue.getTypedValue() }
+	public func getTypedValue<T>() -> T? { elementValue.getTypedValue() }
 }
 
 public typealias DocType = String // Document type
