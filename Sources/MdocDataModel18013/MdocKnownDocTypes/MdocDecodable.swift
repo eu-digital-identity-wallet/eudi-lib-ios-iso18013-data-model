@@ -91,7 +91,11 @@ extension MdocDecodable {
 			value = NSLocalizedString(isex == 1 ? "male" : "female", comment: ""); dt = .string
 		}
 		if case let .byteString(bs) = cborValue {
-			displayImages.append(NameImage(name: name, image: Data(bs), ns: ns))
+			if name == "user_pseudonym", bs.count == 16 {
+				value = NSUUID(uuidBytes: bs).uuidString
+			} else {
+				displayImages.append(NameImage(name: name, image: Data(bs), ns: ns))
+			}
 		}
 		var node = NameValue(name: name, value: value, ns: ns, mdocDataType: dt, order: order)
 		if case let .map(m) = cborValue {

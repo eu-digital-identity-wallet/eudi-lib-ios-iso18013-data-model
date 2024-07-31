@@ -219,4 +219,10 @@ final class MdocDataModel18013Tests: XCTestCase {
 			documentErrors: nil, status: drPid.status)
 		print(Data(drSample.encode(options: CBOROptions())).base64EncodedString())
 	}
+
+	func testUUIDFromBytes() {
+		let bs: [UInt8] = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F]
+		let uuid = NSUUID(uuidBytes: bs)
+		XCTAssertEqual(uuid.uuidString, "00010203-0405-0607-0809-0a0b0c0d0e0f".uppercased())
+	}
 }
