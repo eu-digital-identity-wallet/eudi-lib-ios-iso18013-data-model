@@ -23,7 +23,7 @@ public struct IsoMdlModel: Decodable, MdocDecodable {
 	public var createdAt: Date = Date()
 	public var docType: String = Self.isoDocType
 	public var nameSpaces: [NameSpace]?
-	public var title: String? = String("mdl_doctype_name")
+	public var displayName: String? = String("mdl_doctype_name")
 	public static var isoDocType: String { "org.iso.18013.5.1.mDL" }
 	public static var isoNamespace: String { "org.iso.18013.5.1" }
 
@@ -120,8 +120,8 @@ public struct IsoMdlModel: Decodable, MdocDecodable {
 
 
 extension IsoMdlModel {
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, devicePrivateKey: CoseKeyPrivate, nameSpaces: [NameSpace]? = nil) {
-		self.id = id; self.createdAt = createdAt
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, devicePrivateKey: CoseKeyPrivate, displayName: String?, nameSpaces: [NameSpace]? = nil) {
+		self.id = id; self.createdAt = createdAt; self.displayName = displayName
 		self.issuerSigned = issuerSigned; self.devicePrivateKey = devicePrivateKey; self.nameSpaces = nameSpaces
   	guard let nameSpaceItems = Self.getSignedItems(issuerSigned, docType, nameSpaces) else { return nil }
 		Self.extractDisplayStrings(nameSpaceItems, &displayStrings, &displayImages)

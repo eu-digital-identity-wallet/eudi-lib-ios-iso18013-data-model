@@ -29,7 +29,7 @@ public protocol MdocDecodable: AgeAttesting {
 	var issuerSigned: IssuerSigned? { get set}
 	var devicePrivateKey: CoseKeyPrivate? { get set}
 	var nameSpaces: [NameSpace]? { get set}
-	var title: String? { get set}
+	var displayName: String? { get set}
 	var mandatoryElementKeys: [DataElementIdentifier] { get}
 	var displayStrings: [NameValue] { get }
 	var displayImages: [NameImage] { get }
@@ -91,8 +91,8 @@ extension MdocDecodable {
 			value = NSLocalizedString(isex == 1 ? "male" : "female", comment: ""); dt = .string
 		}
 		if case let .byteString(bs) = cborValue {
-			if name == "user_pseudonym", bs.count == 16 {
-				value = NSUUID(uuidBytes: bs).uuidString
+			if name == "user_pseudonym" {
+				value = Data(bs).base64EncodedString()
 			} else {
 				displayImages.append(NameImage(name: name, image: Data(bs), ns: ns))
 			}
