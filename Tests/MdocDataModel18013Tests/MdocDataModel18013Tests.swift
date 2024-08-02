@@ -225,4 +225,9 @@ final class MdocDataModel18013Tests: XCTestCase {
 		let uuid = NSUUID(uuidBytes: bs)
 		XCTAssertEqual(uuid.uuidString, "00010203-0405-0607-0809-0a0b0c0d0e0f".uppercased())
 	}
+
+	func testUrlHost() {
+		let url = URL(string: "https://api.pp.mobiledl.us/api/Iso18013")!
+		XCTAssertEqual(url.host, "api.pp.mobiledl.us")
+	}
 }
