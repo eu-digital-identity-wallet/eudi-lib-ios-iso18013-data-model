@@ -27,7 +27,9 @@ public struct EuPidModel: Codable, MdocDecodable {
 	public var docType = Self.euPidDocType
 	public var nameSpaces: [NameSpace]?
 	public var displayName: String? = String("eu_pid_doctype_name")
-	
+	public var modifiedAt: Date?
+	public var statusDescription: String?
+
 	public let family_name: String?
 	public let given_name: String?
 	public let birth_date: String?
@@ -96,10 +98,9 @@ public struct EuPidModel: Codable, MdocDecodable {
 }
 
 extension EuPidModel {
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, devicePrivateKey: CoseKeyPrivate, displayName: String?) {
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, devicePrivateKey: CoseKeyPrivate, displayName: String?, statusDescription: String?) {
 		self.id = id
-		self.createdAt = createdAt
-		self.displayName = displayName
+		self.createdAt = createdAt;	self.displayName = displayName; self.statusDescription = statusDescription
 		self.issuerSigned = issuerSigned
 		self.devicePrivateKey = devicePrivateKey
 		guard let nameSpaces = Self.getSignedItems(issuerSigned, docType) else { return nil }

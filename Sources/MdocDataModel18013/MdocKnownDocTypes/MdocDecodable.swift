@@ -22,14 +22,10 @@ import SwiftCBOR
 /// A conforming type represents mdoc data.
 ///
 /// Can be decoded by a CBOR device response
-public protocol MdocDecodable: AgeAttesting {
-	var id: String { get }
-	var createdAt: Date { get }
-	var docType: String { get set }
+public protocol MdocDecodable: DocumentProtocol, AgeAttesting {
 	var issuerSigned: IssuerSigned? { get set}
 	var devicePrivateKey: CoseKeyPrivate? { get set}
 	var nameSpaces: [NameSpace]? { get set}
-	var displayName: String? { get set}
 	var mandatoryElementKeys: [DataElementIdentifier] { get}
 	var displayStrings: [NameValue] { get }
 	var displayImages: [NameImage] { get }
