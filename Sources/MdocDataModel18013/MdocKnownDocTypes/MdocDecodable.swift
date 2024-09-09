@@ -22,14 +22,10 @@ import SwiftCBOR
 /// A conforming type represents mdoc data.
 ///
 /// Can be decoded by a CBOR device response
-public protocol MdocDecodable: AgeAttesting {
-	var id: String { get }
-	var createdAt: Date { get }
-	var docType: String { get set }
+public protocol MdocDecodable: DocumentProtocol, AgeAttesting {
 	var issuerSigned: IssuerSigned? { get set}
 	var devicePrivateKey: CoseKeyPrivate? { get set}
 	var nameSpaces: [NameSpace]? { get set}
-	var title: String? { get set}
 	var mandatoryElementKeys: [DataElementIdentifier] { get}
 	var displayStrings: [NameValue] { get }
 	var displayImages: [NameImage] { get }
@@ -91,7 +87,11 @@ extension MdocDecodable {
 			value = NSLocalizedString(isex == 1 ? "male" : "female", comment: ""); dt = .string
 		}
 		if case let .byteString(bs) = cborValue {
-			displayImages.append(NameImage(name: name, image: Data(bs), ns: ns))
+			if name == "user_pseudonym" {
+				value = Data(bs).base64EncodedString()
+			} else {
+				displayImages.append(NameImage(name: name, image: Data(bs), ns: ns))
+			}
 		}
 		var node = NameValue(name: name, value: value, ns: ns, mdocDataType: dt, order: order)
 		if case let .map(m) = cborValue {
