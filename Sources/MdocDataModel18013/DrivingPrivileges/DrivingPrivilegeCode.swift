@@ -21,7 +21,7 @@ import SwiftCBOR
 import OrderedCollections
 
 /// Driving privilege code
-public struct DrivingPrivilegeCode: Codable {
+public struct DrivingPrivilegeCode: Codable, Sendable {
 	public let code: String
 	public let sign: String?
 	public let value: String?

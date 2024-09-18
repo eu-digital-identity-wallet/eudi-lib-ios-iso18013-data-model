@@ -20,8 +20,8 @@ import OrderedCollections
 @testable import MdocDataModel18013
 
 final class MdocDataModel18013Tests: XCTestCase {
-	static var pkb64 = "pQECIAEhWCBoHIiBQnDRMLUT4yOLqJ1l8mrfNIgrjNnFq4RyZgxSmiJYIGD/Sabu6GejaR4eTiym1JkyjnBNcJ+f59pN+lCEyhVyI1ggC6EPCKyGci++LGWUX3fXpPFW6pYO8pyyKLMKs1qF0jo="
-    static var pk = CoseKeyPrivate(base64: pkb64)!
+	static let pkb64 = "pQECIAEhWCBoHIiBQnDRMLUT4yOLqJ1l8mrfNIgrjNnFq4RyZgxSmiJYIGD/Sabu6GejaR4eTiym1JkyjnBNcJ+f59pN+lCEyhVyI1ggC6EPCKyGci++LGWUX3fXpPFW6pYO8pyyKLMKs1qF0jo="
+    static let pk = CoseKeyPrivate(base64: pkb64)!
     func testExample() throws {
         // XCTest Documenation
         // https://developer.apple.com/documentation/xctest

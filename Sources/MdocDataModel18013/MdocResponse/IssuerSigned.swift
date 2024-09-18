@@ -19,7 +19,7 @@ import SwiftCBOR
 import OrderedCollections
 
 /// Contains the mobile security object for issuer data authentication and the data elements protected by issuer data authentication.
-public struct IssuerSigned {
+public struct IssuerSigned: Sendable {
 	public let issuerNameSpaces: IssuerNameSpaces?
 	public let issuerAuth: IssuerAuth
 	

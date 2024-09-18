@@ -19,7 +19,7 @@ import SwiftCBOR
 import OrderedCollections
 
 /// contains the requested data elements and the namespace they belong to.
-public struct RequestNameSpaces {
+public struct RequestNameSpaces: Sendable {
     public let nameSpaces: [NameSpace: RequestDataElements]
     public subscript(ns: String)-> RequestDataElements? { nameSpaces[ns] }
 } 

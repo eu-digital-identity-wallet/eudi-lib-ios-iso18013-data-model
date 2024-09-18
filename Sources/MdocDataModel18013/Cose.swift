@@ -22,7 +22,7 @@ import SwiftCBOR
 
 extension Cose {
 	/// COSE Message Identification
-	public enum CoseType : String {
+	public enum CoseType : String, Sendable {
 		/// COSE Single Signer Data Object
 		/// Only one signature is applied on the message payload
 		case sign1 = "Signature1"
@@ -47,7 +47,7 @@ extension Cose {
 	/// ECDSA Algorithm Values defined in
 	///
 	/// Table1 in rfc/rfc8152#section-16.2
-	public enum VerifyAlgorithm: UInt64 {
+	public enum VerifyAlgorithm: UInt64, Sendable {
 		case es256 = 6 //-7 ECDSA w/ SHA-256
 		case es384 = 34 //-35 ECDSA w/ SHA-384
 		case es512 = 35//-36 ECDSA w/ SHA-512
@@ -56,7 +56,7 @@ extension Cose {
 	/// MAC Algorithm Values
 	///
 	/// Table 7  in rfc/rfc8152#section-16.2
-	public enum MacAlgorithm: UInt64 {
+	public enum MacAlgorithm: UInt64, Sendable {
 		case hmac256 = 5 //HMAC w/ SHA-256
 		case hmac384 = 6 //HMAC w/ SHA-384
 		case hmac512 = 7 //HMAC w/ SHA-512
@@ -65,7 +65,7 @@ extension Cose {
 
 extension Cose {
 	/// Cose header structure defined in https://datatracker.ietf.org/doc/html/rfc8152
-	struct CoseHeader {
+	struct CoseHeader: Sendable {
 		enum Headers : Int {
 			case keyId = 4
 			case algorithm = 1
@@ -98,7 +98,7 @@ extension Cose {
 }
 
  /// Struct which describes  a representation for cryptographic keys;  how to create and process signatures, message authentication codes, and  encryption using Concise Binary Object Representation (CBOR) or serialization.
-public struct Cose {
+public struct Cose: Sendable {
 	public let type: CoseType
 	let protectedHeader : CoseHeader
 	let unprotectedHeader : CoseHeader?

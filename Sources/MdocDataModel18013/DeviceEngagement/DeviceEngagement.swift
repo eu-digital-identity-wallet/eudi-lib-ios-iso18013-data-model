@@ -35,7 +35,7 @@ import CryptoKit
 /// ```swift
 /// let de = DeviceEngagement(data: bytes)
 /// ```
-public struct DeviceEngagement {
+public struct DeviceEngagement: Sendable {
 	static let versionImpl: String = "1.0"
 	var version: String = Self.versionImpl
 	let security: Security

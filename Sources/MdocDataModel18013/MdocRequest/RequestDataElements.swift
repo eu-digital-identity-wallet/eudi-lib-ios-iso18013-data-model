@@ -21,7 +21,7 @@ import OrderedCollections
 public typealias IntentToRetain = Bool
 
 /// Requested data elements identified by their data element identifier.
-public struct RequestDataElements {
+public struct RequestDataElements: Sendable {
 	/// IntentToRetain indicates whether the mdoc verifier intends to retain the received data element
     public let dataElements: [DataElementIdentifier: IntentToRetain]
     public var elementIdentifiers: [DataElementIdentifier] { Array(dataElements.keys) }

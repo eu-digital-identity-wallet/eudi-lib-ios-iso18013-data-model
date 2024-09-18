@@ -5,7 +5,7 @@
 import Foundation
 import SwiftCBOR
 
-public struct ConnectionMethodHttp  {
+public struct ConnectionMethodHttp: Sendable  {
 	public let uriWebsite: String
 	
 	public static let METHOD_TYPE: UInt64 = 4

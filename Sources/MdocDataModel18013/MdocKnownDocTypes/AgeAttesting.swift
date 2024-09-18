@@ -51,7 +51,7 @@ extension AgeAttesting {
 	
 }
 
-public struct SimpleAgeAttest: AgeAttesting {
+public struct SimpleAgeAttest: AgeAttesting, Sendable {
 	public var ageOverXX = [Int: Bool]()
 	
 	public init(ageOver1: Int, isOver1: Bool, ageOver2: Int, isOver2: Bool) {

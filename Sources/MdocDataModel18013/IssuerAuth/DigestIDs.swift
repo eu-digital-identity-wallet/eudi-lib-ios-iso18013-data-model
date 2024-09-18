@@ -20,7 +20,7 @@ import Foundation
 import SwiftCBOR
 import OrderedCollections
 
-public struct DigestIDs {
+public struct DigestIDs: Sendable {
 	public let digestIDs: [DigestID: [UInt8]]
 	public subscript(digestID: DigestID) -> [UInt8]? {digestIDs[digestID] }
 	

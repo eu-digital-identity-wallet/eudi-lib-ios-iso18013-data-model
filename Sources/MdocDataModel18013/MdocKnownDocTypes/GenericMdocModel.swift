@@ -3,7 +3,7 @@
 
 import Foundation
 
-public struct GenericMdocModel: MdocDecodable {
+public struct GenericMdocModel: MdocDecodable, Sendable {
 	public var id: String = UUID().uuidString
 	public var createdAt: Date = Date()
  	public var issuerSigned: IssuerSigned?

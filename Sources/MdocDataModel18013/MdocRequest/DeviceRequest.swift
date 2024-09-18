@@ -29,7 +29,7 @@ import OrderedCollections
 /// let isoKeys: [IsoMdlModel.CodingKeys] = [.familyName, .documentNumber, .drivingPrivileges, .issueDate, .expiryDate, .portrait]
 ///	let dr3 = DeviceRequest(mdl: isoKeys, agesOver: [18,21], intentToRetain: true)
 /// ```
-public struct DeviceRequest {
+public struct DeviceRequest: Sendable {
 	/// The current version
 	static let currentVersion = "1.0"
 	/// The version requested

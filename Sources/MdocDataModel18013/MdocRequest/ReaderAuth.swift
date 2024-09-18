@@ -18,7 +18,7 @@ import Foundation
 import SwiftCBOR
 
 /// Reader authentication structure encoded as Cose Sign1
-struct ReaderAuth {
+struct ReaderAuth: Sendable {
 	/// encoded data
     let coseSign1: Cose
 	/// one or more certificates

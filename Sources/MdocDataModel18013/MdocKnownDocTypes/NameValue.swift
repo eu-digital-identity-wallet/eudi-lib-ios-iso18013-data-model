@@ -17,7 +17,8 @@ limitations under the License.
 //  NameValue.swift
 import Foundation
 
-public struct NameValue: Equatable, CustomStringConvertible {
+/// Name-Value pair
+public struct NameValue: Equatable, CustomStringConvertible, Sendable {
 	public init(name: String, value: String, ns: String? = nil, mdocDataType: MdocDataType? = nil, order: Int = 0, children: [NameValue]? = nil) {
 		self.name = name
 		self.value = value
@@ -37,15 +38,4 @@ public struct NameValue: Equatable, CustomStringConvertible {
 		if children == nil { children = [] }
 		children!.append(child)
 	}
-}
-
-public struct NameImage {
-	public init(name: String, image: Data, ns: String? = nil) {
-		self.name = name
-		self.image = image
-		self.ns = ns
-	}
-	public let ns: String?
-	public let name: String
-	public let image: Data
 }

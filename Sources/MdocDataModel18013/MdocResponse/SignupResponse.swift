@@ -18,7 +18,7 @@ import Foundation
 import SwiftCBOR
 
 /// Signup response json-encoded
-public struct SignUpResponse: Codable {
+public struct SignUpResponse: Codable, Sendable {
 	public let response: String?
 	public let pin: String?
 	public let privateKey: String?

@@ -19,7 +19,7 @@ limitations under the License.
 import Foundation
 import SwiftCBOR
 
-public struct IssuerAuth {
+public struct IssuerAuth: Sendable {
 	public let mso: MobileSecurityObject
 	public let msoRawData: [UInt8]
 	/// one or more certificates
