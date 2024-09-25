@@ -18,6 +18,9 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /// A conforming type represents mdoc data.
 ///
