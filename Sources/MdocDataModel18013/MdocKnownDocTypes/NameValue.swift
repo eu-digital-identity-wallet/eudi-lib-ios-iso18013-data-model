@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 
 /// Name-Value pair
-public struct NameValue: Equatable, CustomStringConvertible, Sendable {
+public struct NameValue: Equatable, CustomStringConvertible, CustomDebugStringConvertible, Sendable {
 	public init(name: String, value: String, ns: String? = nil, mdocDataType: MdocDataType? = nil, order: Int = 0, children: [NameValue]? = nil) {
 		self.name = name
 		self.value = value
@@ -34,6 +34,8 @@ public struct NameValue: Equatable, CustomStringConvertible, Sendable {
 	public var order: Int = 0
 	public var children: [NameValue]?
 	public var description: String { "\(name): \(value)" }
+	public var debugDescription: String { "\(order). \(ns ?? ""): \(name) - \(value)" }
+
 	public mutating func add(child: NameValue) {
 		if children == nil { children = [] }
 		children!.append(child)
