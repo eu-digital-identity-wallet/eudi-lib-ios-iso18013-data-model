@@ -125,7 +125,7 @@ extension MdocDecodable {
 				displayImages.append(NameImage(name: labels?[name] ?? name, image: Data(bs), ns: ns))
 			}
 		}
-		var node = NameValue(name: name, value: value, ns: ns, mdocDataType: dt, order: order)
+		var node = NameValue(name: labels?[name] ?? name, value: value, ns: ns, mdocDataType: dt, order: order)
 		if case let .map(m) = cborValue {
 			let innerJsonMap = CBOR.decodeDictionary(m, unwrap: false)
 			for (o2,(k,v)) in innerJsonMap.enumerated() {
@@ -150,10 +150,13 @@ extension MdocDecodable {
 	///   - displayStrings: An inout parameter that will be populated with `NameValue` items extracted from the namespaces.
 	///   - displayImages: An inout parameter that will be populated with `NameImage` items extracted from the namespaces.
 	///   - labels: A dictionary where the key is the elementIdentifier and the value is a string representing the label. 
-	public static func extractDisplayStrings(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ displayStrings: inout [NameValue], _ displayImages: inout [NameImage], _ labels: [String: String]? = nil) {
+	///   - nsFilter: An optional array of `NameSpace` to filter/sort the extraction. Defaults to `nil`.
+	public static func extractDisplayStrings(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ displayStrings: inout [NameValue], _ displayImages: inout [NameImage], _ labels: [String: String]? = nil, _ nsFilter: [NameSpace]? = nil) {
 		let bDebugDisplay = UserDefaults.standard.bool(forKey: "DebugDisplay")
 		var order = 0
-		for (ns,items) in nameSpaces {
+		let nsFilterUsed = nsFilter ?? Array(nameSpaces.keys)
+		for ns in nsFilterUsed {
+			let items = nameSpaces[ns] ?? []
 			for item in items {
 				let n = extractDisplayStringOrImage(item.elementIdentifier, item.elementValue, bDebugDisplay, &displayImages, ns, order, labels)
 				displayStrings.append(n)
