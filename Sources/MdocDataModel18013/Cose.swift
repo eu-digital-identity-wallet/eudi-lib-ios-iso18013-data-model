@@ -28,16 +28,16 @@ extension Cose {
 		case sign1 = "Signature1"
 		case mac0 = "MAC0"
 		/// Idenntifies Cose Message Type from input data
-		static func from(data: Data) -> CoseType? {
+		static func from(data: Data) -> (CoseType, [CBOR])? {
 			guard let cose = try? CBORDecoder(input: data.bytes).decodeItem()?.asCose() else {
 				return nil
 			}
 			
 			switch cose.0 {
 			case .coseSign1Item:
-				return .sign1
+				return (.sign1, cose.1)
 			case .coseMac0Item:
-				return .mac0
+				return (.mac0, cose.1)
 			default:
 				return nil
 			}
