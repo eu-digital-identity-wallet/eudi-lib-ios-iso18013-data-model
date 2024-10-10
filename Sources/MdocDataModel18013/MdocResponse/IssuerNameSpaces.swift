@@ -19,7 +19,7 @@ import SwiftCBOR
 import OrderedCollections
 
 /// Returned data elements for each namespace
-public struct IssuerNameSpaces {
+public struct IssuerNameSpaces: Sendable {
 	
 	public let nameSpaces: [NameSpace: [IssuerSignedItem]]
 	public subscript(ns: String) -> [IssuerSignedItem]? { nameSpaces[ns] }

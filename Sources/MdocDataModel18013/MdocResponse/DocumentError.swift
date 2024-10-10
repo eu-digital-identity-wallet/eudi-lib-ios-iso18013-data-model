@@ -19,7 +19,7 @@ import SwiftCBOR
 import OrderedCollections
 
 /// Error codes for documents that are not returned
-public struct DocumentError {
+public struct DocumentError: Sendable {
 	
 	public let docErrors: [DocType: ErrorCode]
 	public subscript(dt: DocType) -> ErrorCode? { docErrors[dt] }

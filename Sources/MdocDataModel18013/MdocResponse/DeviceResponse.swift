@@ -26,7 +26,7 @@ import OrderedCollections
 /// ```swift
 /// let dr = DeviceResponse(data: bytes)
 /// ```
-public struct DeviceResponse {
+public struct DeviceResponse: Sendable {
 	public let version: String
 	public static let defaultVersion = "1.0"
 	/// An array of all returned documents

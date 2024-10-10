@@ -21,7 +21,7 @@ import Foundation
 import SwiftCBOR
 
 /// Security = [int, EDeviceKeyBytes ]
-struct Security {
+struct Security: Sendable {
 	static let cipherSuiteIdentifier: UInt64 = 1
 	// private key for holder only
 	var d: [UInt8]?

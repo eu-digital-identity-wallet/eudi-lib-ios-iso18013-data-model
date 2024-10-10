@@ -19,7 +19,7 @@ import SwiftCBOR
 import OrderedCollections
 
 /// Data item signed by issuer
-public struct IssuerSignedItem {
+public struct IssuerSignedItem: Sendable {
     /// Digest ID for issuer data authentication
 	public let digestID: UInt64
     /// Random value for issuer data authentication
@@ -39,7 +39,7 @@ public struct IssuerSignedItem {
      }
 }
 
-extension CBOR: CustomStringConvertible {
+extension CBOR: @retroactive CustomStringConvertible {
 	public var description: String {
         switch self {
         case .utf8String(let str): return str
@@ -54,7 +54,7 @@ extension CBOR: CustomStringConvertible {
     }
 }
 
-extension CBOR: CustomDebugStringConvertible {
+extension CBOR: @retroactive CustomDebugStringConvertible {
 	public var debugDescription: String {
 				switch self {
 				case .utf8String(let str): return "'\(str)'"

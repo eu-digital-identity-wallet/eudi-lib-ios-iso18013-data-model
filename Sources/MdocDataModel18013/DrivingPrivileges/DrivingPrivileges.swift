@@ -20,7 +20,7 @@ import Foundation
 import SwiftCBOR
 
 ///  The DrivingPrivileges structure can be an empty array.
-public struct DrivingPrivileges: Codable {
+public struct DrivingPrivileges: Codable, Sendable {
 	public let drivingPrivileges: [DrivingPrivilege]
 	public subscript(i: Int) -> DrivingPrivilege { drivingPrivileges[i] }
 }

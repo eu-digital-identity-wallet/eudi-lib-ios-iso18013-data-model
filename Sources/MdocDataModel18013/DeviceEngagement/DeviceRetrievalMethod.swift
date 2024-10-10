@@ -22,7 +22,7 @@ import SwiftCBOR
 
 /// A `DeviceRetrievalMethod` holds two mandatory values (type and version). The first element defines the type and the second element the version for the transfer method.
 /// Additionally, may contain extra info for each connection.
-public enum DeviceRetrievalMethod: Equatable {
+public enum DeviceRetrievalMethod: Equatable, Sendable {
     static var version: UInt64 { 1 }
     
     case qr

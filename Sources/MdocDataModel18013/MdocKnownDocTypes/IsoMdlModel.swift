@@ -18,7 +18,7 @@ limitations under the License.
 
 import Foundation
 
-public struct IsoMdlModel: Decodable, MdocDecodable {
+public struct IsoMdlModel: Decodable, MdocDecodable, Sendable {
 	public var id: String = UUID().uuidString
 	public var createdAt: Date = Date()
 	public var docType: String = Self.isoDocType

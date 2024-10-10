@@ -19,7 +19,7 @@ import SwiftCBOR
 import OrderedCollections
 
 /// Contains the mdoc authentication structure and the data elements protected by mdoc authentication
-public struct DeviceSigned {
+public struct DeviceSigned: Sendable {
 	let nameSpaces: DeviceNameSpaces
 	let nameSpacesRawData: [UInt8]
 	let deviceAuth: DeviceAuth
@@ -57,7 +57,7 @@ extension DeviceSigned: CBOREncodable {
 }
 
 /// Device data elements per namespac
-public struct DeviceNameSpaces {
+public struct DeviceNameSpaces: Sendable {
 	public let deviceNameSpaces: [NameSpace: DeviceSignedItems]
 	public subscript(ns: NameSpace) -> DeviceSignedItems? { deviceNameSpaces[ns] }
 }
@@ -76,7 +76,7 @@ extension DeviceNameSpaces: CBORDecodable {
 }
 
 /// Contains the data element identifiers and values for a namespace
-public struct DeviceSignedItems {
+public struct DeviceSignedItems: Sendable {
 	public let deviceSignedItems: [DataElementIdentifier: DataElementValue]
 	public subscript(ei: DataElementIdentifier) -> DataElementValue? { deviceSignedItems[ei] }
 }

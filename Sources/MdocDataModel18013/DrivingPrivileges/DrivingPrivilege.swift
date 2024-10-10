@@ -21,7 +21,7 @@ import SwiftCBOR
 import OrderedCollections
 
 /// The categories of vehicles/restrictions/conditions contain information describing the driving privileges of the mDL holder
-public struct DrivingPrivilege: Codable {
+public struct DrivingPrivilege: Codable, Sendable {
     /// Vehicle category code as per ISO/IEC 18013-1
 	public let vehicleCategoryCode: String
     /// Date of issue encoded as full-date

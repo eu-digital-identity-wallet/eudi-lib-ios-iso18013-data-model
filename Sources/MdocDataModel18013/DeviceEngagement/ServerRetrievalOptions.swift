@@ -23,7 +23,7 @@ import SwiftCBOR
 import OrderedCollections
 
 /// Optional information on the server retrieval methods supported by the mdoc
-public struct ServerRetrievalOptions: Equatable  {
+public struct ServerRetrievalOptions: Equatable, Sendable  {
 	public var webAPI: ServerRetrievalOption?
 	public var oIDC: ServerRetrievalOption?
 	public var isEmpty:Bool { webAPI == nil && oIDC == nil }

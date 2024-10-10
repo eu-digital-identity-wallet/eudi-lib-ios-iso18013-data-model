@@ -20,7 +20,7 @@ import Logging
 import OrderedCollections
 
 /// Contains a returned cocument. The document type of the returned document is indicated by the docType element.
-public struct Document {
+public struct Document: Sendable {
 	
 	public let docType: DocType
 	public let issuerSigned: IssuerSigned

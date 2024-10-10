@@ -19,14 +19,14 @@ import Foundation
 import SwiftCBOR
 
 /// crv: EC identifier - Taken from the "COSE Elliptic Curves" registry
-public enum ECCurveType: UInt64 {
+public enum ECCurveType: UInt64, Sendable {
 	case p256 = 1
 	case p384 = 2
 	case p521 = 3
 }
 
 /// COSE_Key as defined in RFC 8152
-public struct CoseKey: Equatable {
+public struct CoseKey: Equatable, Sendable {
 	/// EC identifier
 	public let crv: ECCurveType
 	/// key type
@@ -38,7 +38,7 @@ public struct CoseKey: Equatable {
 }
 
 /// COSE_Key + private key
-public struct CoseKeyPrivate  {
+public struct CoseKeyPrivate: Sendable {
 	
 	public let key: CoseKey
 	let d: [UInt8]
@@ -161,7 +161,7 @@ extension CoseKeyPrivate {
 }
 
 /// A COSE_Key exchange pair
-public struct CoseKeyExchange {
+public struct CoseKeyExchange: Sendable {
 	public let publicKey: CoseKey
 	public let privateKey: CoseKeyPrivate
 

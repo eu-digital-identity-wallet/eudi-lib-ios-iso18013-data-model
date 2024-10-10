@@ -21,7 +21,7 @@ import Foundation
 import SwiftCBOR
 
 /// Server retrieval information
-public struct ServerRetrievalOption: Codable, Equatable {
+public struct ServerRetrievalOption: Codable, Equatable, Sendable {
     static var versionImpl: UInt64 { 1 }
     var version: UInt64 = Self.versionImpl
     public var url: String

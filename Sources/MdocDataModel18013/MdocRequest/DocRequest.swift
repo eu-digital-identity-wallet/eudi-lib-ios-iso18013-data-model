@@ -18,7 +18,7 @@ import Foundation
 import SwiftCBOR
 import OrderedCollections
 
-public struct DocRequest {
+public struct DocRequest: Sendable {
     public let itemsRequest: ItemsRequest
     public let itemsRequestRawData: [UInt8]? // items-request raw data NOT tagged
 	/// Used for mdoc reader authentication
@@ -52,9 +52,8 @@ extension DocRequest: CBOREncodable {
 }
 
 extension DocRequest {
-    public var readerCertificate: Data? {
-        guard let ra = readerAuth else { return nil }
-        guard let cert = ra.iaca.last else { return nil }
-        return Data(cert)
+    public var readerCertificates: [Data] {
+        guard let ra = readerAuth else { return [] }
+		return ra.x5chain.map { Data($0) }
     }
 }
