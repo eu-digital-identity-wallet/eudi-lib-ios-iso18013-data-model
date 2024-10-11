@@ -25,7 +25,7 @@ import UIKit
 /// A conforming type represents mdoc data.
 ///
 /// Can be decoded by a CBOR device response
-public protocol MdocDecodable: DocumentProtocol, AgeAttesting {
+public protocol MdocDecodable: Sendable, DocumentProtocol, AgeAttesting {
 	var issuerSigned: IssuerSigned? { get set}
 	var devicePrivateKey: CoseKeyPrivate? { get set}
 	var nameSpaces: [NameSpace]? { get set}
