@@ -16,6 +16,6 @@ limitations under the License.
 
 import Foundation
 
-public protocol MdocModelFactory {
-	static func makeMdocDecodable(id: String, createdAt: Date, issuerSigned: IssuerSigned, devicePrivateKey: CoseKeyPrivate, docType: String, displayName: String?, statusDescription: String?) -> (any MdocDecodable)?
+public protocol MdocModelFactory: Sendable {
+	func makeMdocDecodable(id: String, createdAt: Date, issuerSigned: IssuerSigned, devicePrivateKey: CoseKeyPrivate, docType: String, displayName: String?, statusDescription: String?) -> (any MdocDecodable)?
 }
