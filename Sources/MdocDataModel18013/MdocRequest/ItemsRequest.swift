@@ -18,7 +18,7 @@ import Foundation
 import SwiftCBOR
 import OrderedCollections
 
-public struct ItemsRequest {
+public struct ItemsRequest: Sendable {
 	/// Requested document type.
     public let docType: DocType
 	/// Requested data elements for each NameSpace

@@ -6,7 +6,7 @@ the [EUDI Wallet Reference Implementation project description](https://github.co
 ----
 
 # eudi-lib-ios-iso18013-data-model
-
+![Swift version](https://img.shields.io/badge/Swift-6.0-ff69b4.svg)
 [![Swift](https://github.com/eu-digital-identity-wallet/eudi-lib-ios-iso18013-data-model/actions/workflows/swift.yml/badge.svg)](https://github.com/eu-digital-identity-wallet/eudi-lib-ios-iso18013-data-model/actions/workflows/swift.yml)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=eu-digital-identity-wallet_eudi-lib-ios-iso18013-data-model&metric=ncloc&token=b00a8ef181dca9772a601a2889bf78338ac9e0e9)](https://sonarcloud.io/summary/new_code?id=eu-digital-identity-wallet_eudi-lib-ios-iso18013-data-model)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=eu-digital-identity-wallet_eudi-lib-ios-iso18013-data-model&metric=duplicated_lines_density&token=b00a8ef181dca9772a601a2889bf78338ac9e0e9)](https://sonarcloud.io/summary/new_code?id=eu-digital-identity-wallet_eudi-lib-ios-iso18013-data-model)

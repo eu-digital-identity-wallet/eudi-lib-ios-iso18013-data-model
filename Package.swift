@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -15,7 +15,7 @@ let package = Package(
     ],
     dependencies: [ 
    	   .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
-       .package(url: "https://github.com/niscy-eudiw/SwiftCBOR.git", from: "0.5.7"),
+        .package(url: "https://github.com/niscy-eudiw/SwiftCBOR.git", from: "0.6.2"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
      ],
 

@@ -16,7 +16,7 @@ limitations under the License.
 
 import Foundation
 
-public enum MdocDataType: String {
+public enum MdocDataType: String, Sendable {
     case boolean
     case integer
     case double
@@ -24,5 +24,5 @@ public enum MdocDataType: String {
     case date
     case array
     case dictionary
-		case bytes
+	case bytes
 }

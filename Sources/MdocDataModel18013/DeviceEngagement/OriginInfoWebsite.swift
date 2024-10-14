@@ -17,7 +17,7 @@ limitations under the License.
 import Foundation
 import SwiftCBOR
 
-public struct OriginInfoWebsite {
+public struct OriginInfoWebsite: Sendable {
 	public static let ENGAGEMENT_VERSION_1_1 = "1.1"
 	// * The constant used to specify how the current engagement structure is delivered.
 	static let CAT_DELIVERY: UInt64 = 0

@@ -20,7 +20,7 @@ import OrderedCollections
 public typealias ErrorItems = [DataElementIdentifier: ErrorCode]
 
 /// Error codes for each namespace for items that are not returned
-public struct Errors {
+public struct Errors: Sendable {
 	
 	public let errors: [NameSpace: ErrorItems]
 	public subscript(ns: String) -> ErrorItems? { errors[ns] }

@@ -19,7 +19,7 @@ import SwiftCBOR
 import OrderedCollections
 
 /// contains either the DeviceSignature or the DeviceMac element
-public struct DeviceAuth {
+public struct DeviceAuth: Sendable {
 	let coseMacOrSignature: Cose
 	enum Keys: String {
 		case deviceSignature

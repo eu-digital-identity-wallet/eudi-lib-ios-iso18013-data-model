@@ -14,10 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-//  NameValue.swift
+
 import Foundation
 
-public struct NameValue: Equatable, CustomStringConvertible {
+/// This structure is used to store and manage pairs of names and their corresponding values.
+/// It provides functionality for comparing instances, generating string representations for
+/// debugging and display purposes, and ensuring safe concurrent access.
+public struct NameValue: Equatable, CustomStringConvertible, CustomDebugStringConvertible, Sendable {
 	public init(name: String, value: String, ns: String? = nil, mdocDataType: MdocDataType? = nil, order: Int = 0, children: [NameValue]? = nil) {
 		self.name = name
 		self.value = value
@@ -31,21 +34,13 @@ public struct NameValue: Equatable, CustomStringConvertible {
 	public var value: String
 	public var mdocDataType: MdocDataType?
 	public var order: Int = 0
+	public var style: String?
 	public var children: [NameValue]?
 	public var description: String { "\(name): \(value)" }
+	public var debugDescription: String { "\(order). \(ns ?? ""): \(name) - \(value)" }
+
 	public mutating func add(child: NameValue) {
 		if children == nil { children = [] }
 		children!.append(child)
 	}
-}
-
-public struct NameImage {
-	public init(name: String, image: Data, ns: String? = nil) {
-		self.name = name
-		self.image = image
-		self.ns = ns
-	}
-	public let ns: String?
-	public let name: String
-	public let image: Data
 }

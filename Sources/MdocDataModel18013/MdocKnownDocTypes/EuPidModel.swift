@@ -18,10 +18,10 @@ limitations under the License.
 
 import Foundation
 
-public struct EuPidModel: Codable, MdocDecodable {
+public struct EuPidModel: Codable, MdocDecodable, Sendable {
 	public var issuerSigned: IssuerSigned?
 	public var devicePrivateKey: CoseKeyPrivate?
-	public static var euPidDocType: String = "eu.europa.ec.eudi.pid.1" 
+	public static let euPidDocType: String = "eu.europa.ec.eudi.pid.1" 
 	public var id: String = UUID().uuidString
 	public var createdAt: Date = Date()
 	public var docType = Self.euPidDocType
