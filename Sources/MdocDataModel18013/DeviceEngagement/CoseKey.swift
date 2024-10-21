@@ -18,17 +18,10 @@ import CryptoKit
 import Foundation
 import SwiftCBOR
 
-/// crv: EC identifier - Taken from the "COSE Elliptic Curves" registry
-public enum ECCurveType: UInt64, Sendable {
-	case p256 = 1
-	case p384 = 2
-	case p521 = 3
-}
-
 /// COSE_Key as defined in RFC 8152
 public struct CoseKey: Equatable, Sendable {
 	/// EC identifier
-	public let crv: ECCurveType
+	public let crv: CoseEcCurve
 	/// key type
 	var kty: UInt64 = 2
 	/// value of x-coordinate
@@ -53,23 +46,24 @@ public struct CoseKeyPrivate: Sendable {
 
 extension CoseKeyPrivate {    
 	// make new key
-	public init(crv: ECCurveType) {
+	public init(crv: CoseEcCurve) {
 		var privateKeyx963Data: Data
 		switch crv {
-		case .p256:
+		case .P256:
 			let key = P256.KeyAgreement.PrivateKey(compactRepresentable: false)
 			privateKeyx963Data = key.x963Representation
-		case .p384:
+		case .P384:
 			let key = P384.KeyAgreement.PrivateKey(compactRepresentable: false)
 			privateKeyx963Data = key.x963Representation
-		case .p521:
+		case .P521:
 			let key = P521.KeyAgreement.PrivateKey(compactRepresentable: false)
 			privateKeyx963Data = key.x963Representation
+        default: fatalError("Unsupported curve type \(crv)")
 		}
 		self.init(privateKeyx963Data: privateKeyx963Data, crv: crv)
 	}
 			
-	public init(privateKeyx963Data: Data, crv: ECCurveType = .p256) {
+	public init(privateKeyx963Data: Data, crv: CoseEcCurve = .P256) {
 		let xyk = privateKeyx963Data.advanced(by: 1) //Data(privateKeyx963Data[1...])
 		let klen = xyk.count / 3
 		let xdata: Data = Data(xyk[0..<klen])
@@ -81,7 +75,7 @@ extension CoseKeyPrivate {
 	}
 	
 	public init(publicKeyx963Data: Data, secureEnclaveKeyID: Data) {
-		key = CoseKey(crv: .p256, x963Representation: publicKeyx963Data)
+		key = CoseKey(crv: .P256, x963Representation: publicKeyx963Data)
 		d = [] // not used
 		self.secureEnclaveKeyID = secureEnclaveKeyID
 	}
@@ -105,7 +99,7 @@ extension CoseKey: CBOREncodable {
 
 extension CoseKey: CBORDecodable {
 	public init?(cbor obj: CBOR) {
-		guard let calg = obj[-1], case let CBOR.unsignedInt(ralg) = calg, let alg = ECCurveType(rawValue: ralg) else { return nil }
+		guard let calg = obj[-1], case let CBOR.unsignedInt(ralg) = calg, let alg = CoseEcCurve(rawValue: ralg) else { return nil }
 		crv = alg
 		guard let ckty = obj[1], case let CBOR.unsignedInt(rkty) = ckty else { return nil }
 		kty = rkty
@@ -117,13 +111,13 @@ extension CoseKey: CBORDecodable {
 }
 
 extension CoseKey {
-	public init(crv: ECCurveType, x963Representation: Data) {
+	public init(crv: CoseEcCurve, x963Representation: Data) {
 		let keyData = x963Representation.dropFirst().bytes
 		let count = keyData.count/2
 		self.init(x: Array(keyData[0..<count]), y: Array(keyData[count...]), crv: crv)
 	}
 
-	public init(x: [UInt8], y: [UInt8], crv: ECCurveType = .p256) {
+	public init(x: [UInt8], y: [UInt8], crv: CoseEcCurve = .P256) {
 		self.crv = crv
 		self.x = x
 		self.y = y
@@ -144,7 +138,7 @@ extension CoseKeyPrivate {
 	///   - y: /// value of y-coordinate
 	///   - d: /// value of x-coordinate
 	///   - crv: /// EC identifier
-	public init(x: [UInt8], y: [UInt8], d: [UInt8], crv: ECCurveType = .p256) {
+	public init(x: [UInt8], y: [UInt8], d: [UInt8], crv: CoseEcCurve = .P256) {
 		self.key = CoseKey(x: x, y: y, crv: crv)
 		self.d = d
 		self.secureEnclaveKeyID = nil

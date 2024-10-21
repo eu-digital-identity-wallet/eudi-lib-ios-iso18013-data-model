@@ -33,7 +33,7 @@ public enum KeyAccessProtection: Int, CaseIterable, Sendable {
     case afterFirstUnlockThisDeviceOnly
     case whenPasscodeSetThisDeviceOnly
     
-    // constant to use for the kSecAttrAccessible attribute
+    /// constant to use for the kSecAttrAccessible attribute
     public var constant: CFString {
         switch self {
         case .whenUnlocked: kSecAttrAccessibleWhenUnlocked
@@ -46,11 +46,13 @@ public enum KeyAccessProtection: Int, CaseIterable, Sendable {
 }
 
 public struct KeyAccessControl {
+    /// Require user presence policy using biometry or Passcode
     public var requireUserPresence: Bool = false
-    public var requirePassword: Bool = false
+    /// Require application provided password for additional data encryption key generation
+    public var requireApplicationPassword: Bool = false
     
     public var flags: SecAccessControlCreateFlags {
-        switch (requirePassword, requireUserPresence) {
+        switch (requireApplicationPassword, requireUserPresence) {
         case (false, false): []; case (false, true): [.userPresence]; case (true, false): [.applicationPassword] ; case (true, true): [.userPresence,.applicationPassword]
         }
     }

@@ -56,9 +56,9 @@ public struct DeviceEngagement: Sendable {
 	/// - Parameters
 	///    - isBleServer: true for BLE mdoc peripheral server mode, false for BLE mdoc central client mode
 	///    - crv: The EC curve type used in the mdoc ephemeral private key
-	public init(isBleServer: Bool?, crv: ECCurveType = .p256, rfus: [String]? = nil) {
+	public init(isBleServer: Bool?, crv: CoseEcCurve = .P256, rfus: [String]? = nil) {
 		let pk: CoseKeyPrivate
-		if SecureEnclave.isAvailable, crv == .p256, let se = try? SecureEnclave.P256.KeyAgreement.PrivateKey() {
+		if SecureEnclave.isAvailable, crv == .P256, let se = try? SecureEnclave.P256.KeyAgreement.PrivateKey() {
 			pk = CoseKeyPrivate(publicKeyx963Data: se.publicKey.x963Representation, secureEnclaveKeyID: se.dataRepresentation)
 			seKeyID = se.dataRepresentation
 		} else {

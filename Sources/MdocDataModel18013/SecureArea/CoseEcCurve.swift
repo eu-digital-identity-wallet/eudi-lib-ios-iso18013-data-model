@@ -16,8 +16,10 @@ limitations under the License.
 
 import Foundation
 
- /// Elliptic curve identifiers  from the [IANA COSE registry](https://www.iana.org/assignments/cose/cose.xhtml).
-public enum CoseEcCurve: Int, Sendable {
+/// Elliptic curve identifiers  from the [IANA COSE registry](https://www.iana.org/assignments/cose/cose.xhtml).
+
+/// This list is a superset of the iOS natively supported curves
+public enum CoseEcCurve: UInt64, Sendable {
     /// The curve identifier for P-256
     case P256 = 1
     /// The curve identifier for P-384
@@ -69,7 +71,7 @@ public enum CoseEcCurve: Int, Sendable {
         "brainpoolP512r1": .BRAINPOOLP512R1
     ]
 
-    static func fromInt(_ coseCurveIdentifier: Int) throws -> CoseEcCurve {
+    static func fromInt(_ coseCurveIdentifier: UInt64) throws -> CoseEcCurve {
         guard let curve = CoseEcCurve(rawValue: coseCurveIdentifier) else {
             throw NSError(domain: "EcCurve", code: -1, userInfo: [NSLocalizedDescriptionKey: "No curve with COSE identifier \(coseCurveIdentifier)"])
         }
