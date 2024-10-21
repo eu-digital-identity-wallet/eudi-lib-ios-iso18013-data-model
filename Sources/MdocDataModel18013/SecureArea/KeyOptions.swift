@@ -46,8 +46,8 @@ public enum KeyAccessProtection: Int, CaseIterable, Sendable {
 }
 
 public struct KeyAccessControl {
-    public var requireUserPresence: Bool
-    public var requirePassword: Bool
+    public var requireUserPresence: Bool = false
+    public var requirePassword: Bool = false
     
     public var flags: SecAccessControlCreateFlags {
         switch (requirePassword, requireUserPresence) {
