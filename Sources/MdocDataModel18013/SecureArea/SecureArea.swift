@@ -30,7 +30,7 @@ public protocol SecureArea: Actor {
     // compute signature
     func signature(keyTag: Data, algorithm: SigningAlgorithm, dataToSign: Data, keyUnlockData: Data?) throws -> Data
     // make shared secret with other public key
-    func keyAgreement(keyTag: Data, publicKey: Data, curve: CoseEcCurve, keyUnlockData: Data?) throws -> SharedSecret
+    func keyAgreement(keyTag: Data, publicKey: Data, with curve: CoseEcCurve, keyUnlockData: Data?) throws -> SharedSecret
     // returns information about the key with the given key tag
     func getKeyInfo(keyTag: Data, keyUnlockData: Data?) throws -> KeyInfo
 }
