@@ -71,14 +71,14 @@ public enum CoseEcCurve: UInt64, Sendable {
         "brainpoolP512r1": .BRAINPOOLP512R1
     ]
 
-    static func fromInt(_ coseCurveIdentifier: UInt64) throws -> CoseEcCurve {
+    public static func fromInt(_ coseCurveIdentifier: UInt64) throws -> CoseEcCurve {
         guard let curve = CoseEcCurve(rawValue: coseCurveIdentifier) else {
             throw NSError(domain: "EcCurve", code: -1, userInfo: [NSLocalizedDescriptionKey: "No curve with COSE identifier \(coseCurveIdentifier)"])
         }
         return curve
     }
 
-    static func fromJwkName(_ jwkName: String) throws -> CoseEcCurve {
+    public static func fromJwkName(_ jwkName: String) throws -> CoseEcCurve {
         guard let curve = jwkToCose[jwkName] else {
             throw NSError(domain: "EcCurve", code: -1, userInfo: [NSLocalizedDescriptionKey: "No EcCurve value for \(jwkName)"])
         }
@@ -86,7 +86,7 @@ public enum CoseEcCurve: UInt64, Sendable {
     }
 
     /// The curve size in bits
-    var bitSize: Int {
+    public var bitSize: Int {
         switch self {
         case .P256, .BRAINPOOLP256R1, .X25519, .ED25519: 256
         case .P384, .BRAINPOOLP384R1: 384
@@ -98,7 +98,7 @@ public enum CoseEcCurve: UInt64, Sendable {
     }
 
     /// The name of the curve according to [Standards for Efficient Cryptography Group](https://www.secg.org/).
-    var SECGName: String {
+    public var SECGName: String {
         switch self {
         case .P256: "secp256r1"
         case .P384: "secp384r1"
@@ -115,13 +115,13 @@ public enum CoseEcCurve: UInt64, Sendable {
     }
 
      /// The name of the curve according to [JSON Web Key Elliptic Curve](https://www.iana.org/assignments/jose/jose.xhtml#web-key-elliptic-curve)
-    var jwkName: String {
+    public var jwkName: String {
         guard let name = CoseEcCurve.coseToJwk[self] else { fatalError("No JWK entry for \(self)") }
         return name
     }
 
     /// The default signing algorithm for the curve.
-    var defaultSigningAlgorithm: SigningAlgorithm {
+    public var defaultSigningAlgorithm: SigningAlgorithm {
         switch self {
         case .P256, .BRAINPOOLP256R1, .BRAINPOOLP320R1: .ES256
         case .P384, .BRAINPOOLP384R1: .ES384

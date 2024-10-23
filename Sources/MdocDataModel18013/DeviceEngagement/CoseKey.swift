@@ -32,11 +32,11 @@ public struct CoseKey: Equatable, Sendable {
 
 /// COSE_Key + private key
 public struct CoseKeyPrivate: Sendable {
-	
+
 	public let key: CoseKey
 	let d: [UInt8]
 	public let secureEnclaveKeyID: Data?
-	
+
 	public init(key: CoseKey, d: [UInt8]) {
 		self.key = key
 		self.d = d
@@ -44,7 +44,7 @@ public struct CoseKeyPrivate: Sendable {
 	}
 }
 
-extension CoseKeyPrivate {    
+extension CoseKeyPrivate {
 	// make new key
 	public init(crv: CoseEcCurve) {
 		var privateKeyx963Data: Data
@@ -62,7 +62,7 @@ extension CoseKeyPrivate {
 		}
 		self.init(privateKeyx963Data: privateKeyx963Data, crv: crv)
 	}
-			
+
 	public init(privateKeyx963Data: Data, crv: CoseEcCurve = .P256) {
 		let xyk = privateKeyx963Data.advanced(by: 1) //Data(privateKeyx963Data[1...])
 		let klen = xyk.count / 3
@@ -73,13 +73,13 @@ extension CoseKeyPrivate {
 		d = ddata.bytes
 		secureEnclaveKeyID = nil
 	}
-	
+
 	public init(publicKeyx963Data: Data, secureEnclaveKeyID: Data) {
 		key = CoseKey(crv: .P256, x963Representation: publicKeyx963Data)
 		d = [] // not used
 		self.secureEnclaveKeyID = secureEnclaveKeyID
 	}
-	
+
 	// decode cbor string
 	public init?(base64: String) {
 		guard let d = Data(base64Encoded: base64), let obj = try? CBOR.decode([UInt8](d)), let coseKey = CoseKey(cbor: obj), let cd = obj[-4], case let CBOR.byteString(rd) = cd else { return nil }

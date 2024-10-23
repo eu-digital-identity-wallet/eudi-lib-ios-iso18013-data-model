@@ -23,9 +23,9 @@ public enum KeyPurpose: String, CaseIterable, Sendable {
     case keyAgreement = "Key Agreement"
 }
 
-/// Condition for the key to be available
+/// Key ccess protection options
 ///
-/// When asking SecItemCopyMatching to return the key's data, the error errSecInteractionNotAllowed will be returned if the item's data is not available until a device unlock occurs.
+/// You control an app’s access to a keychain item relative to the state of a device by setting the item’s kSecAttrAccessible attribute when you create the item.
 public enum KeyAccessProtection: Int, CaseIterable, Sendable {
     case whenUnlocked
     case afterFirstUnlock
@@ -44,7 +44,9 @@ public enum KeyAccessProtection: Int, CaseIterable, Sendable {
         }
     }
 }
-
+/// Key access control settings
+///
+/// Using these settings you can check for the presence of the authorized user at the very last minute before retrieving login credentials from the keychain. This helps secure the private key even if the user hands the device in an unlocked state to someone else.
 public struct KeyAccessControl {
     /// Require user presence policy using biometry or Passcode
     public var requireUserPresence: Bool = false

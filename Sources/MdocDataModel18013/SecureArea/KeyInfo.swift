@@ -17,10 +17,18 @@ limitations under the License.
 import Foundation
 
 public struct KeyInfo: Sendable {
+    
+    public init(publicKey: Data? = nil, curve: CoseEcCurve? = nil, keyPurpose: [KeyPurpose]? = nil, attestation: [String]? = nil) {
+        self.publicKey = publicKey
+        self.curve = curve
+        self.keyPurpose = keyPurpose
+        self.attestation = attestation
+    }
+    public var curve: CoseEcCurve?
     /// public key data in x963 representation
-    public var publicKey: [UInt8]?
+    public var publicKey: Data?
     /// Tasks for which key can be used.
-    public var keyPurpose: [KeyPurpose] = KeyPurpose.allCases
-    /// The chain of X.509 certificates, which can be used to verify the properties of that key pair.
-    public var attestation: [[UInt8]]?
+    public var keyPurpose: [KeyPurpose]?
+    /// The chain of X.509 certificates in base64, which can be used to verify the properties of that key pair.
+    public var attestation: [String]?
 }

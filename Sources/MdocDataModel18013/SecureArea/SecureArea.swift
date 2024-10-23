@@ -18,7 +18,7 @@ import CryptoKit
 
 // Abstraction of a secure area for performing cryptographic operations
 // 2 default iOS secure areas will be provided (keychain, software)
-public protocol SecureArea: Sendable {
+public protocol SecureArea: Actor {
     /// name of the secure area
     static var name: String { get }
     /// default Elliptic Curve type
@@ -26,11 +26,18 @@ public protocol SecureArea: Sendable {
     /// make key and return identifier
     func createKey(crv: CoseEcCurve, keyInfo: KeyInfo?) throws -> Data
     // delete key
-    func deleteKey(keyIdentifer: Data) throws
+    func deleteKey(keyTag: Data) throws
     // compute signature
-    func signature(keyIdentifer: Data, algorithm: SigningAlgorithm, dataToSign: Data, keyUnlockData: Data?) throws -> Data
+    func signature(keyTag: Data, algorithm: SigningAlgorithm, dataToSign: Data, keyUnlockData: Data?) throws -> Data
     // make shared secret with other public key
-    func keyAgreement(keyIdentifier: Data, publicKey: Data, keyUnlockData: Data?) throws -> SharedSecret
-    // returns information about the key with the given keyIdentifier
-    func getKeyInfo(keyIdentifier: Data) throws -> KeyInfo
+    func keyAgreement(keyTag: Data, publicKey: Data, curve: CoseEcCurve, keyUnlockData: Data?) throws -> SharedSecret
+    // returns information about the key with the given key tag
+    func getKeyInfo(keyTag: Data, keyUnlockData: Data?) throws -> KeyInfo
+}
+
+extension SecureArea {
+    /// default Elliptic Curve type
+    public static var defaultEcCurve: CoseEcCurve { .P256 }
+    /// default name
+    public static var name: String { String(describing: Self.self).replacingOccurrences(of: "SecureArea", with: "") }
 }
