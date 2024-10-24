@@ -43,16 +43,4 @@ extension SecureArea {
     public static var name: String { String(describing: Self.self).replacingOccurrences(of: "SecureArea", with: "") }
 }
 
-public protocol SecureKeyStorage: Actor {
-    // read key public info
-    func readKeyInfo(id: String) throws -> [String: Data]
-    // read key sensitive info (may trigger biometric or password checks)
-    func readKeyData(id: String) throws -> [String: Data]
 
-    // save key public info
-    func writeKeyInfo(id: String, dict: [String: Data]) throws
-    // save key sensitive info
-    func writeKeyData(id: String, dict: [String: Data]) throws
-    // delete key info and data
-    func deleteKey(id: String) throws
-}
