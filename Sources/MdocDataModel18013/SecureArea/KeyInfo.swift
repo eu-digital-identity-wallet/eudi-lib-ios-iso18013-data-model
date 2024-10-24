@@ -18,17 +18,22 @@ import Foundation
 
 public struct KeyInfo: Sendable {
     
-    public init(publicKey: Data? = nil, curve: CoseEcCurve? = nil, keyPurpose: [KeyPurpose]? = nil, attestation: [String]? = nil) {
+    public init(publicKey: CoseKey, keyPurpose: [KeyPurpose]? = nil, attestation: KeyAttestation? = nil) {
         self.publicKey = publicKey
-        self.curve = curve
         self.keyPurpose = keyPurpose
         self.attestation = attestation
     }
-    public var curve: CoseEcCurve?
-    /// public key data in x963 representation
-    public var publicKey: Data?
+    /// public key data
+    public var publicKey: CoseKey
     /// Tasks for which key can be used.
-    public var keyPurpose: [KeyPurpose]?
+    public var keyPurpose: [KeyPurpose]? = KeyPurpose.allCases
+    public var attestation: KeyAttestation?
+}
+
+public struct KeyAttestation: Sendable {
+    // the key that the attestation is for.
+    public var publicKey: CoseKey
     /// The chain of X.509 certificates in base64, which can be used to verify the properties of that key pair.
     public var attestation: [String]?
+
 }

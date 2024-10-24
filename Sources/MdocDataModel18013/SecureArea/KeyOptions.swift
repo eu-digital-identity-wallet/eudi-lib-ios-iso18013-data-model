@@ -17,6 +17,14 @@ limitations under the License.
 import Foundation
 import Security
 
+public struct KeyOptions: Sendable {
+    public var curve: CoseEcCurve
+    public var accessProtection: KeyAccessProtection?
+    public var accessControl: KeyAccessControl?
+    public var keyPurposes: [KeyPurpose]? = KeyPurpose.allCases
+    public var additionalOptions: Data?
+}
+
 /// Tasks for which keys can be used.
 public enum KeyPurpose: String, CaseIterable, Sendable {
     case signing = "Signing"
@@ -47,7 +55,7 @@ public enum KeyAccessProtection: Int, CaseIterable, Sendable {
 /// Key access control settings
 ///
 /// Using these settings you can check for the presence of the authorized user at the very last minute before retrieving login credentials from the keychain. This helps secure the private key even if the user hands the device in an unlocked state to someone else.
-public struct KeyAccessControl {
+public struct KeyAccessControl: Sendable {
     /// Require user presence policy using biometry or Passcode
     public var requireUserPresence: Bool = false
     /// Require application provided password for additional data encryption key generation

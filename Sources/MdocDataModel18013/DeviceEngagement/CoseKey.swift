@@ -64,7 +64,7 @@ extension CoseKeyPrivate {
 	}
 
 	public init(privateKeyx963Data: Data, crv: CoseEcCurve = .P256) {
-		let xyk = privateKeyx963Data.advanced(by: 1) //Data(privateKeyx963Data[1...])
+		let xyk = privateKeyx963Data.advanced(by: 1)
 		let klen = xyk.count / 3
 		let xdata: Data = Data(xyk[0..<klen])
 		let ydata: Data = Data(xyk[klen..<2 * klen])

@@ -23,16 +23,17 @@ public protocol SecureArea: Actor {
     static var name: String { get }
     /// default Elliptic Curve type
     static var defaultEcCurve: CoseEcCurve { get }
-    /// make key and return identifier
-    func createKey(crv: CoseEcCurve, keyInfo: KeyInfo?) throws -> Data
+    init(storage: any SecureKeyStorage)
+    /// make key and return key tag
+    func createKey(id: String, keyOptions: KeyOptions) throws
     // delete key
-    func deleteKey(keyTag: Data) throws
+    func deleteKey(id: String) throws
     // compute signature
-    func signature(keyTag: Data, algorithm: SigningAlgorithm, dataToSign: Data, keyUnlockData: Data?) throws -> Data
+    func signature(id: String, algorithm: SigningAlgorithm, dataToSign: Data, keyUnlockData: Data?) throws -> Data
     // make shared secret with other public key
-    func keyAgreement(keyTag: Data, publicKey: Data, with curve: CoseEcCurve, keyUnlockData: Data?) throws -> SharedSecret
+    func keyAgreement(id: String, publicKey: CoseKey, keyUnlockData: Data?) throws -> SharedSecret
     // returns information about the key with the given key tag
-    func getKeyInfo(keyTag: Data, keyUnlockData: Data?) throws -> KeyInfo
+    func getKeyInfo(id: String) throws -> KeyInfo
 }
 
 extension SecureArea {
@@ -40,4 +41,18 @@ extension SecureArea {
     public static var defaultEcCurve: CoseEcCurve { .P256 }
     /// default name
     public static var name: String { String(describing: Self.self).replacingOccurrences(of: "SecureArea", with: "") }
+}
+
+public protocol SecureKeyStorage: Actor {
+    // read key public info
+    func readKeyInfo(id: String) throws -> [String: Data]
+    // read key sensitive info (may trigger biometric or password checks)
+    func readKeyData(id: String) throws -> [String: Data]
+    
+    // save key public info
+    func writeKeyInfo(id: String, dict: [String: Data]) throws
+    // save key sensitive info
+    func writeKeyData(id: String, dict: [String: Data]) throws
+    // delete key info and data
+    func deleteKey(id: String) throws
 }
