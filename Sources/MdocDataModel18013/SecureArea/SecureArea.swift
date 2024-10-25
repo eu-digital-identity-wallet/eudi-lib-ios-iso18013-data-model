@@ -15,25 +15,27 @@ limitations under the License.
 */
 import Foundation
 import CryptoKit
+import Security
 
 // Abstraction of a secure area for performing cryptographic operations
 // 2 default iOS secure areas will be provided (keychain, software)
-public protocol SecureArea: Actor {
+public protocol SecureArea: Sendable {
     /// name of the secure area
     static var name: String { get }
     /// default Elliptic Curve type
     static var defaultEcCurve: CoseEcCurve { get }
+    var storage: any SecureKeyStorage { get }
     init(storage: any SecureKeyStorage)
     /// make key and return key tag
-    func createKey(id: String, keyOptions: KeyOptions) async throws
+    func createKey(id: String, keyOptions: KeyOptions?) throws -> (SecKey, CoseKey) 
     // delete key
-    func deleteKey(id: String) async throws
+    func deleteKey(id: String) throws
     // compute signature
-    func signature(id: String, algorithm: SigningAlgorithm, dataToSign: Data, keyUnlockData: Data?) async throws -> Data
+    func signature(id: String, algorithm: SigningAlgorithm, dataToSign: Data, keyUnlockData: Data?) throws -> Data
     // make shared secret with other public key
-    func keyAgreement(id: String, publicKey: CoseKey, keyUnlockData: Data?) async throws -> SharedSecret
+    func keyAgreement(id: String, publicKey: CoseKey, keyUnlockData: Data?) throws -> SharedSecret
     // returns information about the key with the given key tag
-    func getKeyInfo(id: String) async throws -> KeyInfo
+    func getKeyInfo(id: String) throws -> KeyInfo
 }
 
 extension SecureArea {

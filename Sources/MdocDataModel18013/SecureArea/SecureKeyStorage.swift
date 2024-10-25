@@ -15,7 +15,7 @@ limitations under the License.
 */
 import Foundation
 
-public protocol SecureKeyStorage: Actor {
+public protocol SecureKeyStorage: Sendable {
     // read key public info
     func readKeyInfo(id: String) throws -> [String: Data]
     // read key sensitive info (may trigger biometric or password checks)
@@ -24,8 +24,7 @@ public protocol SecureKeyStorage: Actor {
     // save key public info
     func writeKeyInfo(id: String, dict: [String: Data]) throws
     // save key sensitive info
-    // todo: pass key options
-    func writeKeyData(id: String, dict: [String: Data]) throws
+    func writeKeyData(id: String, dict: [String: Data], keyOptions: KeyOptions?) throws
     // delete key info and data
     func deleteKey(id: String) throws
 }

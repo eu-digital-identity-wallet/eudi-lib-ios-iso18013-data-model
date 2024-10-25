@@ -44,27 +44,17 @@ public struct DeviceEngagement: Sendable {
 	public var serverRetrievalOptions: ServerRetrievalOptions? = nil
 	var rfus: [String]?
 	// private key data for holder only
-	var d: [UInt8]?
-	var seKeyID: Data?
+    public var privateKey: CoseKeyPrivate?
 	public var qrCoded: [UInt8]?
-#if DEBUG
-	mutating func setD(d: [UInt8]) { self.d = d }
-	mutating func setKeyID(keyID: Data) { self.seKeyID = keyID }
-#endif
+
 	
 	/// Generate device engagement
 	/// - Parameters
 	///    - isBleServer: true for BLE mdoc peripheral server mode, false for BLE mdoc central client mode
 	///    - crv: The EC curve type used in the mdoc ephemeral private key
-	public init(isBleServer: Bool?, crv: CoseEcCurve = .P256, rfus: [String]? = nil) {
-		let pk: CoseKeyPrivate
-		if SecureEnclave.isAvailable, crv == .P256, let se = try? SecureEnclave.P256.KeyAgreement.PrivateKey() {
-			pk = CoseKeyPrivate(publicKeyx963Data: se.publicKey.x963Representation, secureEnclaveKeyID: se.dataRepresentation)
-			seKeyID = se.dataRepresentation
-		} else {
-			pk = CoseKeyPrivate(crv: crv)
-			d = pk.d
-		}
+    public init?(isBleServer: Bool?, crv: CoseEcCurve, secureArea: any SecureArea, rfus: [String]? = nil) {
+        guard let pk = try? CoseKeyPrivate(curve: crv, secureArea: secureArea) else { return nil }
+        privateKey = pk
 		security = Security(deviceKey: pk.key)
 		self.rfus = rfus
 		if let isBleServer { deviceRetrievalMethods = [.ble(isBleServer: isBleServer, uuid: DeviceRetrievalMethod.getRandomBleUuid())] }
@@ -73,16 +63,6 @@ public struct DeviceEngagement: Sendable {
 	public init?(data: [UInt8]) {
 		guard let obj = try? CBOR.decode(data) else { return nil }
 		self.init(cbor: obj)
-	}
-	
-	public var privateKey: CoseKeyPrivate? {
-		if let seKeyID {
-			return CoseKeyPrivate(publicKeyx963Data: security.deviceKey.getx963Representation(), secureEnclaveKeyID: seKeyID)
-		}
-		else if let d {
-			return CoseKeyPrivate(key: security.deviceKey, d: d)
-		}
-		return nil
 	}
 	
 	public var isBleServer: Bool? {

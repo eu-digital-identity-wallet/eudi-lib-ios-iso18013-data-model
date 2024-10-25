@@ -23,67 +23,33 @@ public struct CoseKey: Equatable, Sendable {
 	/// EC identifier
 	public let crv: CoseEcCurve
 	/// key type
-	var kty: UInt64 = 2
+    public var kty: UInt64 = 2
 	/// value of x-coordinate
-	let x: [UInt8]
+    public let x: [UInt8]
 	/// value of y-coordinate
-	let y: [UInt8]
+    public let y: [UInt8]
 }
 
 /// COSE_Key + private key
 public struct CoseKeyPrivate: Sendable {
 
-	public let key: CoseKey
-	let d: [UInt8]
-	public let secureEnclaveKeyID: Data?
+	public var key: CoseKey
+    public let privateKeyId: String
+    public let secureArea: any SecureArea
 
-	public init(key: CoseKey, d: [UInt8]) {
-		self.key = key
-		self.d = d
-		self.secureEnclaveKeyID = nil
+    public init(key: CoseKey?, privateKeyId: String, secureArea: any SecureArea) throws {
+		self.privateKeyId = privateKeyId
+		self.secureArea = secureArea
+        if let key { self.key = key } else { let ki = try secureArea.getKeyInfo(id: privateKeyId); self.key = ki.publicKey }
 	}
 }
 
 extension CoseKeyPrivate {
 	// make new key
-	public init(crv: CoseEcCurve) {
-		var privateKeyx963Data: Data
-		switch crv {
-		case .P256:
-			let key = P256.KeyAgreement.PrivateKey(compactRepresentable: false)
-			privateKeyx963Data = key.x963Representation
-		case .P384:
-			let key = P384.KeyAgreement.PrivateKey(compactRepresentable: false)
-			privateKeyx963Data = key.x963Representation
-		case .P521:
-			let key = P521.KeyAgreement.PrivateKey(compactRepresentable: false)
-			privateKeyx963Data = key.x963Representation
-        default: fatalError("Unsupported curve type \(crv)")
-		}
-		self.init(privateKeyx963Data: privateKeyx963Data, crv: crv)
-	}
-
-	public init(privateKeyx963Data: Data, crv: CoseEcCurve = .P256) {
-		let xyk = privateKeyx963Data.advanced(by: 1)
-		let klen = xyk.count / 3
-		let xdata: Data = Data(xyk[0..<klen])
-		let ydata: Data = Data(xyk[klen..<2 * klen])
-		let ddata: Data = Data(xyk[2 * klen..<3 * klen])
-		key = CoseKey(crv: crv, x: xdata.bytes, y: ydata.bytes)
-		d = ddata.bytes
-		secureEnclaveKeyID = nil
-	}
-
-	public init(publicKeyx963Data: Data, secureEnclaveKeyID: Data) {
-		key = CoseKey(crv: .P256, x963Representation: publicKeyx963Data)
-		d = [] // not used
-		self.secureEnclaveKeyID = secureEnclaveKeyID
-	}
-
-	// decode cbor string
-	public init?(base64: String) {
-		guard let d = Data(base64Encoded: base64), let obj = try? CBOR.decode([UInt8](d)), let coseKey = CoseKey(cbor: obj), let cd = obj[-4], case let CBOR.byteString(rd) = cd else { return nil }
-		self.init(key: coseKey, d: rd)
+	public init(curve: CoseEcCurve, secureArea: any SecureArea) throws {
+        let ephemeralKeyId = UUID().uuidString
+        let (_, coseKey) = try secureArea.createKey(id: ephemeralKeyId, keyOptions: KeyOptions(curve: curve))
+        try self.init(key: coseKey, privateKeyId: ephemeralKeyId, secureArea: secureArea)
 	}
 }
 
@@ -131,28 +97,6 @@ extension CoseKey {
 	}
 }
 
-extension CoseKeyPrivate {
-	/// Create a COSE_Key from Elliptic Curve paramters of the private key.
-	/// - Parameters:
-	///   - x: /// value of x-coordinate
-	///   - y: /// value of y-coordinate
-	///   - d: /// value of x-coordinate
-	///   - crv: /// EC identifier
-	public init(x: [UInt8], y: [UInt8], d: [UInt8], crv: CoseEcCurve = .P256) {
-		self.key = CoseKey(x: x, y: y, crv: crv)
-		self.d = d
-		self.secureEnclaveKeyID = nil
-	}
-
-	/// An ANSI x9.63 representation of the private key.
-	public func getx963Representation() -> Data {
-		let keyData = NSMutableData(bytes: [0x04], length: [0x04].count)
-		keyData.append(Data(key.x))
-		keyData.append(Data(key.y))
-		keyData.append(Data(d))
-		return keyData as Data
-	}
-}
 
 /// A COSE_Key exchange pair
 public struct CoseKeyExchange: Sendable {
