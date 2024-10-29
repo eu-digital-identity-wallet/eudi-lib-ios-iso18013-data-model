@@ -18,7 +18,6 @@ import Foundation
 import Security
 
 public struct KeyOptions: Sendable {
-    // todo: validate with vci-issuer what curves are supported
     public var curve: CoseEcCurve = .P256 
     public var secureAreaName: String?
     public var accessProtection: KeyAccessProtection?

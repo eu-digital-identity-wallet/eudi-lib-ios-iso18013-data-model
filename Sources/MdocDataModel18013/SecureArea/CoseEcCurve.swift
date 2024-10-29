@@ -133,7 +133,7 @@ public enum CoseEcCurve: UInt64, Sendable {
 }
 
 /// signing algorithm
-public enum SigningAlgorithm: Sendable {
+public enum SigningAlgorithm: String, Sendable {
     case ES256
     case ES384
     case ES512

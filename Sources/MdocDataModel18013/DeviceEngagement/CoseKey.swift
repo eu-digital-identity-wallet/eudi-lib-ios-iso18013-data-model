@@ -38,6 +38,7 @@ public struct CoseKeyPrivate: Sendable {
     public let secureArea: any SecureArea
 
     public init(key: CoseKey?, privateKeyId: String, secureArea: any SecureArea) throws {
+        logger.info("Loading cose key private with id: \(privateKeyId)")
 		self.privateKeyId = privateKeyId
 		self.secureArea = secureArea
         if let key { self.key = key } else { let ki = try secureArea.getKeyInfo(id: privateKeyId); self.key = ki.publicKey }
