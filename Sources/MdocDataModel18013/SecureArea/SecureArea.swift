@@ -14,8 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import Foundation
+#if canImport(CryptoKit)
 import CryptoKit
+#else 
+import Crypto
+#endif 
+#if canImport(Security)
 import Security
+#endif 
 
 // Abstraction of a secure area for performing cryptographic operations
 // 2 default iOS secure areas will be provided (keychain, software)

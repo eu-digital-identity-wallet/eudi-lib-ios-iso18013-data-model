@@ -14,8 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 @testable import MdocDataModel18013
+#if canImport(CryptoKit)
 import CryptoKit
+#else 
+import Crypto
+#endif 
+#if canImport(Security)
 import Security
+#endif 
 import Foundation
 import SwiftCBOR
 

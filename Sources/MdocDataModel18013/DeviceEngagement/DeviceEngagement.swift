@@ -18,7 +18,11 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+#if canImport(CryptoKit)
 import CryptoKit
+#else 
+import Crypto
+#endif 
 
 /// Device engagement information
 ///

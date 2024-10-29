@@ -15,13 +15,17 @@ limitations under the License.
 */
 
 import Foundation
+#if canImport(Security)
 import Security
+#endif
 
 public struct KeyOptions: Sendable {
     public var curve: CoseEcCurve = .P256 
     public var secureAreaName: String?
+#if canImport(Security)
     public var accessProtection: KeyAccessProtection?
     public var accessControl: KeyAccessControl?
+#endif
     public var keyPurposes: [KeyPurpose]? = KeyPurpose.allCases
     public var additionalOptions: Data?
 }
@@ -32,6 +36,7 @@ public enum KeyPurpose: String, CaseIterable, Sendable {
     case keyAgreement = "Key Agreement"
 }
 
+#if canImport(Security)
 /// Key ccess protection options
 ///
 /// You control an app’s access to a keychain item relative to the state of a device by setting the item’s kSecAttrAccessible attribute when you create the item.
@@ -67,5 +72,5 @@ public struct KeyAccessControl: Sendable {
         case (false, false): []; case (false, true): [.userPresence]; case (true, false): [.applicationPassword] ; case (true, true): [.userPresence,.applicationPassword]
         }
     }
-    
 }
+#endif
