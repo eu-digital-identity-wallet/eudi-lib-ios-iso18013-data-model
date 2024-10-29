@@ -61,16 +61,22 @@ public enum KeyAccessProtection: Int, CaseIterable, Sendable {
 /// Key access control settings
 ///
 /// Using these settings you can check for the presence of the authorized user at the very last minute before retrieving login credentials from the keychain. This helps secure the private key even if the user hands the device in an unlocked state to someone else.
-public struct KeyAccessControl: Sendable {
+public struct KeyAccessControl: OptionSet, Sendable {
+    public init(rawValue: Int) {
+        self.rawValue = rawValue
+    }
+    public let rawValue: Int
+    
     /// Require user presence policy using biometry or Passcode
-    public var requireUserPresence: Bool = false
+    public static let requireUserPresence = KeyAccessControl(rawValue: 1 << 0)
     /// Require application provided password for additional data encryption key generation
-    public var requireApplicationPassword: Bool = false
+    public static let requireApplicationPassword = KeyAccessControl(rawValue: 1 << 1)
     
     public var flags: SecAccessControlCreateFlags {
-        switch (requireApplicationPassword, requireUserPresence) {
-        case (false, false): []; case (false, true): [.userPresence]; case (true, false): [.applicationPassword] ; case (true, true): [.userPresence,.applicationPassword]
-        }
+        var result: SecAccessControlCreateFlags = []
+        if contains(.requireUserPresence) { result.insert(.userPresence) }
+        if contains(.requireApplicationPassword) { result.insert(.applicationPassword) }
+        return result
     }
 }
 #endif
