@@ -21,7 +21,7 @@ import OrderedCollections
 
 final class MdocDataModel18013Tests: XCTestCase {
 	static let pkb64 = "pQECIAEhWCBoHIiBQnDRMLUT4yOLqJ1l8mrfNIgrjNnFq4RyZgxSmiJYIGD/Sabu6GejaR4eTiym1JkyjnBNcJ+f59pN+lCEyhVyI1ggC6EPCKyGci++LGWUX3fXpPFW6pYO8pyyKLMKs1qF0jo="
-    static let pk = CoseKeyPrivate(base64: pkb64)!
+    static let pk = CoseKeyPrivate(p256data: pkb64)!
     func testExample() throws {
         // XCTest Documenation
         // https://developer.apple.com/documentation/xctest
@@ -153,14 +153,15 @@ final class MdocDataModel18013Tests: XCTestCase {
     
   #if os(iOS)
     func testGenerateBLEengageQRCodeImage() throws {
-		var de = DeviceEngagement(isBleServer: true)
-        var strQR = de.qrCode
+        var de = try XCTUnwrap(DeviceEngagement(isBleServer: true,  crv: .P256, secureArea: InMemoryP256SecureArea(storage: DummySecureKeyStorage())))
+        XCTAssertNotNil(de.getQrCodePayload())
+        let strQR = de.qrCode
 		XCTAssertNotNil(DeviceEngagement.getQrCodeImage(qrCode: strQR, inputCorrectionLevel: .m))
     }
 	
     func testGenerateBLEengageQRCodePayload() throws {
-	var de = DeviceEngagement(isBleServer: true)
-	XCTAssertNotNil(de.getQrCodePayload())
+        var de = try XCTUnwrap(DeviceEngagement(isBleServer: true,  crv: .P256, secureArea: InMemoryP256SecureArea(storage: DummySecureKeyStorage())))
+        XCTAssertNotNil(de.getQrCodePayload())
     }
   #endif
 
@@ -203,7 +204,19 @@ final class MdocDataModel18013Tests: XCTestCase {
 	
 	func testToJsonConverter() throws {
 		let dr = try XCTUnwrap(DeviceResponse(data: AnnexdTestData.d412.bytes))
-		let model = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: dr.documents!.first!.issuerSigned, devicePrivateKey: CoseKeyPrivate(crv: .p256), displayName: nil, statusDescription: nil))
+        let model = try XCTUnwrap(
+            IsoMdlModel(
+                id: UUID().uuidString,
+                createdAt: Date(),
+                issuerSigned: dr.documents!.first!.issuerSigned,
+                devicePrivateKey: CoseKeyPrivate(
+                    curve: .P256,
+                    secureArea: InMemoryP256SecureArea(storage: DummySecureKeyStorage())
+                ),
+                displayName: nil,
+                statusDescription: nil
+            )
+        )
 		let jsonObj = try XCTUnwrap(model.toJson(base64: true)[IsoMdlModel.isoNamespace] as? OrderedDictionary<String, Any>)
 		XCTAssertEqual(model.docType, IsoMdlModel.isoDocType)
 		XCTAssertEqual(jsonObj["family_name"] as! String, "Doe")
