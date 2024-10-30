@@ -19,14 +19,21 @@ import Foundation
 import Security
 #endif
 
+/// Key options
 public struct KeyOptions: Sendable {
-    public var curve: CoseEcCurve = .P256 
+    /// Cose EC curve
+    public var curve: CoseEcCurve = .P256
+    /// Secure are name
     public var secureAreaName: String?
 #if canImport(Security)
+    /// Key access protection options
     public var accessProtection: KeyAccessProtection?
+    /// Key access control settings
     public var accessControl: KeyAccessControl?
 #endif
+    /// Key purposes
     public var keyPurposes: [KeyPurpose]? = KeyPurpose.allCases
+    /// Any other additional option encoded value
     public var additionalOptions: Data?
 }
 
@@ -37,14 +44,19 @@ public enum KeyPurpose: String, CaseIterable, Sendable {
 }
 
 #if canImport(Security)
-/// Key ccess protection options
+/// Key access protection options
 ///
 /// You control an app’s access to a keychain item relative to the state of a device by setting the item’s kSecAttrAccessible attribute when you create the item.
 public enum KeyAccessProtection: Int, CaseIterable, Sendable {
+    /// Key data can only be accessed while the device is unlocked (default value).
     case whenUnlocked
+    /// Key data can only be  accessed once the device has been unlocked after a restart.  This is  recommended for keys that need to be accesible by background applications.
     case afterFirstUnlock
+    /// Key data can only be accessed while the device is unlocked. Key not restored from device backup.
     case whenUnlockedThisDeviceOnly
+    /// Key data can only be  accessed once the device has been unlocked after a restart.  Key not restored from device backup.
     case afterFirstUnlockThisDeviceOnly
+    /// Key data can only be accessed while the device is unlocked, requires a passcode to be set on the device.  Key not restored from device backup.
     case whenPasscodeSetThisDeviceOnly
     
     /// constant to use for the kSecAttrAccessible attribute
