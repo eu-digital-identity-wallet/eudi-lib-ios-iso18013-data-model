@@ -21,6 +21,15 @@ import Security
 
 /// Key options
 public struct KeyOptions: Sendable {
+    public init(curve: CoseEcCurve = .P256, secureAreaName: String? = nil, accessProtection: KeyAccessProtection? = nil, accessControl: KeyAccessControl? = nil, keyPurposes: [KeyPurpose]? = KeyPurpose.allCases, additionalOptions: Data? = nil) {
+        self.curve = curve
+        self.secureAreaName = secureAreaName
+        self.accessProtection = accessProtection
+        self.accessControl = accessControl
+        self.keyPurposes = keyPurposes
+        self.additionalOptions = additionalOptions
+    }
+    
     /// Cose EC curve
     public var curve: CoseEcCurve = .P256
     /// Secure are name
