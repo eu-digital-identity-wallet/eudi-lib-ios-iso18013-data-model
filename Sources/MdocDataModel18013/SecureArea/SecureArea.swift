@@ -24,23 +24,26 @@ import Security
 #endif 
 
 // Abstraction of a secure area for performing cryptographic operations
-// 2 default iOS secure areas will be provided (keychain, software)
+// 2 default iOS secure areas will be provided (SecureEnclave, Software)
 public protocol SecureArea: Sendable {
-    /// name of the secure area
+    /// name of the secure area. Used to lookup an instance in the registry of secure-areas
     static var name: String { get }
-    /// default Elliptic Curve type
+    /// default Elliptic Curve type for the secure area
     static var defaultEcCurve: CoseEcCurve { get }
+    /// reference to the secure-key-storage abstraction
     var storage: any SecureKeyStorage { get }
+    /// initialize with a secure-key storage object
     init(storage: any SecureKeyStorage)
-    /// make key and return key tag
-    func createKey(id: String, keyOptions: KeyOptions?) throws -> (SecKey, CoseKey) 
-    // delete key
+    /// make key and return a (private key, public key) pair.
+    /// The private/public key pair is passed to the Open4VCI module
+    func createKey(id: String, keyOptions: KeyOptions?) throws -> (SecKey, CoseKey)
+    /// delete key with id
     func deleteKey(id: String) throws
-    // compute signature
+    /// compute signature
     func signature(id: String, algorithm: SigningAlgorithm, dataToSign: Data) throws -> Data
-    // make shared secret with other public key
+    /// make key-agreement (shared secret) with other public key (used for encryption and mac computations)
     func keyAgreement(id: String, publicKey: CoseKey) throws -> SharedSecret
-    // returns information about the key with the given key tag
+    /// returns information about the key with the given id
     func getKeyInfo(id: String) throws -> KeyInfo
 }
 

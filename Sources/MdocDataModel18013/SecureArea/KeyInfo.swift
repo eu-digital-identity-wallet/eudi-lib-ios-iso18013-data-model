@@ -35,5 +35,4 @@ public struct KeyAttestation: Sendable {
     public var publicKey: CoseKey
     /// The chain of X.509 certificates in base64, which can be used to verify the properties of that key pair.
     public var attestation: [String]?
-
 }
