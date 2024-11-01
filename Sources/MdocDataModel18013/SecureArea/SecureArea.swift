@@ -37,9 +37,9 @@ public protocol SecureArea: Sendable {
     // delete key
     func deleteKey(id: String) throws
     // compute signature
-    func signature(id: String, algorithm: SigningAlgorithm, dataToSign: Data, keyUnlockData: Data?) throws -> Data
+    func signature(id: String, algorithm: SigningAlgorithm, dataToSign: Data) throws -> Data
     // make shared secret with other public key
-    func keyAgreement(id: String, publicKey: CoseKey, keyUnlockData: Data?) throws -> SharedSecret
+    func keyAgreement(id: String, publicKey: CoseKey) throws -> SharedSecret
     // returns information about the key with the given key tag
     func getKeyInfo(id: String) throws -> KeyInfo
 }
