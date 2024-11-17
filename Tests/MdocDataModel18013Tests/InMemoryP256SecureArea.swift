@@ -43,12 +43,12 @@ public final class InMemoryP256SecureArea: SecureArea, @unchecked Sendable {
     public func deleteKey(id: String) throws {
     }
 
-    public func signature(id: String, algorithm: MdocDataModel18013.SigningAlgorithm, dataToSign: Data) throws -> (raw: Data, der: Data) {
+    public func signature(id: String, algorithm: MdocDataModel18013.SigningAlgorithm, dataToSign: Data, unlockData: Data?) throws -> (raw: Data, der: Data) {
         let signature = try key.signature(for: dataToSign)
         return (signature.rawRepresentation, signature.derRepresentation)
     }
 
-    public func keyAgreement(id: String, publicKey: MdocDataModel18013.CoseKey) throws -> SharedSecret {
+    public func keyAgreement(id: String, publicKey: MdocDataModel18013.CoseKey, unlockData: Data?) throws -> SharedSecret {
         let puk256 = try P256.KeyAgreement.PublicKey(x963Representation: publicKey.getx963Representation())
         let prk256 = try P256.KeyAgreement.PrivateKey(x963Representation: key.x963Representation)
         let sharedSecret = try prk256.sharedSecretFromKeyAgreement(with: puk256)
