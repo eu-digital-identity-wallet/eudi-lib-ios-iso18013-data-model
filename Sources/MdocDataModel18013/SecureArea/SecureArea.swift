@@ -35,9 +35,9 @@ public protocol SecureArea: Sendable {
     /// initialize with a secure-key storage object
     init(storage: any SecureKeyStorage)
     /// make key and return the  public key.
-    /// The public key pair is passed to the Open4VCI module
+    /// The public key is passed to the Open4VCI module
     func createKey(id: String, keyOptions: KeyOptions?) throws -> CoseKey
-    /// unlock key
+    /// unlock key and return unlock data
     func unlockKey(id: String) async throws -> Data?
     /// delete key with id
     func deleteKey(id: String) throws
