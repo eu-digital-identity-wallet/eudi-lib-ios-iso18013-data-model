@@ -52,7 +52,7 @@ extension CoseKeyPrivate {
 	// make new key
 	public init(curve: CoseEcCurve, secureArea: any SecureArea) throws {
         let ephemeralKeyId = UUID().uuidString
-        let (_, coseKey) = try secureArea.createKey(id: ephemeralKeyId, keyOptions: KeyOptions(curve: curve))
+        let coseKey = try secureArea.createKey(id: ephemeralKeyId, keyOptions: KeyOptions(curve: curve))
         try self.init(key: coseKey, privateKeyId: ephemeralKeyId, secureArea: secureArea)
 	}
 }
@@ -99,6 +99,14 @@ extension CoseKey {
 		keyData.append(Data(y))
 		return keyData as Data
 	}
+    
+    public func toSecKey() throws -> SecKey {
+        var error: Unmanaged<CFError>?
+        guard let publicKey = SecKeyCreateWithData(getx963Representation() as NSData, [kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom, kSecAttrKeyClass: kSecAttrKeyClassPublic] as NSDictionary, &error) else {
+            throw error!.takeRetainedValue() as Error
+        }
+        return publicKey
+    }
 }
 
 

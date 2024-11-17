@@ -34,18 +34,18 @@ public final class InMemoryP256SecureArea: SecureArea, @unchecked Sendable {
         self.storage = storage
     }
 
-    public func createKey(id: String, keyOptions: MdocDataModel18013.KeyOptions?) throws -> (SecKey, MdocDataModel18013.CoseKey) {
+    public func createKey(id: String, keyOptions: MdocDataModel18013.KeyOptions?) throws -> MdocDataModel18013.CoseKey {
         key = if let x963Key { try P256.Signing.PrivateKey(x963Representation: x963Key) } else { P256.Signing.PrivateKey() }
         guard let privateKey = SecKeyCreateWithData(key.x963Representation as NSData, [kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom, kSecAttrKeyClass: kSecAttrKeyClassPrivate] as NSDictionary, nil) else {  throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey : "Error creating private key"])  }
-        return (privateKey, CoseKey(crv: .P256, x963Representation: key.publicKey.x963Representation))
+        return CoseKey(crv: .P256, x963Representation: key.publicKey.x963Representation)
     }
 
     public func deleteKey(id: String) throws {
     }
 
-    public func signature(id: String, algorithm: MdocDataModel18013.SigningAlgorithm, dataToSign: Data) throws -> Data {
-        let signature = (try key.signature(for: dataToSign)).rawRepresentation
-        return signature
+    public func signature(id: String, algorithm: MdocDataModel18013.SigningAlgorithm, dataToSign: Data) throws -> (raw: Data, der: Data) {
+        let signature = try key.signature(for: dataToSign)
+        return (signature.rawRepresentation, signature.derRepresentation)
     }
 
     public func keyAgreement(id: String, publicKey: MdocDataModel18013.CoseKey) throws -> SharedSecret {
