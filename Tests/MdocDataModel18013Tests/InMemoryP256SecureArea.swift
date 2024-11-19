@@ -92,6 +92,6 @@ extension MdocDataModel18013.CoseKeyPrivate {
         let keyData = NSMutableData(bytes: [0x04], length: [0x04].count)
         keyData.append(Data(coseKey.x)); keyData.append(Data(coseKey.y));  keyData.append(Data(rd))
         sampleSA.x963Key = keyData as Data
-        try? self.init(curve: coseKey.crv, secureArea: sampleSA)
+        self.init(secureArea: sampleSA)
     }
 }

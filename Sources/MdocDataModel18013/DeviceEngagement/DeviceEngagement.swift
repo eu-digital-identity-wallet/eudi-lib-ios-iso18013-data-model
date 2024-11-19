@@ -42,7 +42,7 @@ import Crypto
 public struct DeviceEngagement: Sendable {
 	static let versionImpl: String = "1.0"
 	var version: String = Self.versionImpl
-	let security: Security
+	var security: Security!
 	public var originInfos: [OriginInfoWebsite]? = nil
 	public var deviceRetrievalMethods: [DeviceRetrievalMethod]? = nil
 	public var serverRetrievalOptions: ServerRetrievalOptions? = nil
@@ -56,10 +56,7 @@ public struct DeviceEngagement: Sendable {
 	/// - Parameters
 	///    - isBleServer: true for BLE mdoc peripheral server mode, false for BLE mdoc central client mode
 	///    - crv: The EC curve type used in the mdoc ephemeral private key
-    public init?(isBleServer: Bool?, crv: CoseEcCurve, secureArea: any SecureArea, rfus: [String]? = nil) {
-        guard let pk = try? CoseKeyPrivate(curve: crv, secureArea: secureArea) else { return nil }
-        privateKey = pk
-		security = Security(deviceKey: pk.key)
+    public init?(isBleServer: Bool?, rfus: [String]? = nil) {
 		self.rfus = rfus
 		if let isBleServer { deviceRetrievalMethods = [.ble(isBleServer: isBleServer, uuid: DeviceRetrievalMethod.getRandomBleUuid())] }
 	}
@@ -68,6 +65,13 @@ public struct DeviceEngagement: Sendable {
 		guard let obj = try? CBOR.decode(data) else { return nil }
 		self.init(cbor: obj)
 	}
+    
+    public mutating func makePrivateKey(crv: CoseEcCurve, secureArea: any SecureArea) async throws {
+        var pk = CoseKeyPrivate(secureArea: secureArea)
+        try await pk.makeKey(curve: crv)
+        privateKey = pk
+        security = Security(deviceKey: pk.key)
+    }
 	
 	public var isBleServer: Bool? {
 		guard let deviceRetrievalMethods else { return nil}

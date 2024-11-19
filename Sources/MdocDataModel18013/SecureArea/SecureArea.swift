@@ -36,17 +36,17 @@ public protocol SecureArea: Sendable {
     init(storage: any SecureKeyStorage)
     /// make key and return the  public key.
     /// The public key is passed to the Open4VCI module
-    func createKey(id: String, keyOptions: KeyOptions?) throws -> CoseKey
+    func createKey(id: String, keyOptions: KeyOptions?) async throws -> CoseKey
     /// unlock key and return unlock data
     func unlockKey(id: String) async throws -> Data?
     /// delete key with id
-    func deleteKey(id: String) throws
+    func deleteKey(id: String) async throws
     /// compute signature
-    func signature(id: String, algorithm: SigningAlgorithm, dataToSign: Data, unlockData: Data?) throws -> (raw: Data, der: Data)
+    func signature(id: String, algorithm: SigningAlgorithm, dataToSign: Data, unlockData: Data?) async throws -> (raw: Data, der: Data)
     /// make key-agreement (shared secret) with other public key (used for encryption and mac computations)
-    func keyAgreement(id: String, publicKey: CoseKey, unlockData: Data?) throws -> SharedSecret
+    func keyAgreement(id: String, publicKey: CoseKey, unlockData: Data?) async throws -> SharedSecret
     /// returns information about the key with the given id
-    func getKeyInfo(id: String) throws -> KeyInfo
+    func getKeyInfo(id: String) async throws -> KeyInfo
 }
 
 extension SecureArea {

@@ -36,24 +36,28 @@ public struct CoseKey: Equatable, Sendable {
 /// COSE_Key + private key
 public struct CoseKeyPrivate: Sendable {
 
-	public var key: CoseKey
-    public let privateKeyId: String
-    public let secureArea: any SecureArea
+	public var key: CoseKey!
+    public var privateKeyId: String!
+    public var secureArea: (any SecureArea)!
 
-    public init(key: CoseKey?, privateKeyId: String, secureArea: any SecureArea) throws {
+    public init(privateKeyId: String, secureArea: any SecureArea) {
         logger.info("Loading cose key private with id: \(privateKeyId)")
 		self.privateKeyId = privateKeyId
 		self.secureArea = secureArea
-        if let key { self.key = key } else { let ki = try secureArea.getKeyInfo(id: privateKeyId); self.key = ki.publicKey }
 	}
+    
+    public init(secureArea: any SecureArea) {
+        self.secureArea = secureArea
+    }
+    
 }
 
 extension CoseKeyPrivate {
 	// make new key
-	public init(curve: CoseEcCurve, secureArea: any SecureArea) throws {
+    public mutating func makeKey(curve: CoseEcCurve) async throws {
         let ephemeralKeyId = UUID().uuidString
-        let coseKey = try secureArea.createKey(id: ephemeralKeyId, keyOptions: KeyOptions(curve: curve))
-        try self.init(key: coseKey, privateKeyId: ephemeralKeyId, secureArea: secureArea)
+        privateKeyId = ephemeralKeyId
+        self.key = try await secureArea.createKey(id: ephemeralKeyId, keyOptions: KeyOptions(curve: curve))
 	}
 }
 
@@ -113,7 +117,7 @@ extension CoseKey {
 /// A COSE_Key exchange pair
 public struct CoseKeyExchange: Sendable {
 	public let publicKey: CoseKey
-	public let privateKey: CoseKeyPrivate
+	public var privateKey: CoseKeyPrivate
 
 	public init(publicKey: CoseKey, privateKey: CoseKeyPrivate) {
 		self.publicKey = publicKey
