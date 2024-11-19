@@ -15,9 +15,7 @@ limitations under the License.
 */
 
 import Foundation
-#if canImport(Security)
-import Security
-#endif
+
 
 /// Key options
 public struct KeyOptions: Sendable {
@@ -29,17 +27,17 @@ public struct KeyOptions: Sendable {
         self.keyPurposes = keyPurposes
         self.additionalOptions = additionalOptions
     }
-    
+
     /// Cose EC curve
     public var curve: CoseEcCurve = .P256
     /// Secure are name
     public var secureAreaName: String?
-#if canImport(Security)
+
     /// Key access protection options
     public var accessProtection: KeyAccessProtection?
     /// Key access control settings
     public var accessControl: KeyAccessControl?
-#endif
+
     /// Key purposes
     public var keyPurposes: [KeyPurpose]? = KeyPurpose.allCases
     /// Any other additional option encoded value
@@ -67,7 +65,7 @@ public enum KeyAccessProtection: Int, CaseIterable, Sendable {
     case afterFirstUnlockThisDeviceOnly
     /// Key data can only be accessed while the device is unlocked, requires a passcode to be set on the device.  Key not restored from device backup.
     case whenPasscodeSetThisDeviceOnly
-    
+
     /// constant to use for the kSecAttrAccessible attribute
     public var constant: CFString {
         switch self {
@@ -87,12 +85,12 @@ public struct KeyAccessControl: OptionSet, Sendable {
         self.rawValue = rawValue
     }
     public let rawValue: Int
-    
+
     /// Require user presence policy using biometry or Passcode
     public static let requireUserPresence = KeyAccessControl(rawValue: 1 << 0)
     /// Require application provided password for additional data encryption key generation
     public static let requireApplicationPassword = KeyAccessControl(rawValue: 1 << 1)
-    
+
     public var flags: SecAccessControlCreateFlags {
         var result: SecAccessControlCreateFlags = []
         if contains(.requireUserPresence) { result.insert(.userPresence) }
