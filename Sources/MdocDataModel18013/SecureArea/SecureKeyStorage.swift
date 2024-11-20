@@ -16,7 +16,7 @@ limitations under the License.
 import Foundation
 
 // protocol for secure key storage implementations
-public protocol SecureKeyStorage: Sendable {
+public protocol SecureKeyStorage: Actor {
     // read key public info
     func readKeyInfo(id: String) async throws -> [String: Data]
     // read key sensitive info (may trigger biometric or password checks)
