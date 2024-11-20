@@ -16,12 +16,12 @@ limitations under the License.
 @testable import MdocDataModel18013
 #if canImport(CryptoKit)
 import CryptoKit
-#else 
+#else
 import Crypto
-#endif 
+#endif
 #if canImport(Security)
 import Security
-#endif 
+#endif
 import Foundation
 import SwiftCBOR
 
@@ -36,7 +36,7 @@ public final class InMemoryP256SecureArea: SecureArea, @unchecked Sendable {
 
     public func createKey(id: String, keyOptions: MdocDataModel18013.KeyOptions?) throws -> MdocDataModel18013.CoseKey {
         key = if let x963Key { try P256.Signing.PrivateKey(x963Representation: x963Key) } else { P256.Signing.PrivateKey() }
-        guard let privateKey = SecKeyCreateWithData(key.x963Representation as NSData, [kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom, kSecAttrKeyClass: kSecAttrKeyClassPrivate] as NSDictionary, nil) else {  throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey : "Error creating private key"])  }
+        guard SecKeyCreateWithData(key.x963Representation as NSData, [kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom, kSecAttrKeyClass: kSecAttrKeyClassPrivate] as NSDictionary, nil) != nil else {  throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey : "Error creating private key"])  }
         return CoseKey(crv: .P256, x963Representation: key.publicKey.x963Representation)
     }
 
@@ -61,7 +61,7 @@ public final class InMemoryP256SecureArea: SecureArea, @unchecked Sendable {
     }
 }
 
-public final class DummySecureKeyStorage: MdocDataModel18013.SecureKeyStorage {
+public actor DummySecureKeyStorage: MdocDataModel18013.SecureKeyStorage {
     public func readKeyInfo(id: String) throws -> [String : Data] {
         [:]
     }
@@ -71,17 +71,17 @@ public final class DummySecureKeyStorage: MdocDataModel18013.SecureKeyStorage {
     }
 
     public func writeKeyInfo(id: String, dict: [String : Data]) throws {
-        
+
     }
 
     public func writeKeyData(id: String, dict: [String : Data], keyOptions: MdocDataModel18013.KeyOptions?) throws {
-        
+
     }
 
     public func deleteKey(id: String) throws {
-        
+
     }
-    
+
 }
 
 extension MdocDataModel18013.CoseKeyPrivate {
