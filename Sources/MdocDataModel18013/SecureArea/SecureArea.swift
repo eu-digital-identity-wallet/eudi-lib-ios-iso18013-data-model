@@ -16,12 +16,12 @@ limitations under the License.
 import Foundation
 #if canImport(CryptoKit)
 import CryptoKit
-#else 
+#else
 import Crypto
-#endif 
+#endif
 #if canImport(Security)
 import Security
-#endif 
+#endif
 
 // Abstraction of a secure area for performing cryptographic operations
 // 2 default iOS secure areas will be provided (SecureEnclave, Software)
@@ -41,8 +41,8 @@ public protocol SecureArea: Sendable {
     func unlockKey(id: String) async throws -> Data?
     /// delete key with id
     func deleteKey(id: String) async throws
-    /// compute signature
-    func signature(id: String, algorithm: SigningAlgorithm, dataToSign: Data, unlockData: Data?) async throws -> (raw: Data, der: Data)
+    /// compute signature, return raw representation
+    func signature(id: String, algorithm: SigningAlgorithm, dataToSign: Data, unlockData: Data?) async throws -> Data
     /// make key-agreement (shared secret) with other public key (used for encryption and mac computations)
     func keyAgreement(id: String, publicKey: CoseKey, unlockData: Data?) async throws -> SharedSecret
     /// returns information about the key with the given id
@@ -59,7 +59,7 @@ extension SecureArea {
         logger.info("Unlocking key with id: \(id)")
         return nil
     }
-    
+
 }
 
 
