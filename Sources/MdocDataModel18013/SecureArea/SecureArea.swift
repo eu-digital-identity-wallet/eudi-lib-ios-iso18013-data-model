@@ -25,7 +25,7 @@ import Security
 
 // Abstraction of a secure area for performing cryptographic operations
 // 2 default iOS secure areas will be provided (SecureEnclave, Software)
-public protocol SecureArea: Sendable {
+public protocol SecureArea: Actor {
     /// name of the secure area. Used to lookup an instance in the registry of secure-areas
     static var name: String { get }
     /// default Elliptic Curve type for the secure area
@@ -47,6 +47,7 @@ public protocol SecureArea: Sendable {
     func keyAgreement(id: String, publicKey: CoseKey, unlockData: Data?) async throws -> SharedSecret
     /// returns information about the key with the given id
     func getKeyInfo(id: String) async throws -> KeyInfo
+    func getStorage() async -> any SecureKeyStorage
 }
 
 extension SecureArea {
@@ -59,7 +60,7 @@ extension SecureArea {
         logger.info("Unlocking key with id: \(id)")
         return nil
     }
-
+    public func getStorage() async -> any SecureKeyStorage { return storage }
 }
 
 

@@ -25,12 +25,12 @@ import Security
 import Foundation
 import SwiftCBOR
 
-public final class InMemoryP256SecureArea: SecureArea, @unchecked Sendable {
+public actor InMemoryP256SecureArea: SecureArea {
     public var storage: any MdocDataModel18013.SecureKeyStorage
     var key: P256.Signing.PrivateKey!
-    var x963Key: Data?
+    public nonisolated(unsafe) var x963Key: Data?
 
-    public required init(storage: any MdocDataModel18013.SecureKeyStorage) {
+    public init(storage: any MdocDataModel18013.SecureKeyStorage) {
         self.storage = storage
     }
 

@@ -152,15 +152,17 @@ final class MdocDataModel18013Tests: XCTestCase {
 	}
 
   #if os(iOS)
-    func testGenerateBLEengageQRCodeImage() throws {
-        var de = try XCTUnwrap(DeviceEngagement(isBleServer: true,  crv: .P256, secureArea: InMemoryP256SecureArea(storage: DummySecureKeyStorage())))
+    func testGenerateBLEengageQRCodeImage() async throws {
+        var de = try XCTUnwrap(DeviceEngagement(isBleServer: true))
+        try await de.makePrivateKey(crv: .P256, secureArea: InMemoryP256SecureArea(storage: DummySecureKeyStorage()))
         XCTAssertNotNil(de.getQrCodePayload())
         let strQR = de.qrCode
 		XCTAssertNotNil(DeviceEngagement.getQrCodeImage(qrCode: strQR, inputCorrectionLevel: .m))
     }
 
-    func testGenerateBLEengageQRCodePayload() throws {
-        var de = try XCTUnwrap(DeviceEngagement(isBleServer: true,  crv: .P256, secureArea: InMemoryP256SecureArea(storage: DummySecureKeyStorage())))
+    func testGenerateBLEengageQRCodePayload() async throws {
+        var de = try XCTUnwrap(DeviceEngagement(isBleServer: true))
+        try await de.makePrivateKey(crv: .P256, secureArea: InMemoryP256SecureArea(storage: DummySecureKeyStorage()))
         XCTAssertNotNil(de.getQrCodePayload())
     }
   #endif
