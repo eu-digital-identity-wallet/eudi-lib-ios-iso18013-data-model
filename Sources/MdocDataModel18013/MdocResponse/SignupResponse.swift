@@ -28,12 +28,6 @@ public struct SignUpResponse: Codable, Sendable {
 		guard let b64 = response, let d = Data(base64Encoded: b64) else { return nil }
 		return DeviceResponse(data: d.bytes)
 	}
-
-	/// Device private key decoded from base64-encoded string
-	public var devicePrivateKey: CoseKeyPrivate? {
-		guard let privateKey else { return nil }
-		return CoseKeyPrivate(base64: privateKey)
-	}
 	
 	enum CodingKeys: String, CodingKey {
 		case response
@@ -50,21 +44,5 @@ public struct SignUpResponse: Codable, Sendable {
 		guard let sr = data.decodeJSON(type: SignUpResponse.self), let dr = sr.deviceResponse, let docs = dr.documents else { return nil }
 		return docs.map { (docType: $0.docType, dr: DeviceResponse(version: dr.version, documents: [$0], status: dr.status), iss: $0.issuerSigned) }
 	}
-	
-	/// Decompose CBOR signup responses from data
-	///
-	/// A data file may contain signup responses with many documents (doc.types).
-	/// - Parameter data: Data from file or memory
-	/// - Returns:  separate json serialized signup response objects for each doc.type
-	public static func decomposeCBORSignupResponse(data: Data) -> [(docType: String, jsonData: Data, drData: Data, issData: Data, pkData: Data?)]? {
-		guard let sr = data.decodeJSON(type: SignUpResponse.self), let drs = decomposeCBORDeviceResponse(data: data) else { return nil }
-		return drs.compactMap {
-			let drData = Data(CBOR.encode($0.dr.toCBOR(options: CBOROptions())))
-			let issData = Data(CBOR.encode($0.iss.toCBOR(options: CBOROptions())))
-			var jsonObj = ["response": drData.base64EncodedString()]
-			if let pk = sr.privateKey { jsonObj["privateKey"] = pk }
-			guard let jsonData = try? JSONSerialization.data(withJSONObject: jsonObj) else { return nil }
-			return (docType: $0.docType, jsonData: jsonData, drData: drData, issData: issData, pkData: sr.devicePrivateKey?.getx963Representation())
-		}
-	}
+
 }
