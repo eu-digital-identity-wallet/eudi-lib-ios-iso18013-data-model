@@ -51,6 +51,14 @@ extension Cose {
 		case es256 = 6 //-7 ECDSA w/ SHA-256
 		case es384 = 34 //-35 ECDSA w/ SHA-384
 		case es512 = 35//-36 ECDSA w/ SHA-512
+        
+        public var signingAlgorithm: SigningAlgorithm {
+            switch self {
+            case .es256: return .ES256
+            case .es384: return .ES384
+            case .es512: return .ES512
+            }
+        }
 	}
 	
 	/// MAC Algorithm Values
