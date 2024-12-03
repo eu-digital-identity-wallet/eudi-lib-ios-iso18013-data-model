@@ -26,13 +26,17 @@ import Foundation
 import SwiftCBOR
 
 public actor InMemoryP256SecureArea: SecureArea {
-    public var storage: any MdocDataModel18013.SecureKeyStorage
+    var storage: any MdocDataModel18013.SecureKeyStorage
     var key: P256.Signing.PrivateKey!
     public nonisolated(unsafe) var x963Key: Data?
 
-    public init(storage: any MdocDataModel18013.SecureKeyStorage) {
+    init(storage: any MdocDataModel18013.SecureKeyStorage) {
         self.storage = storage
     }
+    nonisolated public static func create(storage: any MdocDataModel18013.SecureKeyStorage) -> InMemoryP256SecureArea {
+        InMemoryP256SecureArea(storage: storage)
+    }
+    public func getStorage() async -> any MdocDataModel18013.SecureKeyStorage { storage }
 
     public func createKey(id: String, keyOptions: MdocDataModel18013.KeyOptions?) throws -> MdocDataModel18013.CoseKey {
         key = if let x963Key { try P256.Signing.PrivateKey(x963Representation: x963Key) } else { P256.Signing.PrivateKey() }

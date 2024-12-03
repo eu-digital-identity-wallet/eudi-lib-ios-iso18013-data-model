@@ -30,10 +30,8 @@ public protocol SecureArea: Actor {
     static var name: String { get }
     /// default Elliptic Curve type for the secure area
     static var defaultEcCurve: CoseEcCurve { get }
-    /// reference to the secure-key-storage abstraction
-    var storage: any SecureKeyStorage { get }
     /// initialize with a secure-key storage object
-    init(storage: any SecureKeyStorage)
+    nonisolated static func create(storage: any SecureKeyStorage) -> Self
     /// make key and return the  public key.
     /// The public key is passed to the Open4VCI module
     func createKey(id: String, keyOptions: KeyOptions?) async throws -> CoseKey
@@ -47,6 +45,7 @@ public protocol SecureArea: Actor {
     func keyAgreement(id: String, publicKey: CoseKey, unlockData: Data?) async throws -> SharedSecret
     /// returns information about the key with the given id
     func getKeyInfo(id: String) async throws -> KeyInfo
+    /// return the storage instance
     func getStorage() async -> any SecureKeyStorage
 }
 
@@ -60,7 +59,7 @@ extension SecureArea {
         logger.info("Unlocking key with id: \(id)")
         return nil
     }
-    public func getStorage() async -> any SecureKeyStorage { return storage }
+    //public func getStorage() async -> any SecureKeyStorage { return storage }
 }
 
 
