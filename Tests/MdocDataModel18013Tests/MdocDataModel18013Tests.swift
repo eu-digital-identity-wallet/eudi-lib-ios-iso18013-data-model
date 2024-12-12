@@ -95,17 +95,17 @@ final class MdocDataModel18013Tests: XCTestCase {
 	  	let d1 = try XCTUnwrap(docs.first(where: {$0.docType == EuPidModel.euPidDocType}))
 		let d2 = try XCTUnwrap(docs.first(where: {$0.docType == IsoMdlModel.isoDocType}))
 		//let ns1 = d1?.issuerSigned.issuerNameSpaces!.nameSpaces.first
-		let pidObj = try XCTUnwrap(EuPidModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d1.issuerSigned, devicePrivateKey: Self.pk, displayName: nil, statusDescription: nil))
+		let pidObj = try XCTUnwrap(EuPidModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d1.issuerSigned, displayName: nil))
 		XCTAssertEqual(pidObj.family_name, "ANDERSSON")
-		let mdlObj = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d2.issuerSigned, devicePrivateKey: Self.pk, displayName: nil, statusDescription: nil))
+		let mdlObj = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d2.issuerSigned, displayName: nil))
 		XCTAssertEqual(mdlObj.familyName, "ANDERSSON")
-		printDisplayStrings(mdlObj.displayStrings)
+		printDisplayStrings(mdlObj.docClaims)
 	}
 
-	func printDisplayStrings(_ displayStrings: [NameValue], level: Int = 0) {
+	func printDisplayStrings(_ displayStrings: [DocClaim], level: Int = 0) {
 		for ns in displayStrings {
 			for _ in 0..<level { print(" ", terminator: "") }
-			print(ns.order, ":", ns.name, ns.value, "(\(ns.mdocDataType?.rawValue ?? ""))")
+			print(ns.order, ":", ns.name, ns.stringValue)
 			// display children
 			if let children = ns.children {
 				printDisplayStrings(children, level: level + 1)
@@ -138,7 +138,7 @@ final class MdocDataModel18013Tests: XCTestCase {
 		XCTAssertEqual(doc.deviceSigned?.nameSpacesRawData.count, 1); XCTAssertEqual(doc.deviceSigned?.nameSpacesRawData[0], 160) // {} A0 empty dic
 		XCTAssertEqual(doc.deviceSigned?.deviceAuth.coseMacOrSignature.macAlgorithm, Cose.MacAlgorithm.hmac256)
 		XCTAssertEqual(doc.deviceSigned?.deviceAuth.coseMacOrSignature.signature.bytes.toHexString().uppercased(), "E99521A85AD7891B806A07F8B5388A332D92C189A7BF293EE1F543405AE6824D")
-		let model = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: dr.documents!.first!.issuerSigned, devicePrivateKey: Self.pk, displayName: nil, statusDescription: nil))
+		let model = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: dr.documents!.first!.issuerSigned, displayName: nil))
 		XCTAssertEqual(model.familyName, "Doe")
 	}
 
@@ -202,26 +202,6 @@ final class MdocDataModel18013Tests: XCTestCase {
 		_ = try XCTUnwrap(doc.issuerSigned.issuerNameSpaces)
 		let tmp = IsoMdlModel.self.moreThan2AgeOverElementIdentifiers(IsoMdlModel.isoDocType, IsoMdlModel.isoNamespace, ageAttestIs19, ["birth_date", "age_over_18", "age_over_21", "age_over_60"])
 		XCTAssertEqual(tmp, ["age_over_18"])
-	}
-
-	func testToJsonConverter() throws {
-		let dr = try XCTUnwrap(DeviceResponse(data: AnnexdTestData.d412.bytes))
-        let model = try XCTUnwrap(
-            IsoMdlModel(
-                id: UUID().uuidString,
-                createdAt: Date(),
-                issuerSigned: dr.documents!.first!.issuerSigned,
-                devicePrivateKey: CoseKeyPrivate(
-                    secureArea: InMemoryP256SecureArea(storage: DummySecureKeyStorage())
-                ),
-                displayName: nil,
-                statusDescription: nil
-            )
-        )
-		let jsonObj = try XCTUnwrap(model.toJson(base64: true)[IsoMdlModel.isoNamespace] as? OrderedDictionary<String, Any>)
-		XCTAssertEqual(model.docType, IsoMdlModel.isoDocType)
-		XCTAssertEqual(jsonObj["family_name"] as! String, "Doe")
-		XCTAssertEqual(jsonObj["issue_date"] as! String, "2019-10-20")
 	}
 
 	func testJoinSampleDeviceResponses() throws {
