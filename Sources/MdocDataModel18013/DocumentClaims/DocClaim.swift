@@ -33,19 +33,32 @@ public struct DocClaim: Equatable, CustomStringConvertible, CustomDebugStringCon
 		self.namespace = namespace
 		self.children = children
 	}
+    /// The namespace of the claim (if document is a mso-mdoc)
 	public let namespace: String?
+    /// The name of the claim.
 	public let name: String
+    /// The display name of the claim, originated from VCI metadata/claims.
     public let displayName: String?
+    /// The value of the claim as a string.
 	public let stringValue: String
+    /// The value of the claim as a `DocDataValue` (enum with associated values)
 	public let docDataValue: DocDataValue?
+    /// The type of the value of the claim, originated from VCI metadata/claims.
     public let valueType: String?
+    /// A flag indicating whether the claim is optional, originated from VCI metadata/claims.
     public var isOptional: Bool = false
+    /// The order of the claim in the document.
 	public var order: Int = 0
+    /// A string for Wallet UI usage to define the style of the claim.
 	public var style: String?
+    /// The children of the claim.
 	public var children: [DocClaim]?
+    /// Description of the claim.
 	public var description: String { "\(name): \(stringValue)" }
+    /// Debug description of the claim.
 	public var debugDescription: String { "\(order). \t\(name): \(stringValue)" }
 
+    /// Adds a child to the claim.
 	public mutating func add(child: DocClaim) {
 		if children == nil { children = [] }
 		children!.append(child)
