@@ -24,7 +24,7 @@ import OrderedCollections
 /// let dr = DeviceRequest(data: bytes)
 /// ```
 
-/// In mdoc reader initialize a ``DeviceRequest`` with desired elements to read 
+/// In mdoc reader initialize a ``DeviceRequest`` with desired elements to read
 /// ```swift
 /// let isoKeys: [IsoMdlModel.CodingKeys] = [.familyName, .documentNumber, .drivingPrivileges, .issueDate, .expiryDate, .portrait]
 ///	let dr3 = DeviceRequest(mdl: isoKeys, agesOver: [18,21], intentToRetain: true)
@@ -50,7 +50,7 @@ extension DeviceRequest: CBORDecodable {
         version = v
 		if v.count == 0 || v.prefix(1) != "1" { return nil }
         guard case let .array(cdrs) = m[Keys.docRequests] else { return nil }
-        let drs = cdrs.compactMap { DocRequest(cbor: $0) } 
+        let drs = cdrs.compactMap { DocRequest(cbor: $0) }
         guard drs.count > 0 else { return nil }
         docRequests = drs
     }
@@ -58,7 +58,7 @@ extension DeviceRequest: CBORDecodable {
 
 extension DeviceRequest: CBOREncodable {
     public func encode(options: CBOROptions) -> [UInt8] { toCBOR(options: options).encode(options: options) }
-    
+
 	public func toCBOR(options: CBOROptions) -> CBOR {
 		var m = OrderedDictionary<CBOR, CBOR>()
         m[.utf8String(Keys.version.rawValue)] = .utf8String(version)
@@ -72,8 +72,8 @@ extension DeviceRequest {
     /// - Parameters:
     ///   - items: Iso specified elements to request
     ///   - agesOver: Ages to request if equal or above
-    ///   - intentToRetain: Specify intent to retain (after retrieval)    
-	init(mdl items: [IsoMdlModel.CodingKeys], agesOver: [Int], intentToRetain: IntentToRetain = true) {
+    ///   - intentToRetain: Specify intent to retain (after retrieval)
+	public init(mdl items: [IsoMdlModel.CodingKeys], agesOver: [Int], intentToRetain: IntentToRetain = true) {
 		var isoDataElements: [DataElementIdentifier: IntentToRetain] = Dictionary(grouping: items, by: {$0.rawValue}).mapValues {_ in intentToRetain}
 		for ao in agesOver { isoDataElements["age_over_\(ao)"] = intentToRetain }
 		let isoReqElements = RequestDataElements(dataElements: isoDataElements )

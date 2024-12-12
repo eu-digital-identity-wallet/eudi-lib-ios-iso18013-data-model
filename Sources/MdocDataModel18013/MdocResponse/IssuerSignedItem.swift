@@ -30,7 +30,7 @@ public struct IssuerSignedItem: Sendable {
 	public let elementValue: DataElementValue
     /// Raw CBOR data
 	public var rawData: [UInt8]?
-    
+
     enum Keys: String {
        case digestID
        case random
@@ -43,7 +43,7 @@ extension CBOR: @retroactive CustomStringConvertible {
 	public var description: String {
         switch self {
         case .utf8String(let str): return str
-		case .tagged(let tag, .utf8String(let str)): 
+		case .tagged(let tag, .utf8String(let str)):
 					if tag.rawValue == 1004 || tag == .standardDateTimeString { return str.usPosixDate() }
 					return str
         case .unsignedInt(let i): return String(i)
@@ -73,18 +73,20 @@ extension CBOR: @retroactive CustomDebugStringConvertible {
 }
 
 extension CBOR {
-	public var mdocDataType: MdocDataType? {
+	public var mdocDataValue: DocDataValue? {
 		switch self {
-		case .utf8String(_), .null: return .string
-		case .byteString(_): return .bytes
+		case .utf8String(let s): return .string(s)
+		case .byteString(let b): return .bytes(b)
 		case .map(_): return .dictionary
 		case .array(_): return .array
-		case .boolean(_): return .boolean
-		case .tagged(.standardDateTimeString, _): return .date
-		case .tagged(Tag(rawValue: 1004), _): return .date
-		case .tagged(_, .utf8String(_)): return .string
-		case .simple(_), .unsignedInt(_): return .integer
-		case .float(_), .double(_): return .double
+		case .boolean(let b): return .boolean(b)
+		case .tagged(.standardDateTimeString, .utf8String(let s)): return .date(s)
+		case .tagged(Tag(rawValue: 1004), .utf8String(let s)): return .date(s)
+		case .tagged(_, .utf8String(let s)): return .string(s)
+		case .unsignedInt(let i): return .integer(i)
+        case .simple(let i): return .integer(UInt64(i))
+		case .double(let d): return .double(d)
+        case .float(let f): return .double(Double(f))
 		default:
 			return nil
 		}
@@ -100,7 +102,7 @@ extension IssuerSignedItem: CustomDebugStringConvertible {
 }
 
 extension IssuerSignedItem {
-	public var mdocDataType: MdocDataType? { elementValue.mdocDataType }
+	public var mdocDataValue: DocDataValue? { elementValue.mdocDataValue }
 }
 
 extension IssuerSignedItem: CBORDecodable {
@@ -130,7 +132,7 @@ extension IssuerSignedItem: CBOREncodable {
         // it is not recommended to encode again, the digest may change
         return toCBOR(options: CBOROptions()).encode()
     }
-    
+
 	public func toCBOR(options: CBOROptions) -> CBOR {
         var cbor = OrderedDictionary<CBOR, CBOR>()
         cbor[.utf8String(Keys.digestID.rawValue)] = .unsignedInt(digestID)

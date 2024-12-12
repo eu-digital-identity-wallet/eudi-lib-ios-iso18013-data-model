@@ -18,17 +18,14 @@ limitations under the License.
 
 import Foundation
 
-public struct EuPidModel: Codable, MdocDecodable, Sendable {
-	public var issuerSigned: IssuerSigned?
-	public var devicePrivateKey: CoseKeyPrivate?
-	public static let euPidDocType: String = "eu.europa.ec.eudi.pid.1" 
+public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
+	public static let euPidDocType: String = "eu.europa.ec.eudi.pid.1"
 	public var id: String = UUID().uuidString
 	public var createdAt: Date = Date()
-	public var docType = Self.euPidDocType
+	public var docType: String? = Self.euPidDocType
 	public var nameSpaces: [NameSpace]?
 	public var displayName: String? = String("eu_pid_doctype_name")
 	public var modifiedAt: Date?
-	public var statusDescription: String?
 
 	public let family_name: String?
 	public let given_name: String?
@@ -57,7 +54,7 @@ public struct EuPidModel: Codable, MdocDecodable, Sendable {
 	public let administrative_number: String?
 	public let issuing_country: String?
 	public let issuing_jurisdiction: String?
-	
+
 	public enum CodingKeys: String, CodingKey, CaseIterable {
 		case family_name
 		case given_name
@@ -91,22 +88,19 @@ public struct EuPidModel: Codable, MdocDecodable, Sendable {
 		[.family_name, .given_name, .birth_date]
 	}
 	public var ageOverXX = [Int: Bool]()
-	public var displayStrings = [NameValue]()
-	public var displayImages = [NameImage]()
+	public var docClaims = [DocClaim]()
     public static var pidMandatoryElementKeys: [DataElementIdentifier] { ["age_over_18"] + mandatoryElementCodingKeys.map(\.rawValue) }
 	public var mandatoryElementKeys: [DataElementIdentifier] { Self.pidMandatoryElementKeys }
 }
 
 extension EuPidModel {
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, devicePrivateKey: CoseKeyPrivate, displayName: String?, statusDescription: String?) {
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, claimDisplayNames: [NameSpace: [String: String]]?, mandatoryClaims: [NameSpace: [String: Bool]]?, claimValueTypes: [NameSpace: [String: String]]?) {
 		self.id = id
-		self.createdAt = createdAt;	self.displayName = displayName; self.statusDescription = statusDescription
-		self.issuerSigned = issuerSigned
-		self.devicePrivateKey = devicePrivateKey
-		guard let nameSpaces = Self.getSignedItems(issuerSigned, docType) else { return nil }
-		Self.extractDisplayStrings(nameSpaces, &displayStrings, &displayImages)
+		self.createdAt = createdAt;	self.displayName = displayName
+		guard let nameSpaces = Self.getCborSignedItems(issuerSigned) else { return nil }
+		Self.extractCborClaims(nameSpaces, &docClaims, claimDisplayNames, mandatoryClaims, claimValueTypes)
 		Self.extractAgeOverValues(nameSpaces, &ageOverXX)
-		func getValue<T>(key: EuPidModel.CodingKeys) -> T? { Self.getItemValue(nameSpaces, string: key.rawValue) }
+		func getValue<T>(key: EuPidModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaces, string: key.rawValue) }
 		family_name = getValue(key: .family_name)
 		given_name = getValue(key: .given_name)
 		birth_date = getValue(key: .birth_date)

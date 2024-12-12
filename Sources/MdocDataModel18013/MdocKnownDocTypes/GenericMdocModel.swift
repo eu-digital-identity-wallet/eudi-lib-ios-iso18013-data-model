@@ -3,28 +3,34 @@
 
 import Foundation
 
-public struct GenericMdocModel: MdocDecodable, Sendable {
+public struct GenericMdocModel: DocClaimsDecodable, Sendable {
 	public var id: String = UUID().uuidString
 	public var createdAt: Date = Date()
- 	public var issuerSigned: IssuerSigned?
-	public var devicePrivateKey: CoseKeyPrivate?
-	public var docType: String
-	public var nameSpaces: [NameSpace]? 
+	public var docType: String?
 	public var displayName: String?
 	public var modifiedAt: Date?
-	public var statusDescription: String?
 	public var ageOverXX = [Int: Bool]()
-	public var displayStrings = [NameValue]()
-	public var displayImages = [NameImage]()
-    public var mandatoryElementKeys: [DataElementIdentifier] = []
+	public var docClaims = [DocClaim]()
+
+    public init(id: String = UUID().uuidString, createdAt: Date = Date(), docType: String? = nil, displayName: String? = nil, modifiedAt: Date? = nil, ageOverXX: [Int : Bool] = [Int: Bool](), docClaims: [DocClaim] = [DocClaim]()) {
+        self.id = id
+        self.createdAt = createdAt
+        self.docType = docType
+        self.displayName = displayName
+        self.modifiedAt = modifiedAt
+        self.ageOverXX = ageOverXX
+        self.docClaims = docClaims
+    }
 }
 
 extension GenericMdocModel {
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, devicePrivateKey: CoseKeyPrivate, docType: String, displayName: String?, statusDescription: String?) {
-		self.id = id; self.createdAt = createdAt; self.displayName = displayName; self.statusDescription = statusDescription
-		self.issuerSigned = issuerSigned; self.devicePrivateKey = devicePrivateKey; self.docType = docType
-		if let nameSpaces = Self.getSignedItems(issuerSigned, docType) {
-			Self.extractDisplayStrings(nameSpaces, &displayStrings, &displayImages)
+
+
+
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, docType: String, displayName: String?, claimDisplayNames: [NameSpace: [String: String]]?, mandatoryClaims: [NameSpace: [String: Bool]]?, claimValueTypes: [NameSpace: [String: String]]?) {
+		self.id = id; self.createdAt = createdAt; self.displayName = displayName; self.docType = docType
+		if let nameSpaces = Self.getCborSignedItems(issuerSigned) {
+			Self.extractCborClaims(nameSpaces, &docClaims, claimDisplayNames, mandatoryClaims, claimValueTypes)
 		}
 	}
 } // end extension
