@@ -22,7 +22,7 @@ import Foundation
 /// debugging and display purposes, and ensuring safe concurrent access.
 @DebugDescription
 public struct DocClaim: Equatable, CustomStringConvertible, CustomDebugStringConvertible, Sendable {
-	public init(name: String, displayName: String? = nil, dataValue: DocDataValue? = nil, valueType: String? = nil, stringValue: String, isOptional: Bool = false, order: Int = 0, namespace: String? = nil, children: [DocClaim]? = nil) {
+	public init(name: String, displayName: String? = nil, dataValue: DocDataValue, stringValue: String, valueType: String? = nil, isOptional: Bool = false, order: Int = 0, namespace: String? = nil, children: [DocClaim]? = nil) {
 		self.name = name
         self.displayName = displayName
 		self.dataValue = dataValue
@@ -42,7 +42,7 @@ public struct DocClaim: Equatable, CustomStringConvertible, CustomDebugStringCon
     /// The value of the claim as a string.
 	public let stringValue: String
     /// The value of the claim as a `DocDataValue` (enum with associated values)
-	public let dataValue: DocDataValue?
+	public let dataValue: DocDataValue
     /// The type of the value of the claim, originated from VCI metadata/claims.
     public let valueType: String?
     /// A flag indicating whether the claim is optional, originated from VCI metadata/claims.

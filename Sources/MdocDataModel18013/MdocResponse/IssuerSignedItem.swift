@@ -75,20 +75,19 @@ extension CBOR: @retroactive CustomDebugStringConvertible {
 extension CBOR {
 	public var mdocDataValue: DocDataValue? {
 		switch self {
-		case .utf8String(let s): return .string(s)
-		case .byteString(let b): return .bytes(b)
-		case .map(_): return .dictionary
-		case .array(_): return .array
-		case .boolean(let b): return .boolean(b)
-		case .tagged(.standardDateTimeString, .utf8String(let s)): return .date(s)
-		case .tagged(Tag(rawValue: 1004), .utf8String(let s)): return .date(s)
-		case .tagged(_, .utf8String(let s)): return .string(s)
-		case .unsignedInt(let i): return .integer(i)
-        case .simple(let i): return .integer(UInt64(i))
-		case .double(let d): return .double(d)
-        case .float(let f): return .double(Double(f))
-		default:
-			return nil
+		case .utf8String(let s): .string(s)
+		case .byteString(let b): .bytes(b)
+		case .map(_): .dictionary
+		case .array(_): .array
+		case .boolean(let b): .boolean(b)
+		case .tagged(.standardDateTimeString, .utf8String(let s)): .date(s)
+		case .tagged(Tag(rawValue: 1004), .utf8String(let s)): .date(s)
+		case .tagged(_, .utf8String(let s)): .string(s)
+		case .unsignedInt(let i): .integer(i)
+        case .simple(let i): .integer(UInt64(i))
+		case .double(let d): .double(d)
+        case .float(let f): .double(Double(f))
+		default: nil
 		}
 	}
 }

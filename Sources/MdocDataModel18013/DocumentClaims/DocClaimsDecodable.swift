@@ -109,10 +109,10 @@ extension DocClaimsDecodable {
 	/// - Returns: A `DocClaim` object containing the extracted display string or image.
 	public static func extractCborClaim(_ name: String, _ cborValue: CBOR, _ bDebugDisplay: Bool, _ namespace: NameSpace, _ order: Int, _ displayNames: [String:String]? = nil, _ mandatory: [String:Bool]? = nil, _ valueTypes: [String:String]? = nil) -> DocClaim {
 		var stringValue = bDebugDisplay ? cborValue.debugDescription : cborValue.description
-		let dt = cborValue.mdocDataValue
+		let dt = cborValue.mdocDataValue ?? .string(stringValue)
 		if name == "sex", let isex = Int(stringValue), isex <= 2 { stringValue = NSLocalizedString(isex == 1 ? "male" : "female", comment: "") }
         let isMandatory = mandatory?[name] ?? true
-		var node = DocClaim(name: name, displayName: displayNames?[name], dataValue: dt, valueType: valueTypes?[name], stringValue: stringValue, isOptional: !isMandatory, order: order, namespace: namespace)
+		var node = DocClaim(name: name, displayName: displayNames?[name], dataValue: dt, stringValue: stringValue, valueType: valueTypes?[name], isOptional: !isMandatory, order: order, namespace: namespace)
 		if case let .map(m) = cborValue {
 			let innerJsonMap = CBOR.decodeDictionary(m, unwrap: false)
 			for (o2,(k,v)) in innerJsonMap.enumerated() {

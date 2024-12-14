@@ -32,7 +32,9 @@ public enum DocDataValue: Sendable, Equatable, CustomStringConvertible, CustomDe
     case date(String)
  	/// Bytes value
  	case bytes([UInt8])
+    /// An array value.
     case array
+    /// A dictionary value.
     case dictionary
 #if os(iOS)
     public var image: UIImage? {
