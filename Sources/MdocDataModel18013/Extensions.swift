@@ -24,19 +24,19 @@ extension String {
 	public var hex_decimal: Int {
 		return Int(self, radix: 16)!
 	}
-	
+
 	subscript (bounds: CountableClosedRange<Int>) -> String {
 		let start = index(startIndex, offsetBy: bounds.lowerBound)
 		let end = index(startIndex, offsetBy: bounds.upperBound)
 		return String(self[start...end])
 	}
-	
+
 	subscript (bounds: CountableRange<Int>) -> String {
 		let start = index(startIndex, offsetBy: bounds.lowerBound)
 		let end = index(startIndex, offsetBy: bounds.upperBound)
 		return String(self[start..<end])
 	}
-	
+
 	public var byteArray: [UInt8] {
 		var res = [UInt8]()
 		for offset in stride(from: 0, to: count, by: 2) {
@@ -45,11 +45,11 @@ extension String {
 		}
 		return res
 	}
-	
+
 	var fullDateEncoded: CBOR {
 		CBOR.tagged(CBOR.Tag(rawValue: 1004), .utf8String(self))
 	}
-	
+
 	public func usPosixDate(useIsoFormat: Bool = true) -> String {
 		guard let ds = self.split(separator: "T").first else { return "" }
 		if useIsoFormat { return String(ds)}
@@ -58,7 +58,7 @@ extension String {
 		guard dc.count >= 3 else { return "" }
 		return "\(dc[1])/\(dc[2])/\(dc[0])"
 	}
-	
+
 	public func toBytes() -> [UInt8]? {
 		let length = count
 		if length & 1 != 0 {
@@ -134,7 +134,7 @@ extension CBOR {
 		guard case let CBOR.tagged(tag, cborEncoded) = self, tag == .encodedCBORDataItem, case let .byteString(bytes) = cborEncoded else {  return nil }
 		return .init(data: bytes)
 	}
-	
+
 	public func decodeFullDate() -> String? {
 		guard case let CBOR.tagged(tag, cborEncoded) = self, tag.rawValue == 1004, case let .utf8String(s) = cborEncoded else { return nil }
 		return s
@@ -142,13 +142,13 @@ extension CBOR {
 }
 
 extension CBOR {
-	
+
 	// ======================================================================
 	// MARK: - Public
 	// ======================================================================
-	
+
 	// MARK: - Public Methods
-	
+
 	public func unwrap() -> Any? {
 		switch self {
 		case .simple(let value): return value
@@ -168,39 +168,39 @@ extension CBOR {
 			return nil
 		}
 	}
-	
+
 	public func asUInt64() -> UInt64? {
 		return self.unwrap() as? UInt64
 	}
-	
+
 	public func asDouble() -> Double? {
 		return self.unwrap() as? Double
 	}
-	
+
 	public func asInt64() -> Int64? {
 		return self.unwrap() as? Int64
 	}
-	
+
 	public func asString() -> String? {
 		return self.unwrap() as? String
 	}
-	
+
 	public func asList() -> [CBOR]? {
 		return self.unwrap() as? [CBOR]
 	}
-	
+
 	public func asMap() -> OrderedDictionary<CBOR, CBOR>? {
 		return self.unwrap() as? OrderedDictionary<CBOR, CBOR>
 	}
-	
+
 	public func asBytes() -> [UInt8]? {
 		return self.unwrap() as? [UInt8]
 	}
-	
+
 	public func asData() -> Data {
 		return Data(self.encode())
 	}
-	
+
 	public static func asDateString(_ tag: Tag, _ value: CBOR) -> Any {
 		if tag.rawValue == 1004 || tag == .standardDateTimeString, let strDate = value.unwrap() as? String {
 			return strDate.usPosixDate()
@@ -208,7 +208,7 @@ extension CBOR {
 			return value.unwrap() ?? ""
 		}
 	}
-	
+
 	public func asCose() -> (CBOR.Tag, [CBOR])? {
 		guard let rawCose =  self.unwrap() as? (CBOR.Tag, CBOR),
 			  let cosePayload = rawCose.1.asList() else {
@@ -216,7 +216,7 @@ extension CBOR {
 		}
 		return (rawCose.0, cosePayload)
 	}
-	
+
 	public func decodeBytestring() -> CBOR? {
 		guard let bytestring = self.asBytes(),
 			  let decoded = try? CBORDecoder(input: bytestring).decodeItem() else {
@@ -228,17 +228,17 @@ extension CBOR {
 
 /// Methods to cast collections of CBOR types in the form of the dictionary/list
 extension CBOR {
-	
+
 	// ======================================================================
 	// MARK: - Public
 	// ======================================================================
-	
+
 	// MARK: - Public Properties
-	
+
 	public static func decodeList(_ list: [CBOR], unwrap: Bool = true, base64: Bool = false) -> [Any] {
 		list.map { val in decodeCborVal(val, unwrap: unwrap, base64: base64) }
 	}
-	
+
 	public static func decodeDictionary(_ dictionary: OrderedDictionary<CBOR, CBOR>, unwrap: Bool = true, base64: Bool = false) -> OrderedDictionary<String, Any> {
 		var payload = OrderedDictionary<String, Any>()
 		for (key, val) in dictionary {
@@ -248,7 +248,7 @@ extension CBOR {
 		}
 		return payload
 	}
-	
+
 	public static func decodeCborVal(_ val: CBOR, unwrap: Bool, base64: Bool) -> Any {
 		if unwrap, case .map(let d) = val {
 			return decodeDictionary(d, unwrap: unwrap)
@@ -264,7 +264,7 @@ extension CBOR {
 			return val
 		}
 	}
- 
+
 	public func getTypedValue<T>() -> T? {
 		if T.self == ServerRetrievalOption.self { return ServerRetrievalOption(cbor: self) as? T }
 		else if T.self == DrivingPrivileges.self { return DrivingPrivileges(cbor: self) as? T }
@@ -293,7 +293,7 @@ extension Dictionary where Key == CBOR {
 	public subscript<Index: RawRepresentable>(index: Index) -> Value? where Index.RawValue == String {
 		self[CBOR(stringLiteral: index.rawValue)]
 	}
-	
+
 	public subscript<Index: RawRepresentable>(index: Index) -> Value? where Index.RawValue == Int {
 		self[CBOR(integerLiteral: index.rawValue)]
 	}
@@ -303,7 +303,7 @@ extension OrderedDictionary where Key == CBOR {
 	public subscript<Index: RawRepresentable>(index: Index) -> Value? where Index.RawValue == String {
 		self[CBOR(stringLiteral: index.rawValue)]
 	}
-	
+
 	public subscript<Index: RawRepresentable>(index: Index) -> Value? where Index.RawValue == Int {
 		self[CBOR(integerLiteral: index.rawValue)]
 	}
@@ -322,14 +322,14 @@ extension Dictionary where Key == String, Value == Any {
 		}
 		return ""
 	}
-	
+
 	public func decodeJSON<T: Decodable>(type: T.Type = T.self) -> T? {
 			 let decoder = JSONDecoder()
 		guard let data = try? JSONSerialization.data(withJSONObject: self) else { return nil }
 			 guard let response = try? decoder.decode(type.self, from: data) else { return nil }
 			 return response
 	 }
-	
+
 	public subscript<Index: RawRepresentable>(index: Index) -> String where Index.RawValue == String {
 		getInnerValue(index.rawValue)
 	}
@@ -347,14 +347,14 @@ extension OrderedDictionary where Key == String, Value == Any {
 		}
 		return ""
 	}
-	
+
 	public func decodeJSON<T: Decodable>(type: T.Type = T.self) -> T? {
 			 let decoder = JSONDecoder()
 		guard let data = try? JSONSerialization.data(withJSONObject: self) else { return nil }
 			 guard let response = try? decoder.decode(type.self, from: data) else { return nil }
 			 return response
 	 }
-	
+
 	public subscript<Index: RawRepresentable>(index: Index) -> String where Index.RawValue == String {
 		getInnerValue(index.rawValue)
 	}
@@ -366,6 +366,12 @@ public protocol CBORDecodable {
 
 extension IssuerSignedItem {
 	public func getTypedValue<T>() -> T? { elementValue.getTypedValue() }
+}
+
+extension Array where Element == DocClaim {
+	public subscript(named: String) -> DocClaim? {
+		first { $0.name == named }
+	}
 }
 
 public typealias DocType = String // Document type

@@ -112,7 +112,7 @@ extension DocClaimsDecodable {
 		let dt = cborValue.mdocDataValue
 		if name == "sex", let isex = Int(stringValue), isex <= 2 { stringValue = NSLocalizedString(isex == 1 ? "male" : "female", comment: "") }
         let isMandatory = mandatory?[name] ?? true
-		var node = DocClaim(name: name, displayName: displayNames?[name], docDataValue: dt, valueType: valueTypes?[name], stringValue: stringValue, isOptional: !isMandatory, order: order, namespace: namespace)
+		var node = DocClaim(name: name, displayName: displayNames?[name], dataValue: dt, valueType: valueTypes?[name], stringValue: stringValue, isOptional: !isMandatory, order: order, namespace: namespace)
 		if case let .map(m) = cborValue {
 			let innerJsonMap = CBOR.decodeDictionary(m, unwrap: false)
 			for (o2,(k,v)) in innerJsonMap.enumerated() {
