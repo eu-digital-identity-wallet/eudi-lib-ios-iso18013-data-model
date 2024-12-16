@@ -26,6 +26,7 @@ public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
 	public var nameSpaces: [NameSpace]?
 	public var displayName: String? = String("eu_pid_doctype_name")
 	public var modifiedAt: Date?
+    public var docDataFormat: DocDataFormat = .cbor
 
 	public let family_name: String?
 	public let given_name: String?

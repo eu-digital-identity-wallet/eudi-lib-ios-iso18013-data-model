@@ -18,9 +18,6 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
-#if canImport(UIKit)
-import UIKit
-#endif
 
 /// A conforming type represents claims data.
 ///
@@ -34,10 +31,12 @@ public protocol DocClaimsDecodable: Sendable, AgeAttesting {
 	var modifiedAt: Date? { get }
 	/// The display name of the document.
 	var displayName: String? { get }
-	// The document type. It is not null for CBOR (mso-mdoc) documents
+	// The document type. For CBOR (mso_mdoc) documents is native, for SD-JWT (vc+sd-jwt) documents is the type of the document.
 	var docType: String? { get }
 	// document claims in a format agnostic way
 	var docClaims: [DocClaim] { get }
+    /// The format of the document data.
+    var docDataFormat: DocDataFormat { get }
 } // end protocol
 
 extension DocClaimsDecodable {
@@ -97,7 +96,7 @@ extension DocClaimsDecodable {
 		return Set(	agesDict.filter { $1 == false }.keys.map { "age_over_\($0)" })
 	}
 
-	/// Extracts a display string or image from a CBOR value.
+	/// Extracts a CBOR value.
 	///
 	/// - Parameters:
 	///   - name: The name associated with the CBOR value.
