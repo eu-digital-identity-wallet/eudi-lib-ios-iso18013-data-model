@@ -39,6 +39,7 @@ public protocol DocClaimsDecodable: Sendable, AgeAttesting {
     var docDataFormat: DocDataFormat { get }
 } // end protocol
 
+/// Methods to extract CBOR values.
 extension DocClaimsDecodable {
 
 	public static func getCborItemValue<T>(_ issuerSigned: IssuerSigned, _ s: String) -> T? {
@@ -134,7 +135,9 @@ extension DocClaimsDecodable {
 	/// - Parameters:
 	///   - nameSpaces: A dictionary where the key is a `NameSpace` and the value is an array of `IssuerSignedItem`.
 	///   - docClaims: An inout parameter that will be populated with `DocClaim` items extracted from the namespaces.
-	///   - labels: A dictionary where the key is the elementIdentifier and the value is a string representing the label.
+	///   - claimDisplayNames: A dictionary where the key is the elementIdentifier and the value is a string representing the label.
+    ///   - mandatoryClaims: A dictionary where the key is the elementIdentifier and the value is a boolean indicating whether the claim is mandatory.
+    ///   - claimValueTypes: A dictionary where the key is the elementIdentifier and the value is a string representing the value type.
 	///   - nsFilter: An optional array of `NameSpace` to filter/sort the extraction. Defaults to `nil`.
 	public static func extractCborClaims(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ docClaims: inout [DocClaim], _ claimDisplayNames: [NameSpace: [String: String]]? = nil, _ mandatoryClaims: [NameSpace: [String: Bool]]? = nil, _ claimValueTypes: [NameSpace: [String: String]]? = nil, nsFilter: [NameSpace]? = nil) {
 		let bDebugDisplay = UserDefaults.standard.bool(forKey: "DebugDisplay")

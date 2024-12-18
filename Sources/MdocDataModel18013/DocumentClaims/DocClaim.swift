@@ -17,9 +17,9 @@ limitations under the License.
 
 import Foundation
 
-/// This structure is used to store and manage pairs of names and their corresponding values.
-/// It provides functionality for comparing instances, generating string representations for
-/// debugging and display purposes, and ensuring safe concurrent access.
+/// This structure is used to store document claim values and associated metadata.
+/// It provides functionality for generating string representations for
+/// debugging and display purposes.
 @DebugDescription
 public struct DocClaim: Equatable, CustomStringConvertible, CustomDebugStringConvertible, Sendable {
 	public init(name: String, displayName: String? = nil, dataValue: DocDataValue, stringValue: String, valueType: String? = nil, isOptional: Bool = false, order: Int = 0, namespace: String? = nil, children: [DocClaim]? = nil) {
