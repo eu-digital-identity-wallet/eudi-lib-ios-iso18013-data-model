@@ -32,10 +32,12 @@ public enum DocDataValue: Sendable, Equatable, CustomStringConvertible, CustomDe
     case date(String)
  	/// Bytes value
  	case bytes([UInt8])
+    /// An array value.
     case array
+    /// A dictionary value.
     case dictionary
 #if os(iOS)
-    var image: UIImage? {
+    public var image: UIImage? {
         switch self {
         case .bytes(let bytes):
             return UIImage(data: Data(bytes))
@@ -44,7 +46,7 @@ public enum DocDataValue: Sendable, Equatable, CustomStringConvertible, CustomDe
         }
     }
 #endif
-    var base64: String? {
+    public var base64: String? {
         switch self {
         case .bytes(let bytes):
             return Data(bytes).base64EncodedString()
@@ -52,7 +54,7 @@ public enum DocDataValue: Sendable, Equatable, CustomStringConvertible, CustomDe
             return nil
         }
     }
-    var dateValue: Date? {
+    public var dateValue: Date? {
         switch self {
         case .date(let str):
             let dateFormatter = ISO8601DateFormatter()

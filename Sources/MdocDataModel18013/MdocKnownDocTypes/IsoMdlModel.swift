@@ -28,6 +28,7 @@ public struct IsoMdlModel: Decodable, DocClaimsDecodable, Sendable {
 	public var modifiedAt: Date?
 	public static var isoDocType: String { "org.iso.18013.5.1.mDL" }
 	public static var isoNamespace: String { "org.iso.18013.5.1" }
+    public var docDataFormat: DocDataFormat = .cbor
 
 	let exp: UInt64?
 	let iat: UInt64?
