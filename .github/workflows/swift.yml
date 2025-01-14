@@ -3,8 +3,12 @@
 
 name: Swift
 
-on: [push]
-
+on:
+  pull_request:
+    types: [opened, reopened]
+  push:
+    branches: ['main']
+    tags: [ v* ]
 jobs:
   build:
 

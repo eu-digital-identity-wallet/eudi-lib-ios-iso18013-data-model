@@ -18,19 +18,18 @@ limitations under the License.
 
 import Foundation
 
-public struct IsoMdlModel: Decodable, MdocDecodable, Sendable {
+public struct IsoMdlModel: Decodable, DocClaimsDecodable, Sendable {
 	public var id: String = UUID().uuidString
 	public var createdAt: Date = Date()
-	public var docType: String = Self.isoDocType
+	public var docType: String? = Self.isoDocType
 	public var nameSpaces: [NameSpace]?
 	public var displayName: String? = String("mdl_doctype_name")
+	public var docClaims = [DocClaim]()
 	public var modifiedAt: Date?
-	public var statusDescription: String?
 	public static var isoDocType: String { "org.iso.18013.5.1.mDL" }
 	public static var isoNamespace: String { "org.iso.18013.5.1" }
+    public var docDataFormat: DocDataFormat = .cbor
 
-	public var issuerSigned: IssuerSigned?
-	public var devicePrivateKey: CoseKeyPrivate?
 	let exp: UInt64?
 	let iat: UInt64?
 	public let familyName: String?
@@ -57,8 +56,6 @@ public struct IsoMdlModel: Decodable, MdocDecodable, Sendable {
 	public let residentPostalCode: String?
 	public let ageInYears: UInt64?
 	public var ageOverXX = [Int: Bool]()
-	public var displayStrings = [NameValue]()
-	public var displayImages = [NameImage]()
 	public let ageBirthYear: UInt64?
 	public let portrait: [UInt8]?
 	public let unDistinguishingSign: String?
@@ -71,7 +68,7 @@ public struct IsoMdlModel: Decodable, MdocDecodable, Sendable {
 	public let biometricTemplateSignatureSign: String?
 	let webapiInfo: ServerRetrievalOption?
 	let oidcInfo: ServerRetrievalOption?
-	
+
 	public enum CodingKeys: String, CodingKey, CaseIterable {
 		case exp = "exp"
 		case iat = "iat"
@@ -122,12 +119,11 @@ public struct IsoMdlModel: Decodable, MdocDecodable, Sendable {
 
 
 extension IsoMdlModel {
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, devicePrivateKey: CoseKeyPrivate, displayName: String?, statusDescription: String?, nameSpaces: [NameSpace]? = nil) {
-		self.id = id; self.createdAt = createdAt; self.displayName = displayName; self.statusDescription = statusDescription
-		self.issuerSigned = issuerSigned; self.devicePrivateKey = devicePrivateKey; self.nameSpaces = nameSpaces
-  	guard let nameSpaceItems = Self.getSignedItems(issuerSigned, docType, nameSpaces) else { return nil }
-		Self.extractDisplayStrings(nameSpaceItems, &displayStrings, &displayImages)
-		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getItemValue(nameSpaceItems, string: key.rawValue) }
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, claimDisplayNames: [NameSpace: [String: String]]?, mandatoryClaims: [NameSpace: [String: Bool]]?, claimValueTypes: [NameSpace: [String: String]]?) {
+		self.id = id; self.createdAt = createdAt; self.displayName = displayName
+  	    guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned, nameSpaces) else { return nil }
+		Self.extractCborClaims(nameSpaceItems, &docClaims, claimDisplayNames, mandatoryClaims, claimValueTypes)
+		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems, string: key.rawValue) }
 		Self.extractAgeOverValues(nameSpaceItems, &ageOverXX)
 		exp = getValue(key: .exp)
 		iat = getValue(key: .iat)

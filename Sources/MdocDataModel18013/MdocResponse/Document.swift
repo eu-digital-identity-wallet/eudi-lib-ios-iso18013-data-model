@@ -21,20 +21,20 @@ import OrderedCollections
 
 /// Contains a returned cocument. The document type of the returned document is indicated by the docType element.
 public struct Document: Sendable {
-	
+
 	public let docType: DocType
 	public let issuerSigned: IssuerSigned
 	public let deviceSigned: DeviceSigned? // todo: make mandatory
 	/// error codes for data elements that are not returned
 	public let errors: Errors?
-	
+
 	enum Keys:String {
 		case docType
 		case issuerSigned
 		case deviceSigned
 		case errors
 	}
-	
+
 	public init(docType: DocType, issuerSigned: IssuerSigned, deviceSigned: DeviceSigned? = nil, errors: Errors? = nil) {
 		self.docType = docType
 		self.issuerSigned = issuerSigned
@@ -85,6 +85,6 @@ extension Array where Element == DocRequest {
 	public func findDoc(name: String) -> DocRequest? { first(where: { $0.itemsRequest.docType == name} ) }
 }
 
-extension Array where Element == NameValue {
-	public func findNameValue(name: String) -> NameValue? { first(where: { $0.name == name} ) }
+extension Array where Element == DocClaim {
+	public func findNameValue(name: String) -> DocClaim? { first(where: { $0.name == name} ) }
 }
