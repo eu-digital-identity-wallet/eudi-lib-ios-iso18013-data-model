@@ -19,6 +19,8 @@ limitations under the License.
 import Foundation
 
 public struct IsoMdlModel: Decodable, DocClaimsDecodable, Sendable {
+    public var display: [DisplayMetadata]?
+    public var issuerDisplay: [DisplayMetadata]?
 	public var id: String = UUID().uuidString
 	public var createdAt: Date = Date()
 	public var docType: String? = Self.isoDocType
@@ -119,8 +121,8 @@ public struct IsoMdlModel: Decodable, DocClaimsDecodable, Sendable {
 
 
 extension IsoMdlModel {
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, claimDisplayNames: [NameSpace: [String: String]]?, mandatoryClaims: [NameSpace: [String: Bool]]?, claimValueTypes: [NameSpace: [String: String]]?) {
-		self.id = id; self.createdAt = createdAt; self.displayName = displayName
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, claimDisplayNames: [NameSpace: [String: String]]?, mandatoryClaims: [NameSpace: [String: Bool]]?, claimValueTypes: [NameSpace: [String: String]]?) {
+        self.id = id; self.createdAt = createdAt; self.displayName = displayName; self.display = display; self.issuerDisplay = issuerDisplay
   	    guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned, nameSpaces) else { return nil }
 		Self.extractCborClaims(nameSpaceItems, &docClaims, claimDisplayNames, mandatoryClaims, claimValueTypes)
 		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems, string: key.rawValue) }

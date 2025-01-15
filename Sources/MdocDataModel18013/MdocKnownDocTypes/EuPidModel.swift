@@ -19,6 +19,8 @@ limitations under the License.
 import Foundation
 
 public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
+    public var display: [DisplayMetadata]?
+    public var issuerDisplay: [DisplayMetadata]?
 	public static let euPidDocType: String = "eu.europa.ec.eudi.pid.1"
 	public var id: String = UUID().uuidString
 	public var createdAt: Date = Date()
@@ -95,9 +97,9 @@ public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
 }
 
 extension EuPidModel {
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, claimDisplayNames: [NameSpace: [String: String]]?, mandatoryClaims: [NameSpace: [String: Bool]]?, claimValueTypes: [NameSpace: [String: String]]?) {
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, claimDisplayNames: [NameSpace: [String: String]]?, mandatoryClaims: [NameSpace: [String: Bool]]?, claimValueTypes: [NameSpace: [String: String]]?) {
 		self.id = id
-		self.createdAt = createdAt;	self.displayName = displayName
+        self.createdAt = createdAt;	self.displayName = displayName; self.display = display; self.issuerDisplay = issuerDisplay
 		guard let nameSpaces = Self.getCborSignedItems(issuerSigned) else { return nil }
 		Self.extractCborClaims(nameSpaces, &docClaims, claimDisplayNames, mandatoryClaims, claimValueTypes)
 		Self.extractAgeOverValues(nameSpaces, &ageOverXX)
