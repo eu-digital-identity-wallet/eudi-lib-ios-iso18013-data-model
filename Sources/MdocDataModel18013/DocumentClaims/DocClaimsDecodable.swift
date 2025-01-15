@@ -18,7 +18,6 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
-import OpenID4VCI
 
 /// A conforming type represents claims data.
 ///
