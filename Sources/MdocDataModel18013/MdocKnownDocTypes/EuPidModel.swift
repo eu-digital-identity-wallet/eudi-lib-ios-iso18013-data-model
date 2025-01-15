@@ -19,6 +19,8 @@ limitations under the License.
 import Foundation
 
 public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
+    public var display: [DisplayMetadata]?
+    public var issuerDisplay: [DisplayMetadata]?
 	public static let euPidDocType: String = "eu.europa.ec.eudi.pid.1"
 	public var id: String = UUID().uuidString
 	public var createdAt: Date = Date()
@@ -27,7 +29,8 @@ public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
 	public var displayName: String? = String("eu_pid_doctype_name")
 	public var modifiedAt: Date?
     public var docDataFormat: DocDataFormat = .cbor
-
+    public var credentialIssuerIdentifier: String?
+    public var configurationIdentifier: String?
 	public let family_name: String?
 	public let given_name: String?
 	public let birth_date: String?
@@ -57,6 +60,8 @@ public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
 	public let issuing_jurisdiction: String?
 
 	public enum CodingKeys: String, CodingKey, CaseIterable {
+        case credentialIssuerIdentifier
+        case configurationIdentifier
 		case family_name
 		case given_name
 		case birth_date
@@ -95,9 +100,10 @@ public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
 }
 
 extension EuPidModel {
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, claimDisplayNames: [NameSpace: [String: String]]?, mandatoryClaims: [NameSpace: [String: Bool]]?, claimValueTypes: [NameSpace: [String: String]]?) {
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, claimDisplayNames: [NameSpace: [String: String]]?, mandatoryClaims: [NameSpace: [String: Bool]]?, claimValueTypes: [NameSpace: [String: String]]?) {
 		self.id = id
-		self.createdAt = createdAt;	self.displayName = displayName
+        self.createdAt = createdAt;	self.displayName = displayName; self.display = display; self.issuerDisplay = issuerDisplay
+        self.credentialIssuerIdentifier = credentialIssuerIdentifier; self.configurationIdentifier = configurationIdentifier
 		guard let nameSpaces = Self.getCborSignedItems(issuerSigned) else { return nil }
 		Self.extractCborClaims(nameSpaces, &docClaims, claimDisplayNames, mandatoryClaims, claimValueTypes)
 		Self.extractAgeOverValues(nameSpaces, &ageOverXX)
