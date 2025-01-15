@@ -18,6 +18,7 @@ limitations under the License.
 
 import Foundation
 import SwiftCBOR
+import OpenID4VCI
 
 /// A conforming type represents claims data.
 ///
@@ -29,8 +30,12 @@ public protocol DocClaimsDecodable: Sendable, AgeAttesting {
 	var createdAt: Date { get }
 	/// The date and time the document was last modified.
 	var modifiedAt: Date? { get }
-	/// The display name of the document.
+	/// The display name of the document (derived from `display`).
 	var displayName: String? { get }
+    /// The display properties of the document
+    var display: [DisplayMetadata]? { get }
+    /// The display properties of the issuer
+    var issuerDisplay: [DisplayMetadata]? { get }
 	// The document type. For CBOR (mso_mdoc) documents is native, for SD-JWT (vc+sd-jwt) documents is the type of the document.
 	var docType: String? { get }
 	// document claims in a format agnostic way
