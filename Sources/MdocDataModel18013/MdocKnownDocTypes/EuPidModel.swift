@@ -31,6 +31,8 @@ public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
     public var docDataFormat: DocDataFormat = .cbor
     public var credentialIssuerIdentifier: String?
     public var configurationIdentifier: String?
+    public var validFrom: Date?
+    public var validUntil: Date?
 	public let family_name: String?
 	public let given_name: String?
 	public let birth_date: String?
@@ -100,10 +102,11 @@ public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
 }
 
 extension EuPidModel {
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, claimDisplayNames: [NameSpace: [String: String]]?, mandatoryClaims: [NameSpace: [String: Bool]]?, claimValueTypes: [NameSpace: [String: String]]?) {
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, claimDisplayNames: [NameSpace: [String: String]]?, mandatoryClaims: [NameSpace: [String: Bool]]?, claimValueTypes: [NameSpace: [String: String]]?) {
 		self.id = id
         self.createdAt = createdAt;	self.displayName = displayName; self.display = display; self.issuerDisplay = issuerDisplay
         self.credentialIssuerIdentifier = credentialIssuerIdentifier; self.configurationIdentifier = configurationIdentifier
+        self.validFrom = validFrom; self.validUntil = validUntil
 		guard let nameSpaces = Self.getCborSignedItems(issuerSigned) else { return nil }
 		Self.extractCborClaims(nameSpaces, &docClaims, claimDisplayNames, mandatoryClaims, claimValueTypes)
 		Self.extractAgeOverValues(nameSpaces, &ageOverXX)
