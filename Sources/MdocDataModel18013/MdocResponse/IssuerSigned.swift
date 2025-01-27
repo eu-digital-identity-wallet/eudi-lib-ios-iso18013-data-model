@@ -51,4 +51,16 @@ extension IssuerSigned: CBOREncodable {
 	}
 }
 
-
+extension IssuerSigned {
+    public var validFrom: Date? {
+        let usDateStr = issuerAuth.mso.validityInfo.validFrom.usPosixDate()
+        let df = usDateFormatter
+        return df.date(from: usDateStr)
+    }
+    
+    public var validUntil: Date? {
+        let usDateStr = issuerAuth.mso.validityInfo.validUntil.usPosixDate()
+        let df = usDateFormatter
+        return df.date(from: usDateStr)
+    }
+}

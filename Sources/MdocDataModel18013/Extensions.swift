@@ -382,3 +382,9 @@ public typealias ErrorCode = UInt64
 public typealias DigestID = UInt64
 
 public class BundleClass {}
+
+let usDateFormatter: DateFormatter = {
+    let df = DateFormatter()
+    df.dateFormat = "yyyy-MM-dd"
+    return df
+}()

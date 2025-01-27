@@ -45,6 +45,10 @@ public protocol DocClaimsDecodable: Sendable, AgeAttesting {
 	var docClaims: [DocClaim] { get }
     /// The format of the document data.
     var docDataFormat: DocDataFormat { get }
+    /// Valid from date
+    var validFrom: Date? { get }
+    /// Valid until date
+    var validUntil: Date? { get }
 } // end protocol
 
 /// Methods to extract CBOR values.
