@@ -80,6 +80,14 @@ extension String {
 	}
 }
 
+extension UUID {
+    init?(uuidBytes: [UInt8]) {
+        let nsUUIDString = UUID.ReferenceType(uuidBytes: uuidBytes).uuidString
+        guard let uuid = UUID(uuidString: nsUUIDString) else { return nil }
+        self = uuid
+    }
+}
+
 extension Data {
 	public var bytes: Array<UInt8> {
 		Array(self)

@@ -27,7 +27,7 @@ public enum DeviceRetrievalMethod: Equatable, Sendable {
     
     case qr
     case nfc(maxLenCommand: UInt64, maxLenResponse: UInt64)
-    case ble(isBleServer: Bool, uuid: String)
+    case ble(isBleServer: Bool, uuid: UUID)
     //  case wifiaware // not supported in ios
 }
 
@@ -46,7 +46,7 @@ extension DeviceRetrievalMethod: CBOREncodable {
             cborArr.append(options)
         case .ble(let isBleServer, let uuid):
             Self.appendTypeAndVersion(&cborArr, type: 2)
-            let options: CBOR = [0: .boolean(isBleServer), 1: .boolean(!isBleServer), .unsignedInt(isBleServer ? 10 : 11): .byteString(uuid.replacingOccurrences(of: "-", with: "").byteArray)]
+            let options: CBOR = [0: .boolean(isBleServer), 1: .boolean(!isBleServer), .unsignedInt(isBleServer ? 10 : 11): .byteString(uuid.uuidString.replacingOccurrences(of: "-", with: "").byteArray)]
             cborArr.append(options)
         }
         return .array(cborArr)
@@ -67,10 +67,10 @@ extension DeviceRetrievalMethod: CBORDecodable {
             self = .nfc(maxLenCommand: mlc, maxLenResponse: mlr)
         case 2:
             guard case let .map(options) = arr[2] else { return nil }
-            if case let .boolean(b) = options[0], b, case let .byteString(bytes) = options[10] {
-                self = .ble(isBleServer: b, uuid: bytes.hex)
-            } else if case let .boolean(b) = options[1], b, case let .byteString(bytes) = options[11] {
-                self = .ble(isBleServer: !b, uuid: bytes.hex)
+            if case let .boolean(b) = options[0], b, case let .byteString(bytes) = options[10], let uuid = UUID(uuidBytes: bytes) {
+                self = .ble(isBleServer: b, uuid: uuid)
+            } else if case let .boolean(b) = options[1], b, case let .byteString(bytes) = options[11], let uuid = UUID(uuidBytes: bytes) {
+                self = .ble(isBleServer: !b, uuid: uuid)
             } else { return nil }
         default: return nil
         }
