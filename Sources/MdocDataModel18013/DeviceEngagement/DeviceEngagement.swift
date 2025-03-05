@@ -58,7 +58,7 @@ public struct DeviceEngagement: Sendable {
 	///    - crv: The EC curve type used in the mdoc ephemeral private key
     public init?(isBleServer: Bool?, rfus: [String]? = nil) {
 		self.rfus = rfus
-		if let isBleServer { deviceRetrievalMethods = [.ble(isBleServer: isBleServer, uuid: DeviceRetrievalMethod.getRandomBleUuid())] }
+        if let isBleServer { deviceRetrievalMethods = [.ble(isBleServer: isBleServer, uuid: UUID())] }
 	}
 	/// initialize from cbor data
 	public init?(data: [UInt8]) {
@@ -84,7 +84,7 @@ public struct DeviceEngagement: Sendable {
 	public var ble_uuid: String? {
 		guard let deviceRetrievalMethods else { return nil}
 		for case let .ble(_, uuid) in deviceRetrievalMethods {
-			return uuid
+            return uuid.uuidString
 		}
 		return nil
 	}
