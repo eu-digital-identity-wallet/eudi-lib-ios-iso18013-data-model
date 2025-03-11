@@ -24,6 +24,7 @@ import Foundation
 public struct DocClaim: Equatable, CustomStringConvertible, CustomDebugStringConvertible, Sendable {
 	public init(name: String, displayName: String? = nil, dataValue: DocDataValue, stringValue: String, valueType: String? = nil, isOptional: Bool = false, order: Int = 0, namespace: String? = nil, children: [DocClaim]? = nil) {
 		self.name = name
+        self.path = [name]
         self.displayName = displayName
 		self.dataValue = dataValue
         self.valueType = valueType
@@ -37,6 +38,8 @@ public struct DocClaim: Equatable, CustomStringConvertible, CustomDebugStringCon
 	public let namespace: String?
     /// The name of the claim.
 	public let name: String
+    // the path of the claim
+    public var path: [String] = []
     /// The display name of the claim, originated from VCI metadata/claims.
     public let displayName: String?
     /// The value of the claim as a string.

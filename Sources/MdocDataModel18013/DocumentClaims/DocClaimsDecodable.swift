@@ -129,14 +129,18 @@ extension DocClaimsDecodable {
 			let innerJsonMap = CBOR.decodeDictionary(m, unwrap: false)
 			for (o2,(k,v)) in innerJsonMap.enumerated() {
 				guard let cv = v as? CBOR else { continue }
-				node.add(child: extractCborClaim(k, cv, bDebugDisplay, namespace, o2, displayNames, mandatory, valueTypes))
+				var child: DocClaim = extractCborClaim(k, cv, bDebugDisplay, namespace, o2, displayNames, mandatory, valueTypes)
+                child.path = node.path + [child.name]
+                node.add(child: child)
 			}
 		} else if case let .array(a) = cborValue {
 			let innerJsonArray = CBOR.decodeList(a, unwrap: false)
 			for (o2,v) in innerJsonArray.enumerated() {
 				guard let cv = v as? CBOR else { continue }
 				let k = "\(name)" //[\(o2)]"
-				node.add(child: extractCborClaim(k, cv, bDebugDisplay, namespace, o2, displayNames, mandatory, valueTypes))
+                var child = extractCborClaim(k, cv, bDebugDisplay, namespace, o2, displayNames, mandatory, valueTypes)
+                child.path = node.path + [child.name]
+				node.add(child: child)
 			}
 		}
 		return node
