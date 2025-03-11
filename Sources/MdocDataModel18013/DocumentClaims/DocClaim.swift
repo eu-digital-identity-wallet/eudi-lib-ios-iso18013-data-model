@@ -39,7 +39,7 @@ public struct DocClaim: Equatable, CustomStringConvertible, CustomDebugStringCon
     /// The name of the claim.
 	public let name: String
     // the path of the claim
-    public internal(set) var path: [String] = []
+    public var path: [String] = []
     /// The display name of the claim, originated from VCI metadata/claims.
     public let displayName: String?
     /// The value of the claim as a string.
