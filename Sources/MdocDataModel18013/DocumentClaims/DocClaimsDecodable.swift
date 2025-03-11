@@ -135,7 +135,7 @@ extension DocClaimsDecodable {
 			let innerJsonArray = CBOR.decodeList(a, unwrap: false)
 			for (o2,v) in innerJsonArray.enumerated() {
 				guard let cv = v as? CBOR else { continue }
-				let k = "\(name)[\(o2)]"
+				let k = "\(name)" //[\(o2)]"
 				node.add(child: extractCborClaim(k, cv, bDebugDisplay, namespace, o2, displayNames, mandatory, valueTypes))
 			}
 		}

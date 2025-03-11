@@ -33,13 +33,13 @@ final class MdocDataModel18013Tests: XCTestCase {
     func testDecodeDE1() throws {
         let de = try XCTUnwrap(DeviceEngagement(data: Self.AnnexdTestData.d31.bytes))
         XCTAssertEqual(de.version, "1.0")
-        XCTAssertEqual(de.deviceRetrievalMethods?.first, .ble(isBleServer: false, uuid: "45EFEF742B2C4837A9A3B0E1D05A6917"))
+        XCTAssertEqual(de.deviceRetrievalMethods?.first, .ble(isBleServer: false, uuid: UUID(uuidString: "45EFEF74-2B2C-4837-A9A3-B0E1D05A6917")!))
     }
 
     func testDecodeDE2() throws {
         let de = try XCTUnwrap(DeviceEngagement(data: Self.OtherTestData.deOnline.bytes))
         XCTAssertEqual(de.version, "1.0")
-        XCTAssertEqual(de.deviceRetrievalMethods?.first, .ble(isBleServer: true, uuid: "0000D29600001000800000805F9B34FB"))
+        XCTAssertEqual(de.deviceRetrievalMethods?.first, .ble(isBleServer: true, uuid: UUID(uuidString: "0000D296-0000-1000-8000-00805F9B34FB")!))
         XCTAssertEqual(de.serverRetrievalOptions?.webAPI, ServerRetrievalOption(url: "https://api.pp.mobiledl.us/api/Iso18013", token: "eWqbX81BE0LaT1cumhgh"))
     }
 
