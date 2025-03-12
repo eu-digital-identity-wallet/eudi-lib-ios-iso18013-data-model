@@ -119,27 +119,24 @@ extension DocClaimsDecodable {
 	///   - order: The order in which the value should be processed.
 	///   - labels: A dictionary where the key is the elementIdentifier and the value is a string representing the label.
 	/// - Returns: A `DocClaim` object containing the extracted display string or image.
-	public static func extractCborClaim(_ name: String, _ cborValue: CBOR, _ bDebugDisplay: Bool, _ namespace: NameSpace, _ order: Int, _ displayNames: [String:String]? = nil, _ mandatory: [String:Bool]? = nil, _ valueTypes: [String:String]? = nil) -> DocClaim {
+    public static func extractCborClaim(_ name: String, _ path: [String], _ cborValue: CBOR, _ bDebugDisplay: Bool, _ namespace: NameSpace, _ order: Int, _ displayNames: [String:String]? = nil, _ mandatory: [String:Bool]? = nil, _ valueTypes: [String:String]? = nil) -> DocClaim {
 		var stringValue = bDebugDisplay ? cborValue.debugDescription : cborValue.description
 		let dt = cborValue.mdocDataValue ?? .string(stringValue)
 		if name == "sex", let isex = Int(stringValue), isex <= 2 { stringValue = NSLocalizedString(isex == 1 ? "male" : "female", comment: "") }
         let isMandatory = mandatory?[name] ?? true
-		var node = DocClaim(name: name, displayName: displayNames?[name], dataValue: dt, stringValue: stringValue, valueType: valueTypes?[name], isOptional: !isMandatory, order: order, namespace: namespace)
+        var node = DocClaim(name: name, path: path, displayName: displayNames?[name], dataValue: dt, stringValue: stringValue, valueType: valueTypes?[name], isOptional: !isMandatory, order: order, namespace: namespace)
 		if case let .map(m) = cborValue {
 			let innerJsonMap = CBOR.decodeDictionary(m, unwrap: false)
 			for (o2,(k,v)) in innerJsonMap.enumerated() {
 				guard let cv = v as? CBOR else { continue }
-				var child: DocClaim = extractCborClaim(k, cv, bDebugDisplay, namespace, o2, displayNames, mandatory, valueTypes)
-                child.path = node.path + [child.name]
+				let child: DocClaim = extractCborClaim(k, node.path + [k], cv, bDebugDisplay, namespace, o2, displayNames, mandatory, valueTypes)
                 node.add(child: child)
 			}
 		} else if case let .array(a) = cborValue {
 			let innerJsonArray = CBOR.decodeList(a, unwrap: false)
 			for (o2,v) in innerJsonArray.enumerated() {
 				guard let cv = v as? CBOR else { continue }
-				let k = "\(name)" //[\(o2)]"
-                var child = extractCborClaim(k, cv, bDebugDisplay, namespace, o2, displayNames, mandatory, valueTypes)
-                child.path = node.path + [child.name]
+                let child = extractCborClaim("", node.path + [""], cv, bDebugDisplay, namespace, o2, displayNames, mandatory, valueTypes)
 				node.add(child: child)
 			}
 		}
@@ -162,7 +159,7 @@ extension DocClaimsDecodable {
 		for ns in nsFilterUsed {
 			let items = nameSpaces[ns] ?? []
 			for item in items {
-				let n = extractCborClaim(item.elementIdentifier, item.elementValue, bDebugDisplay, ns, order, claimDisplayNames?[ns], mandatoryClaims?[ns], claimValueTypes?[ns])
+                let n = extractCborClaim(item.elementIdentifier, [ns, item.elementIdentifier],  item.elementValue, bDebugDisplay, ns, order, claimDisplayNames?[ns], mandatoryClaims?[ns], claimValueTypes?[ns])
 				docClaims.append(n)
 				order = order + 1
 			}

@@ -21,10 +21,10 @@ import Foundation
 /// It provides functionality for generating string representations for
 /// debugging and display purposes.
 @DebugDescription
-public struct DocClaim: Equatable, CustomStringConvertible, CustomDebugStringConvertible, Sendable {
-	public init(name: String, displayName: String? = nil, dataValue: DocDataValue, stringValue: String, valueType: String? = nil, isOptional: Bool = false, order: Int = 0, namespace: String? = nil, children: [DocClaim]? = nil) {
+public struct DocClaim: Equatable, Identifiable, CustomStringConvertible, CustomDebugStringConvertible, Sendable {
+    public init(name: String, path: [String]? = nil, displayName: String? = nil, dataValue: DocDataValue, stringValue: String, valueType: String? = nil, isOptional: Bool = false, order: Int = 0, namespace: String? = nil, children: [DocClaim]? = nil) {
 		self.name = name
-        self.path = [name]
+        self.path = path ?? [name]
         self.displayName = displayName
 		self.dataValue = dataValue
         self.valueType = valueType
@@ -61,6 +61,7 @@ public struct DocClaim: Equatable, CustomStringConvertible, CustomDebugStringCon
     /// Debug description of the claim.
 	public var debugDescription: String { "\(order). \t\(name): \(stringValue)" }
 
+    public var id: String { path.map({ if $0.isEmpty { String(order) } else { $0 } }).joined(separator: ".") }
     /// Adds a child to the claim.
 	public mutating func add(child: DocClaim) {
 		if children == nil { children = [] }
