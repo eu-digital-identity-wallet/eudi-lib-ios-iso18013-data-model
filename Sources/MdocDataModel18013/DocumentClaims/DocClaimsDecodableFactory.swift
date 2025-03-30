@@ -18,7 +18,7 @@ import Foundation
 
 /// A protocol to create a ``DocClaimsDecodable`` from a cbor encoded ``IssuerSigned`` struct
 public protocol DocClaimsDecodableFactory: Sendable {
-    func makeClaimsDecodableFromCbor(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, claimDisplayNames: [NameSpace: [String: String]]?, mandatoryClaims: [NameSpace: [String: Bool]]?, claimValueTypes: [NameSpace: [String: String]]?) -> (
+    func makeClaimsDecodableFromCbor(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) -> (
         any DocClaimsDecodable
     )?
 }
