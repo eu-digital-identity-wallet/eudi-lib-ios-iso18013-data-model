@@ -127,12 +127,12 @@ public struct IsoMdlModel: Decodable, DocClaimsDecodable, Sendable {
 
 
 extension IsoMdlModel {
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, claimDisplayNames: [NameSpace: [String: String]]?, mandatoryClaims: [NameSpace: [String: Bool]]?, claimValueTypes: [NameSpace: [String: String]]?) {
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
         self.id = id; self.createdAt = createdAt; self.displayName = displayName; self.display = display; self.issuerDisplay = issuerDisplay
         self.credentialIssuerIdentifier = credentialIssuerIdentifier; self.configurationIdentifier = configurationIdentifier
         self.validFrom = validFrom; self.validUntil = validUntil
   	    guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned, nameSpaces) else { return nil }
-		Self.extractCborClaims(nameSpaceItems, &docClaims, claimDisplayNames, mandatoryClaims, claimValueTypes)
+		Self.extractCborClaims(nameSpaceItems, &docClaims, displayNames, mandatory)
 		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems, string: key.rawValue) }
 		Self.extractAgeOverValues(nameSpaceItems, &ageOverXX)
 		exp = getValue(key: .exp)
