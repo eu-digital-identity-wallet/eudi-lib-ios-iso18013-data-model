@@ -382,6 +382,12 @@ extension Array where Element == DocClaim {
 	}
 }
 
+extension Array where Element == DisplayMetadata {
+	public func getName(_ uiCulture: String?) -> String? {
+		(first(where: { $0.localeIdentifier == uiCulture }) ?? first)?.name
+	}
+}
+
 public typealias DocType = String // Document type
 public typealias NameSpace = String // Name space
 public typealias DataElementIdentifier = String // Data element identifier
