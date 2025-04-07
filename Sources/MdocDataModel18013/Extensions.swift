@@ -383,8 +383,13 @@ extension Array where Element == DocClaim {
 }
 
 extension Array where Element == DisplayMetadata {
-	public func getName(_ uiCulture: String?) -> String? {
-		(first(where: { $0.localeIdentifier == uiCulture }) ?? first)?.name
+	// get the first name with the given locale or the first element if not found
+    public func getName(_ uiCulture: String?) -> String? {
+		(first(where: { $0.locale?.language.languageCode?.identifier == uiCulture ?? Locale.current.language.languageCode?.identifier }) ?? first)?.name
+	}
+    // get the first logo with the given locale or the first element if not found
+    public func getLogo(_ uiCulture: String?) -> LogoMetadata? {
+		(first(where: { $0.locale?.language.languageCode?.identifier == uiCulture ?? Locale.current.language.languageCode?.identifier }) ?? first)?.logo
 	}
 }
 
