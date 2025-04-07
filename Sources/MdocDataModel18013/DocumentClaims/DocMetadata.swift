@@ -1,6 +1,8 @@
 import Foundation
 
 public struct DocMetadata: Sendable, Codable {
+    /// document id
+    public let docId: String
 	/// the credential issuer identifier (issuer URL)
 	public let credentialIssuerIdentifier: String
 	/// the document configuration identifier
@@ -21,7 +23,8 @@ public struct DocMetadata: Sendable, Codable {
 	/// flat claims (for mso-mdoc documents)
 	public let flatClaims: [String: DocClaimMetadata]?
 
-	public init(credentialIssuerIdentifier: String, configurationIdentifier: String, docType: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?,  namespacedClaims: [NameSpace: [String: DocClaimMetadata]]? = nil, flatClaims: [String: DocClaimMetadata]? = nil) {
+	public init(docId: String, credentialIssuerIdentifier: String, configurationIdentifier: String, docType: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, namespacedClaims: [NameSpace: [String: DocClaimMetadata]]? = nil, flatClaims: [String: DocClaimMetadata]? = nil) {
+        self.docId = docId
 		self.credentialIssuerIdentifier = credentialIssuerIdentifier
 		self.configurationIdentifier = configurationIdentifier
 		self.docType = docType
@@ -44,6 +47,12 @@ public struct DocMetadata: Sendable, Codable {
 }
 
 public struct DocClaimMetadata: Sendable, Codable {
+    public init(display: [DisplayMetadata]?, isMandatory: Bool?, valueType: String? = nil) {
+        self.display = display
+        self.isMandatory = isMandatory
+        self.valueType = valueType
+    }
+
 	public func getDisplayName(_ uiCulture: String?) -> String? { display?.getName(uiCulture) }
 	public let display: [DisplayMetadata]?
 	public let isMandatory: Bool?
