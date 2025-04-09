@@ -20,7 +20,7 @@ public struct LogoMetadata: Codable, Equatable, Sendable {
     public let urlString: String?
     public let alternativeText: String?
     public var uri: URL? { urlString.flatMap(URL.init(string:)) }
-    
+
     public init(urlString: String? = nil, alternativeText: String? = nil) {
         self.urlString = urlString
         self.alternativeText = alternativeText
