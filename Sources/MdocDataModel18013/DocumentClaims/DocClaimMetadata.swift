@@ -15,24 +15,15 @@ limitations under the License.
 */
 
 import Foundation
-/// Format of document data
-/// ``cbor``: IssuerSigned struct cbor encoded
-/// ``sdjwt``: vc+sd-jwt encoded
-///
-/// Raw value must be a 4-length string due to keychain requirements
-public enum DocDataFormat: String, Sendable, CustomStringConvertible, CustomDebugStringConvertible, Codable {
-	case cbor = "cbor"
-	case sdjwt = "sjwt"
 
-    /// A description to display
-    public var description: String {
-        switch self {
-        case .cbor: return "mso_mdoc"
-        case .sdjwt: return "vc+sd-jwt"
-        }
-    }
-
-    public var debugDescription: String {
-        description
-    }
+@DebugDescription
+public struct DocClaimMetadata: Sendable, Codable, CustomStringConvertible, CustomDebugStringConvertible {
+	public func getDisplayName(_ uiCulture: String?) -> String? { display?.getName(uiCulture) }
+	public let display: [DisplayMetadata]?
+	public let isMandatory: Bool?
+	public let claimPath: [String]
+	/// Description of the claim.
+	public var description: String { "\(claimPath)" }
+	/// Debug description of the claim.
+	public var debugDescription: String { "\(claimPath)" }
 }
