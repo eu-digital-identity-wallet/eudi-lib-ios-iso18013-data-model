@@ -44,7 +44,7 @@ extension CBOR: @retroactive CustomStringConvertible {
         switch self {
         case .utf8String(let str): return str
 		case .tagged(let tag, .utf8String(let str)):
-					if tag.rawValue == 1004 || tag == .standardDateTimeString { return str.usPosixDate() }
+					if tag.rawValue == 1004 || tag == .standardDateTimeString { return str }
 					return str
         case .unsignedInt(let i): return String(i)
         case .boolean(let b): return String(b)
