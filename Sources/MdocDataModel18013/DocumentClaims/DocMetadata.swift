@@ -1,8 +1,6 @@
 import Foundation
 
 public struct DocMetadata: Sendable, Codable {
-    /// document id
-    public let docId: String
 	/// the credential issuer identifier (issuer URL)
 	public let credentialIssuerIdentifier: String
 	/// the document configuration identifier
@@ -23,8 +21,7 @@ public struct DocMetadata: Sendable, Codable {
 	/// flat claims (for mso-mdoc documents)
 	public let flatClaims: [String: DocClaimMetadata]?
 
-	public init(docId: String, credentialIssuerIdentifier: String, configurationIdentifier: String, docType: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, namespacedClaims: [NameSpace: [String: DocClaimMetadata]]? = nil, flatClaims: [String: DocClaimMetadata]? = nil) {
-        self.docId = docId
+	public init(credentialIssuerIdentifier: String, configurationIdentifier: String, docType: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, namespacedClaims: [NameSpace: [String: DocClaimMetadata]]? = nil, flatClaims: [String: DocClaimMetadata]? = nil) {
 		self.credentialIssuerIdentifier = credentialIssuerIdentifier
 		self.configurationIdentifier = configurationIdentifier
 		self.docType = docType

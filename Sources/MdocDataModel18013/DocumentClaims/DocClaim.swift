@@ -22,12 +22,11 @@ import Foundation
 /// debugging and display purposes.
 @DebugDescription
 public struct DocClaim: Equatable, Identifiable, CustomStringConvertible, CustomDebugStringConvertible, Sendable {
-    public init(name: String, path: [String]? = nil, displayName: String? = nil, dataValue: DocDataValue, stringValue: String, valueType: String? = nil, isOptional: Bool = false, order: Int = 0, namespace: String? = nil, children: [DocClaim]? = nil) {
+    public init(name: String, path: [String]? = nil, displayName: String? = nil, dataValue: DocDataValue, stringValue: String, isOptional: Bool = false, order: Int = 0, namespace: String? = nil, children: [DocClaim]? = nil) {
 		self.name = name
         self.path = path ?? [name]
         self.displayName = displayName
 		self.dataValue = dataValue
-        self.valueType = valueType
 		self.stringValue = stringValue
         self.isOptional = isOptional
 		self.order = order
@@ -46,8 +45,6 @@ public struct DocClaim: Equatable, Identifiable, CustomStringConvertible, Custom
 	public let stringValue: String
     /// The value of the claim as a `DocDataValue` (enum with associated values)
 	public let dataValue: DocDataValue
-    /// The type of the value of the claim, originated from VCI metadata/claims.
-    public let valueType: String?
     /// A flag indicating whether the claim is optional, originated from VCI metadata/claims.
     public var isOptional: Bool = false
     /// The order of the claim in the document.

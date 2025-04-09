@@ -39,14 +39,14 @@ public struct GenericMdocModel: DocClaimsDecodable, Sendable {
 
 extension GenericMdocModel {
 
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, docType: String, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, claimDisplayNames: [NameSpace: [String: String]]?, mandatoryClaims: [NameSpace: [String: Bool]]?, claimValueTypes: [NameSpace: [String: String]]?) {
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, docType: String, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
         self.id = id; self.createdAt = createdAt; self.displayName = displayName
         self.display = display; self.issuerDisplay = issuerDisplay
         self.credentialIssuerIdentifier = credentialIssuerIdentifier; self.configurationIdentifier = configurationIdentifier
         self.validFrom = validFrom; self.validUntil = validUntil
         self.docType = docType; self.docDataFormat = .cbor
 		if let nameSpaces = Self.getCborSignedItems(issuerSigned) {
-			Self.extractCborClaims(nameSpaces, &docClaims, claimDisplayNames, mandatoryClaims, claimValueTypes)
+			Self.extractCborClaims(nameSpaces, &docClaims, displayNames, mandatory)
 		}
 	}
 } // end extension

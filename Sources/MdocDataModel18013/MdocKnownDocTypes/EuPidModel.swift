@@ -48,22 +48,26 @@ public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
 	public let resident_state: String?
 	public let resident_country: String?
 	public let resident_street: String?
-	public let resident_house_number:String?
-	public let gender: UInt64?
-	public let nationality: String?
+	public let resident_house_number: String?
+	public let sex: UInt64?
+	public let nationality: [String]?
 	public let age_in_years: UInt64?
 	public let age_birth_year: UInt64?
 	public let expiry_date: String?
 	public let issuing_authority: String?
 	public let issuance_date: String?
 	public let document_number: String?
-	public let administrative_number: String?
+	public let personal_administrative_number: String?
 	public let issuing_country: String?
 	public let issuing_jurisdiction: String?
+    public let email_address: String?
+    public let mobile_phone_number: String?
+    public let trust_anchor: String?
 
 	public enum CodingKeys: String, CodingKey, CaseIterable {
         case credentialIssuerIdentifier
         case configurationIdentifier
+
 		case family_name
 		case given_name
 		case birth_date
@@ -80,7 +84,7 @@ public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
 		case resident_country
 		case resident_street
 		case resident_house_number
-		case gender
+		case sex
 		case nationality
 		case age_in_years
 		case age_birth_year
@@ -88,9 +92,12 @@ public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
 		case issuing_authority
 		case issuance_date
 		case document_number
-		case administrative_number
+		case personal_administrative_number
 		case issuing_country
 		case issuing_jurisdiction
+        case email_address
+        case mobile_phone_number
+        case trust_anchor
 	}
 	static var mandatoryElementCodingKeys: [CodingKeys] {
 		[.family_name, .given_name, .birth_date]
@@ -102,13 +109,13 @@ public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
 }
 
 extension EuPidModel {
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, claimDisplayNames: [NameSpace: [String: String]]?, mandatoryClaims: [NameSpace: [String: Bool]]?, claimValueTypes: [NameSpace: [String: String]]?) {
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
 		self.id = id
         self.createdAt = createdAt;	self.displayName = displayName; self.display = display; self.issuerDisplay = issuerDisplay
         self.credentialIssuerIdentifier = credentialIssuerIdentifier; self.configurationIdentifier = configurationIdentifier
         self.validFrom = validFrom; self.validUntil = validUntil
 		guard let nameSpaces = Self.getCborSignedItems(issuerSigned) else { return nil }
-		Self.extractCborClaims(nameSpaces, &docClaims, claimDisplayNames, mandatoryClaims, claimValueTypes)
+		Self.extractCborClaims(nameSpaces, &docClaims, displayNames, mandatory)
 		Self.extractAgeOverValues(nameSpaces, &ageOverXX)
 		func getValue<T>(key: EuPidModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaces, string: key.rawValue) }
 		family_name = getValue(key: .family_name)
@@ -127,7 +134,7 @@ extension EuPidModel {
 		resident_country = getValue(key: .resident_country)
 		resident_street = getValue(key: .resident_street)
 		resident_house_number = getValue(key: .resident_house_number)
-		gender = getValue(key: .gender)
+		sex = getValue(key: .sex)
 		nationality = getValue(key: .nationality)
 		age_in_years = getValue(key: .age_in_years)
 		age_birth_year = getValue(key: .age_birth_year)
@@ -135,8 +142,11 @@ extension EuPidModel {
 		issuing_authority = getValue(key: .issuing_authority)
 		issuance_date = getValue(key: .issuance_date)
 		document_number = getValue(key: .document_number)
-		administrative_number = getValue(key: .administrative_number)
+        personal_administrative_number = getValue(key: .personal_administrative_number)
 		issuing_country = getValue(key: .issuing_country)
 		issuing_jurisdiction = getValue(key: .issuing_jurisdiction)
+        email_address = getValue(key: .email_address)
+        mobile_phone_number = getValue(key: .mobile_phone_number)
+        trust_anchor = getValue(key: .trust_anchor)
 	}
 }
