@@ -18,6 +18,12 @@ import Foundation
 
 @DebugDescription
 public struct DocClaimMetadata: Sendable, Codable, CustomStringConvertible, CustomDebugStringConvertible {
+    public init(display: [DisplayMetadata]?, isMandatory: Bool?, claimPath: [String]) {
+        self.display = display
+        self.isMandatory = isMandatory
+        self.claimPath = claimPath
+}
+
 	public func getDisplayName(_ uiCulture: String?) -> String? { display?.getName(uiCulture) }
 	public let display: [DisplayMetadata]?
 	public let isMandatory: Bool?

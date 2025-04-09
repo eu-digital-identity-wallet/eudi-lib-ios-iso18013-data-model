@@ -29,22 +29,18 @@ public struct DocMetadata: Sendable, Codable {
 	public let display: [DisplayMetadata]?
 	/// display properties of the issuer that issued the document
 	public let issuerDisplay: [DisplayMetadata]?
-		/// get display name of the issuer for the given culture
-	 public func getIssuerDisplayName(_ uiCulture: String?) -> String? { issuerDisplay?.getName(uiCulture) }
+	/// get display name of the issuer for the given culture
+	public func getIssuerDisplayName(_ uiCulture: String?) -> String? { issuerDisplay?.getName(uiCulture) }
+	/// claims (for mso-mdoc and sd-jwt documents)
+	public let claims: [DocClaimMetadata]?
 
-	/// namespaced claims (for sd-jwt documents)
-	public let namespacedClaims: [NameSpace: [String: DocClaimMetadata]]?
-	/// flat claims (for mso-mdoc documents)
-	public let flatClaims: [String: DocClaimMetadata]?
-
-	public init(credentialIssuerIdentifier: String, configurationIdentifier: String, docType: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, namespacedClaims: [NameSpace: [String: DocClaimMetadata]]? = nil, flatClaims: [String: DocClaimMetadata]? = nil) {
+	public init(credentialIssuerIdentifier: String, configurationIdentifier: String, docType: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, claims: [DocClaimMetadata]? = nil) {
 		self.credentialIssuerIdentifier = credentialIssuerIdentifier
 		self.configurationIdentifier = configurationIdentifier
 		self.docType = docType
 		self.display = display
 		self.issuerDisplay = issuerDisplay
-		self.namespacedClaims = namespacedClaims
-		self.flatClaims = flatClaims
+		self.claims = claims
 	}
 
 	public init?(from data: Data?) {

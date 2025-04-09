@@ -50,14 +50,18 @@ extension String {
 		CBOR.tagged(CBOR.Tag(rawValue: 1004), .utf8String(self))
 	}
 
-	public func usPosixDate(useIsoFormat: Bool = true) -> String {
-		guard let ds = self.split(separator: "T").first else { return "" }
-		if useIsoFormat { return String(ds)}
-		// todo: use iso-date formatter for localized display
-		let dc = ds.split(separator: "-")
-		guard dc.count >= 3 else { return "" }
-		return "\(dc[1])/\(dc[2])/\(dc[0])"
-	}
+    public func convertToLocalDate() -> Date? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = contains(".") ? "yyyy-MM-dd'T'HH:mm:ss.SSSZ" : "yyyy-MM-dd'T'HH:mm:ssZ"
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0) // UTC timezone
+        // Parse the string to Date (UTC)
+        guard let date = dateFormatter.date(from: self) else {
+            return nil
+        }
+        // The Date object itself doesn't have a timezone - it's just a point in time
+        // To display it in local timezone, you would use another formatter
+        return date
+    }
 
 	public func toBytes() -> [UInt8]? {
 		let length = count
@@ -211,7 +215,7 @@ extension CBOR {
 
 	public static func asDateString(_ tag: Tag, _ value: CBOR) -> Any {
 		if tag.rawValue == 1004 || tag == .standardDateTimeString, let strDate = value.unwrap() as? String {
-			return strDate.usPosixDate()
+			return strDate
 		} else {
 			return value.unwrap() ?? ""
 		}
@@ -279,7 +283,7 @@ extension CBOR {
 		else if case let .tagged(tag, cbor) = self {
 			if T.self == String.self, tag.rawValue == 1004 || tag == .standardDateTimeString {
 				let strDate = cbor.unwrap() as? String
-				return strDate?.usPosixDate() as? T
+				return strDate as? T
 			}
 			return cbor.unwrap() as? T
 		}
