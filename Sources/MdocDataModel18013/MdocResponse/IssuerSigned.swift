@@ -22,12 +22,12 @@ import OrderedCollections
 public struct IssuerSigned: Sendable {
 	public let issuerNameSpaces: IssuerNameSpaces?
 	public let issuerAuth: IssuerAuth
-	
+
 	enum Keys: String {
 	   case nameSpaces
 	   case issuerAuth
 	 }
-	
+
 	public init(issuerNameSpaces: IssuerNameSpaces?, issuerAuth: IssuerAuth) {
 		self.issuerNameSpaces = issuerNameSpaces
 		self.issuerAuth = issuerAuth
@@ -51,4 +51,12 @@ extension IssuerSigned: CBOREncodable {
 	}
 }
 
+extension IssuerSigned {
+    public var validFrom: Date? {
+        issuerAuth.mso.validityInfo.validFrom.convertToLocalDate()
+    }
 
+    public var validUntil: Date? {
+        issuerAuth.mso.validityInfo.validUntil.convertToLocalDate()
+    }
+}

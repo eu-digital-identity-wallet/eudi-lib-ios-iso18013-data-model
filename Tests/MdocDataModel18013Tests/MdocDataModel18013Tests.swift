@@ -33,13 +33,13 @@ final class MdocDataModel18013Tests: XCTestCase {
     func testDecodeDE1() throws {
         let de = try XCTUnwrap(DeviceEngagement(data: Self.AnnexdTestData.d31.bytes))
         XCTAssertEqual(de.version, "1.0")
-        XCTAssertEqual(de.deviceRetrievalMethods?.first, .ble(isBleServer: false, uuid: "45EFEF742B2C4837A9A3B0E1D05A6917"))
+        XCTAssertEqual(de.deviceRetrievalMethods?.first, .ble(isBleServer: false, uuid: UUID(uuidString: "45EFEF74-2B2C-4837-A9A3-B0E1D05A6917")!))
     }
 
     func testDecodeDE2() throws {
         let de = try XCTUnwrap(DeviceEngagement(data: Self.OtherTestData.deOnline.bytes))
         XCTAssertEqual(de.version, "1.0")
-        XCTAssertEqual(de.deviceRetrievalMethods?.first, .ble(isBleServer: true, uuid: "0000D29600001000800000805F9B34FB"))
+        XCTAssertEqual(de.deviceRetrievalMethods?.first, .ble(isBleServer: true, uuid: UUID(uuidString: "0000D296-0000-1000-8000-00805F9B34FB")!))
         XCTAssertEqual(de.serverRetrievalOptions?.webAPI, ServerRetrievalOption(url: "https://api.pp.mobiledl.us/api/Iso18013", token: "eWqbX81BE0LaT1cumhgh"))
     }
 
@@ -95,9 +95,9 @@ final class MdocDataModel18013Tests: XCTestCase {
 	  	let d1 = try XCTUnwrap(docs.first(where: {$0.docType == EuPidModel.euPidDocType}))
 		let d2 = try XCTUnwrap(docs.first(where: {$0.docType == IsoMdlModel.isoDocType}))
 		//let ns1 = d1?.issuerSigned.issuerNameSpaces!.nameSpaces.first
-		let pidObj = try XCTUnwrap(EuPidModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d1.issuerSigned, displayName: nil, claimDisplayNames: nil, mandatoryClaims: nil, claimValueTypes: nil))
+		let pidObj = try XCTUnwrap(EuPidModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d1.issuerSigned, displayName: "PID", display: nil, issuerDisplay: nil, credentialIssuerIdentifier: nil, configurationIdentifier: nil, validFrom: d1.issuerSigned.validFrom, validUntil: d1.issuerSigned.validUntil, statusIdentifier: d1.issuerSigned.issuerAuth.statusIdentifier, displayNames: nil, mandatory: nil))
 		XCTAssertEqual(pidObj.family_name, "ANDERSSON")
-		let mdlObj = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d2.issuerSigned, displayName: nil, claimDisplayNames: nil, mandatoryClaims: nil, claimValueTypes: nil))
+		let mdlObj = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d2.issuerSigned, displayName: "mDL", display: nil, issuerDisplay: nil, credentialIssuerIdentifier: nil, configurationIdentifier: nil, validFrom: d1.issuerSigned.validFrom, validUntil: d1.issuerSigned.validUntil, statusIdentifier: d1.issuerSigned.issuerAuth.statusIdentifier, displayNames: nil, mandatory: nil))
 		XCTAssertEqual(mdlObj.familyName, "ANDERSSON")
 		printDisplayStrings(mdlObj.docClaims)
 	}
@@ -138,7 +138,8 @@ final class MdocDataModel18013Tests: XCTestCase {
 		XCTAssertEqual(doc.deviceSigned?.nameSpacesRawData.count, 1); XCTAssertEqual(doc.deviceSigned?.nameSpacesRawData[0], 160) // {} A0 empty dic
 		XCTAssertEqual(doc.deviceSigned?.deviceAuth.coseMacOrSignature.macAlgorithm, Cose.MacAlgorithm.hmac256)
 		XCTAssertEqual(doc.deviceSigned?.deviceAuth.coseMacOrSignature.signature.bytes.toHexString().uppercased(), "E99521A85AD7891B806A07F8B5388A332D92C189A7BF293EE1F543405AE6824D")
-		let model = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: dr.documents!.first!.issuerSigned, displayName: nil, claimDisplayNames: nil, mandatoryClaims: nil, claimValueTypes: nil))
+        let d1 = dr.documents!.first!
+		let model = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d1.issuerSigned, displayName: "PID", display: nil, issuerDisplay: nil, credentialIssuerIdentifier: nil, configurationIdentifier: nil, validFrom: d1.issuerSigned.validFrom, validUntil: d1.issuerSigned.validUntil, statusIdentifier: d1.issuerSigned.issuerAuth.statusIdentifier, displayNames: nil, mandatory: nil))
 		XCTAssertEqual(model.familyName, "Doe")
 	}
 

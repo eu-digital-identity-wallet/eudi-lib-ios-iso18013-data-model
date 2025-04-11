@@ -23,6 +23,9 @@ public struct IsoMdlModel: Decodable, DocClaimsDecodable, Sendable {
     public var issuerDisplay: [DisplayMetadata]?
     public var credentialIssuerIdentifier: String?
     public var configurationIdentifier: String?
+    public var validFrom: Date?
+    public var validUntil: Date?
+    public var statusIdentifier: StatusIdentifier?
 	public var id: String = UUID().uuidString
 	public var createdAt: Date = Date()
 	public var docType: String? = Self.isoDocType
@@ -125,11 +128,12 @@ public struct IsoMdlModel: Decodable, DocClaimsDecodable, Sendable {
 
 
 extension IsoMdlModel {
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, claimDisplayNames: [NameSpace: [String: String]]?, mandatoryClaims: [NameSpace: [String: Bool]]?, claimValueTypes: [NameSpace: [String: String]]?) {
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
         self.id = id; self.createdAt = createdAt; self.displayName = displayName; self.display = display; self.issuerDisplay = issuerDisplay
         self.credentialIssuerIdentifier = credentialIssuerIdentifier; self.configurationIdentifier = configurationIdentifier
+        self.validFrom = validFrom; self.validUntil = validUntil; self.statusIdentifier = statusIdentifier
   	    guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned, nameSpaces) else { return nil }
-		Self.extractCborClaims(nameSpaceItems, &docClaims, claimDisplayNames, mandatoryClaims, claimValueTypes)
+		Self.extractCborClaims(nameSpaceItems, &docClaims, displayNames, mandatory)
 		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems, string: key.rawValue) }
 		Self.extractAgeOverValues(nameSpaceItems, &ageOverXX)
 		exp = getValue(key: .exp)

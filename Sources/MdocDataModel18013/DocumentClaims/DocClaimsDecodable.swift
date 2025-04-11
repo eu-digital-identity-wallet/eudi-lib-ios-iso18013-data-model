@@ -45,6 +45,12 @@ public protocol DocClaimsDecodable: Sendable, AgeAttesting {
 	var docClaims: [DocClaim] { get }
     /// The format of the document data.
     var docDataFormat: DocDataFormat { get }
+    /// Valid from date
+    var validFrom: Date? { get }
+    /// Valid until date
+    var validUntil: Date? { get }
+    /// This identifier is used to check the status of the document.
+    var statusIdentifier: StatusIdentifier? { get }
 } // end protocol
 
 /// Methods to extract CBOR values.
@@ -115,24 +121,25 @@ extension DocClaimsDecodable {
 	///   - order: The order in which the value should be processed.
 	///   - labels: A dictionary where the key is the elementIdentifier and the value is a string representing the label.
 	/// - Returns: A `DocClaim` object containing the extracted display string or image.
-	public static func extractCborClaim(_ name: String, _ cborValue: CBOR, _ bDebugDisplay: Bool, _ namespace: NameSpace, _ order: Int, _ displayNames: [String:String]? = nil, _ mandatory: [String:Bool]? = nil, _ valueTypes: [String:String]? = nil) -> DocClaim {
+    public static func extractCborClaim(_ name: String, _ path: [String], _ cborValue: CBOR, _ bDebugDisplay: Bool, _ namespace: NameSpace, _ order: Int, _ displayNames: [String:String]? = nil, _ mandatory: [String:Bool]? = nil) -> DocClaim {
 		var stringValue = bDebugDisplay ? cborValue.debugDescription : cborValue.description
 		let dt = cborValue.mdocDataValue ?? .string(stringValue)
 		if name == "sex", let isex = Int(stringValue), isex <= 2 { stringValue = NSLocalizedString(isex == 1 ? "male" : "female", comment: "") }
         let isMandatory = mandatory?[name] ?? true
-		var node = DocClaim(name: name, displayName: displayNames?[name], dataValue: dt, stringValue: stringValue, valueType: valueTypes?[name], isOptional: !isMandatory, order: order, namespace: namespace)
+        var node = DocClaim(name: name, path: path, displayName: displayNames?[name], dataValue: dt, stringValue: stringValue, isOptional: !isMandatory, order: order, namespace: namespace)
 		if case let .map(m) = cborValue {
 			let innerJsonMap = CBOR.decodeDictionary(m, unwrap: false)
 			for (o2,(k,v)) in innerJsonMap.enumerated() {
 				guard let cv = v as? CBOR else { continue }
-				node.add(child: extractCborClaim(k, cv, bDebugDisplay, namespace, o2, displayNames, mandatory, valueTypes))
+				let child: DocClaim = extractCborClaim(k, node.path + [k], cv, bDebugDisplay, namespace, o2, displayNames, mandatory)
+                node.add(child: child)
 			}
 		} else if case let .array(a) = cborValue {
 			let innerJsonArray = CBOR.decodeList(a, unwrap: false)
 			for (o2,v) in innerJsonArray.enumerated() {
 				guard let cv = v as? CBOR else { continue }
-				let k = "\(name)[\(o2)]"
-				node.add(child: extractCborClaim(k, cv, bDebugDisplay, namespace, o2, displayNames, mandatory, valueTypes))
+                let child = extractCborClaim("", node.path + [""], cv, bDebugDisplay, namespace, o2, displayNames, mandatory)
+				node.add(child: child)
 			}
 		}
 		return node
@@ -143,18 +150,17 @@ extension DocClaimsDecodable {
 	/// - Parameters:
 	///   - nameSpaces: A dictionary where the key is a `NameSpace` and the value is an array of `IssuerSignedItem`.
 	///   - docClaims: An inout parameter that will be populated with `DocClaim` items extracted from the namespaces.
-	///   - claimDisplayNames: A dictionary where the key is the elementIdentifier and the value is a string representing the label.
-    ///   - mandatoryClaims: A dictionary where the key is the elementIdentifier and the value is a boolean indicating whether the claim is mandatory.
-    ///   - claimValueTypes: A dictionary where the key is the elementIdentifier and the value is a string representing the value type.
+	///   - displayNames: A namespaced dictionary where the key is the elementIdentifier and the value is a string representing the label.
+    ///   - mandatory: A namespaced dictionary where the key is the elementIdentifier and the value is a boolean indicating whether the claim is mandatory.
 	///   - nsFilter: An optional array of `NameSpace` to filter/sort the extraction. Defaults to `nil`.
-	public static func extractCborClaims(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ docClaims: inout [DocClaim], _ claimDisplayNames: [NameSpace: [String: String]]? = nil, _ mandatoryClaims: [NameSpace: [String: Bool]]? = nil, _ claimValueTypes: [NameSpace: [String: String]]? = nil, nsFilter: [NameSpace]? = nil) {
+	public static func extractCborClaims(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ docClaims: inout [DocClaim], _ displayNames: [NameSpace: [String: String]]?, _ mandatory: [NameSpace: [String: Bool]]?, nsFilter: [NameSpace]? = nil) {
 		let bDebugDisplay = UserDefaults.standard.bool(forKey: "DebugDisplay")
 		var order = 0
 		let nsFilterUsed = nsFilter ?? Array(nameSpaces.keys)
 		for ns in nsFilterUsed {
 			let items = nameSpaces[ns] ?? []
 			for item in items {
-				let n = extractCborClaim(item.elementIdentifier, item.elementValue, bDebugDisplay, ns, order, claimDisplayNames?[ns], mandatoryClaims?[ns], claimValueTypes?[ns])
+                let n = extractCborClaim(item.elementIdentifier, [ns, item.elementIdentifier],  item.elementValue, bDebugDisplay, ns, order, displayNames?[ns], mandatory?[ns])
 				docClaims.append(n)
 				order = order + 1
 			}

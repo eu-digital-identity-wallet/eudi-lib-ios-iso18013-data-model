@@ -21,12 +21,12 @@ import Foundation
 /// It provides functionality for generating string representations for
 /// debugging and display purposes.
 @DebugDescription
-public struct DocClaim: Equatable, CustomStringConvertible, CustomDebugStringConvertible, Sendable {
-	public init(name: String, displayName: String? = nil, dataValue: DocDataValue, stringValue: String, valueType: String? = nil, isOptional: Bool = false, order: Int = 0, namespace: String? = nil, children: [DocClaim]? = nil) {
+public struct DocClaim: Equatable, Identifiable, CustomStringConvertible, CustomDebugStringConvertible, Sendable {
+    public init(name: String, path: [String]? = nil, displayName: String? = nil, dataValue: DocDataValue, stringValue: String, isOptional: Bool = false, order: Int = 0, namespace: String? = nil, children: [DocClaim]? = nil) {
 		self.name = name
+        self.path = path ?? [name]
         self.displayName = displayName
 		self.dataValue = dataValue
-        self.valueType = valueType
 		self.stringValue = stringValue
         self.isOptional = isOptional
 		self.order = order
@@ -37,14 +37,14 @@ public struct DocClaim: Equatable, CustomStringConvertible, CustomDebugStringCon
 	public let namespace: String?
     /// The name of the claim.
 	public let name: String
+    // the path of the claim
+    public var path: [String] = []
     /// The display name of the claim, originated from VCI metadata/claims.
     public let displayName: String?
     /// The value of the claim as a string.
 	public let stringValue: String
     /// The value of the claim as a `DocDataValue` (enum with associated values)
 	public let dataValue: DocDataValue
-    /// The type of the value of the claim, originated from VCI metadata/claims.
-    public let valueType: String?
     /// A flag indicating whether the claim is optional, originated from VCI metadata/claims.
     public var isOptional: Bool = false
     /// The order of the claim in the document.
@@ -58,6 +58,7 @@ public struct DocClaim: Equatable, CustomStringConvertible, CustomDebugStringCon
     /// Debug description of the claim.
 	public var debugDescription: String { "\(order). \t\(name): \(stringValue)" }
 
+    public var id: String { path.map({ if $0.isEmpty { String(order) } else { $0 } }).joined(separator: ".") }
     /// Adds a child to the claim.
 	public mutating func add(child: DocClaim) {
 		if children == nil { children = [] }
