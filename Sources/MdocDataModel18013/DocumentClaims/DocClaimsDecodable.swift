@@ -49,6 +49,8 @@ public protocol DocClaimsDecodable: Sendable, AgeAttesting {
     var validFrom: Date? { get }
     /// Valid until date
     var validUntil: Date? { get }
+    /// This identifier is used to check the status of the document.
+    var statusIdentifier: StatusIdentifier? { get }
 } // end protocol
 
 /// Methods to extract CBOR values.
@@ -148,9 +150,8 @@ extension DocClaimsDecodable {
 	/// - Parameters:
 	///   - nameSpaces: A dictionary where the key is a `NameSpace` and the value is an array of `IssuerSignedItem`.
 	///   - docClaims: An inout parameter that will be populated with `DocClaim` items extracted from the namespaces.
-	///   - claimDisplayNames: A dictionary where the key is the elementIdentifier and the value is a string representing the label.
-    ///   - mandatoryClaims: A dictionary where the key is the elementIdentifier and the value is a boolean indicating whether the claim is mandatory.
-    ///   - claimValueTypes: A dictionary where the key is the elementIdentifier and the value is a string representing the value type.
+	///   - displayNames: A namespaced dictionary where the key is the elementIdentifier and the value is a string representing the label.
+    ///   - mandatory: A namespaced dictionary where the key is the elementIdentifier and the value is a boolean indicating whether the claim is mandatory.
 	///   - nsFilter: An optional array of `NameSpace` to filter/sort the extraction. Defaults to `nil`.
 	public static func extractCborClaims(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ docClaims: inout [DocClaim], _ displayNames: [NameSpace: [String: String]]?, _ mandatory: [NameSpace: [String: Bool]]?, nsFilter: [NameSpace]? = nil) {
 		let bDebugDisplay = UserDefaults.standard.bool(forKey: "DebugDisplay")
