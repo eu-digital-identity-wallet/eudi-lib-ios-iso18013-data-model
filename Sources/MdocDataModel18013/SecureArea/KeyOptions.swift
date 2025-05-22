@@ -19,13 +19,14 @@ import Foundation
 
 /// Key options
 public struct KeyOptions: Sendable {
-    public init(curve: CoseEcCurve = .P256, secureAreaName: String? = nil, accessProtection: KeyAccessProtection? = nil, accessControl: KeyAccessControl? = nil, keyPurposes: [KeyPurpose]? = KeyPurpose.allCases, additionalOptions: Data? = nil) {
+    public init(curve: CoseEcCurve = .P256, secureAreaName: String? = nil, accessProtection: KeyAccessProtection? = nil, accessControl: KeyAccessControl? = nil, keyPurposes: [KeyPurpose]? = KeyPurpose.allCases, additionalOptions: Data? = nil, allowReuse: Bool = true) {
         self.curve = curve
         self.secureAreaName = secureAreaName
         self.accessProtection = accessProtection
         self.accessControl = accessControl
         self.keyPurposes = keyPurposes
         self.additionalOptions = additionalOptions
+        self.allowReuse = allowReuse
     }
 
     /// Cose EC curve
@@ -42,6 +43,8 @@ public struct KeyOptions: Sendable {
     public var keyPurposes: [KeyPurpose]? = KeyPurpose.allCases
     /// Any other additional option encoded value
     public var additionalOptions: Data?
+    /// Allow reuse (use more than once)
+    public var allowReuse: Bool
 }
 
 /// Tasks for which keys can be used.

@@ -35,6 +35,9 @@ public protocol SecureArea: Actor {
     /// make key and return the  public key.
     /// The public key is passed to the Open4VCI module
     func createKey(id: String, keyOptions: KeyOptions?) async throws -> CoseKey
+    /// make an array of keys and return the public keys
+    /// The public keys are passed to the Open4VCI module
+    func createKeyBatch(id: String, keyOptions: KeyOptions?, batchSize: UInt64) async throws -> [CoseKey]
     /// unlock key and return unlock data
     func unlockKey(id: String) async throws -> Data?
     /// delete key with id
@@ -47,6 +50,8 @@ public protocol SecureArea: Actor {
     func getKeyInfo(id: String) async throws -> KeyInfo
     /// return the storage instance
     func getStorage() async -> any SecureKeyStorage
+    /// default signing algorithm for the speicified curve
+    func defaultSigningAlgorithm(ecCurve: CoseEcCurve) -> SigningAlgorithm
 }
 
 extension SecureArea {
@@ -59,6 +64,7 @@ extension SecureArea {
         logger.info("Unlocking key with id: \(id)")
         return nil
     }
+    public func defaultSigningAlgorithm(ecCurve: CoseEcCurve) -> SigningAlgorithm { ecCurve.defaultSigningAlgorithm }
     //public func getStorage() async -> any SecureKeyStorage { return storage }
 }
 

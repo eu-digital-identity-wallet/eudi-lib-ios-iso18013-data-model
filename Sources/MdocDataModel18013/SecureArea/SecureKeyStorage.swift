@@ -23,8 +23,10 @@ public protocol SecureKeyStorage: Actor {
     func readKeyData(id: String) async throws -> [String: Data]
     // save key public info
     func writeKeyInfo(id: String, dict: [String: Data]) async throws
-    // save key sensitive info
+    // save key data (sensitive) info
     func writeKeyData(id: String, dict: [String: Data], keyOptions: KeyOptions?) async throws
+    // save key data batch info
+    func writeKeyDataBatch(id: String, dicts: [[String: Data]], keyOptions: KeyOptions?) async throws
     // delete key info and data
     func deleteKey(id: String) async throws
 }
