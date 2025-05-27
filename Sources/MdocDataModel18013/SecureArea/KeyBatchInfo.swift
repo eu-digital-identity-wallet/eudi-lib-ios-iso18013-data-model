@@ -16,21 +16,21 @@ limitations under the License.
 
 import Foundation
 
-public struct KeyInfo: Sendable {
+public struct KeyInfo: Codable, Sendable {
     
     public init(publicKey: CoseKey, keyPurpose: [KeyPurpose]? = nil, attestation: KeyAttestation? = nil) {
-        self.publicKey = publicKey
+        //self.publicKey = publicKey
         self.keyPurpose = keyPurpose
         self.attestation = attestation
     }
     /// public key data
-    public var publicKey: CoseKey
+    // public var publicKey: CoseKey
     /// Tasks for which key can be used.
     public var keyPurpose: [KeyPurpose]? = KeyPurpose.allCases
     public var attestation: KeyAttestation?
 }
 
-public struct KeyAttestation: Sendable {
+public struct KeyAttestation: Codable, Sendable {
     // the key that the attestation is for.
     public var publicKey: CoseKey
     /// The chain of X.509 certificates in base64, which can be used to verify the properties of that key pair.
