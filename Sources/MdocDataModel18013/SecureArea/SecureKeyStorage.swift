@@ -20,13 +20,11 @@ public protocol SecureKeyStorage: Actor {
     // read key public info
     func readKeyInfo(id: String) async throws -> [String: Data]
     // read key sensitive info (may trigger biometric or password checks)
-    func readKeyData(id: String) async throws -> [String: Data]
+    func readKeyData(id: String, index: Int) async throws -> [String: Data]
     // save key public info
     func writeKeyInfo(id: String, dict: [String: Data]) async throws
-    // save key data (sensitive) info
-    func writeKeyData(id: String, dict: [String: Data], keyOptions: KeyOptions?) async throws
     // save key data batch info
-    func writeKeyDataBatch(id: String, dicts: [[String: Data]], keyOptions: KeyOptions?) async throws
+    func writeKeyDataBatch(id: String, startIndex: Int, dicts: [[String: Data]], keyOptions: KeyOptions?) async throws
     // delete key info and data
-    func deleteKey(id: String) async throws
+    func deleteKeyBatch(id: String, batchSize: Int) async throws
 }

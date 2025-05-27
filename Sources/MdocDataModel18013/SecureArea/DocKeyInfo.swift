@@ -17,20 +17,20 @@ limitations under the License.
 import Foundation
 
 /// Represents key document usage
-public struct KeyBatchUsage: Codable, Sendable {
-    public init(secureAreaName: String?, batchSize: Int, allowReuse: Bool) {
+public struct DocKeyInfo: Codable, Sendable {
+    public init(secureAreaName: String?, batchSize: Int, credentialPolicy: CredentialPolicy) {
         self.secureAreaName = secureAreaName
         self.batchSize = batchSize
-        self.allowReuse = allowReuse
+        self.credentialPolicy = credentialPolicy
     }
 
     public let secureAreaName: String?
     public var batchSize: Int
-    public let allowReuse: Bool
+    public let credentialPolicy: CredentialPolicy
 
 	public init?(from data: Data?) {
 		guard let data else { return nil }
-		do { self = try JSONDecoder().decode(KeyBatchUsage.self, from: data) }
+		do { self = try JSONDecoder().decode(DocKeyInfo.self, from: data) }
 		catch { return nil }
 	}
 

@@ -32,22 +32,19 @@ public protocol SecureArea: Actor {
     static var defaultEcCurve: CoseEcCurve { get }
     /// initialize with a secure-key storage object
     nonisolated static func create(storage: any SecureKeyStorage) -> Self
-    /// make key and return the  public key.
-    /// The public key is passed to the Open4VCI module
-    func createKey(id: String, keyOptions: KeyOptions?) async throws -> CoseKey
     /// make an array of keys and return the public keys
     /// The public keys are passed to the Open4VCI module
-    func createKeyBatch(id: String, keyOptions: KeyOptions?, batchSize: UInt64) async throws -> [CoseKey]
+    func createKeyBatch(id: String, keyOptions: KeyOptions?) async throws -> [CoseKey]
     /// unlock key and return unlock data
     func unlockKey(id: String) async throws -> Data?
     /// delete key with id
-    func deleteKey(id: String) async throws
+    func deleteKeyBatch(id: String, batchSize: Int) async throws
     /// compute signature, return raw representation
-    func signature(id: String, algorithm: SigningAlgorithm, dataToSign: Data, unlockData: Data?) async throws -> Data
+    func signature(id: String, index: Int, algorithm: SigningAlgorithm, dataToSign: Data, unlockData: Data?) async throws -> Data
     /// make key-agreement (shared secret) with other public key (used for encryption and mac computations)
-    func keyAgreement(id: String, publicKey: CoseKey, unlockData: Data?) async throws -> SharedSecret
+    func keyAgreement(id: String, index: Int, publicKey: CoseKey, unlockData: Data?) async throws -> SharedSecret
     /// returns information about the key with the given id
-    func getKeyInfo(id: String) async throws -> KeyInfo
+    func getKeyBatchInfo(id: String) async throws -> KeyBatchInfo
     /// return the storage instance
     func getStorage() async -> any SecureKeyStorage
     /// default signing algorithm for the speicified curve
@@ -65,7 +62,25 @@ extension SecureArea {
         return nil
     }
     public func defaultSigningAlgorithm(ecCurve: CoseEcCurve) -> SigningAlgorithm { ecCurve.defaultSigningAlgorithm }
-    //public func getStorage() async -> any SecureKeyStorage { return storage }
+    
+    /// returns information about the key with the given key
+    public func getKeyBatchInfo(id: String) async throws -> KeyBatchInfo {
+        let storage = await getStorage()
+        let keyInfoDict = try await storage.readKeyInfo(id: id)
+        guard let keyInfoData = keyInfoDict[kSecValueData as String] else { throw SecureAreaError("Key info not found") }
+        guard let keyInfo = KeyBatchInfo(from: keyInfoData) else { throw SecureAreaError("Key info wrong format") }
+        return keyInfo
+    }
+    
+    public func updateKeyBatchInfo(id: String, keyIndex: Int) async throws {
+        let storage = await getStorage()
+        let keyInfoDict = try await storage.readKeyInfo(id: id)
+        guard let keyInfoData = keyInfoDict[kSecValueData as String] else { throw SecureAreaError("Key info not found") }
+        guard let kbi = KeyBatchInfo(from: keyInfoData) else { throw SecureAreaError("Key info wrong format") }
+        let newKbi = KeyBatchInfo(previous: kbi, keyIndex: keyIndex)
+        let descrOld = keyInfoDict[kSecAttrDescription as String] ?? Data()
+        try await storage.writeKeyInfo(id: id, dict: [kSecValueData as String: newKbi.toData() ?? Data(), kSecAttrDescription as String: descrOld])
+    }
 }
 
 

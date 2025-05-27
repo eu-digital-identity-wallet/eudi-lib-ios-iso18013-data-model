@@ -16,7 +16,7 @@ limitations under the License.
 
 import Foundation
 
-public enum CredentialPolicy {
+public enum CredentialPolicy: Codable, Sendable {
     /**
      * Policy that deletes the credential after a single use.
      *

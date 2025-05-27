@@ -37,27 +37,21 @@ public actor InMemoryP256SecureArea: SecureArea {
         InMemoryP256SecureArea(storage: storage)
     }
     public func getStorage() async -> any MdocDataModel18013.SecureKeyStorage { storage }
-
-    public func createKey(id: String, keyOptions: MdocDataModel18013.KeyOptions?) throws -> MdocDataModel18013.CoseKey {
+  
+    public func createKeyBatch(id: String, keyOptions: KeyOptions?) async throws -> [CoseKey] {
         key = if let x963Key { try P256.Signing.PrivateKey(x963Representation: x963Key) } else { P256.Signing.PrivateKey() }
         guard SecKeyCreateWithData(key.x963Representation as NSData, [kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom, kSecAttrKeyClass: kSecAttrKeyClassPrivate] as NSDictionary, nil) != nil else {  throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey : "Error creating private key"])  }
-        return CoseKey(crv: .P256, x963Representation: key.publicKey.x963Representation)
-    }
-    
-    public func createKeyBatch(id: String, keyOptions: KeyOptions?, batchSize: UInt64) async throws -> [CoseKey] {
-        let res = try createKey(id: id, keyOptions: keyOptions)
-        return [res]
-    }
+        return [CoseKey(crv: .P256, x963Representation: key.publicKey.x963Representation)]
+   }
 
-    public func deleteKey(id: String) throws {
-    }
+    public func deleteKeyBatch(id: String, batchSize: Int) throws { }
 
-    public func signature(id: String, algorithm: MdocDataModel18013.SigningAlgorithm, dataToSign: Data, unlockData: Data?) throws -> Data {
+    public func signature(id: String, index: Int, algorithm: MdocDataModel18013.SigningAlgorithm, dataToSign: Data, unlockData: Data?) throws -> Data {
         let signature = try key.signature(for: dataToSign)
         return signature.rawRepresentation
     }
 
-    public func keyAgreement(id: String, publicKey: MdocDataModel18013.CoseKey, unlockData: Data?) throws -> SharedSecret {
+    public func keyAgreement(id: String, index: Int, publicKey: MdocDataModel18013.CoseKey, unlockData: Data?) throws -> SharedSecret {
         let puk256 = try P256.KeyAgreement.PublicKey(x963Representation: publicKey.getx963Representation())
         let prk256 = try P256.KeyAgreement.PrivateKey(x963Representation: key.x963Representation)
         let sharedSecret = try prk256.sharedSecretFromKeyAgreement(with: puk256)
@@ -65,8 +59,8 @@ public actor InMemoryP256SecureArea: SecureArea {
 
     }
 
-    public func getKeyInfo(id: String) throws -> MdocDataModel18013.KeyInfo {
-        KeyInfo(publicKey: CoseKey(crv: .P256, x963Representation: key.publicKey.x963Representation))
+    public func getKeyBatchInfo(id: String) throws -> MdocDataModel18013.KeyBatchInfo {
+        KeyBatchInfo(secureAreaName: Self.name, crv: .P256, usedCounts: [0], credentialPolicy: .rotateUse)
     }
 }
 
@@ -75,17 +69,15 @@ public actor DummySecureKeyStorage: MdocDataModel18013.SecureKeyStorage {
         [:]
     }
 
-    public func readKeyData(id: String) throws -> [String : Data] {
+    public func readKeyData(id: String, index: Int) throws -> [String : Data] {
         [:]
     }
 
     public func writeKeyInfo(id: String, dict: [String : Data]) throws {  }
 
-    public func writeKeyData(id: String, dict: [String : Data], keyOptions: MdocDataModel18013.KeyOptions?) throws { }
-
-    public func writeKeyDataBatch(id: String, dicts: [[String: Data]], keyOptions: KeyOptions?) async throws { }
+    public func writeKeyDataBatch(id: String, startIndex: Int, dicts: [[String: Data]], keyOptions: KeyOptions?) async throws { }
     
-    public func deleteKey(id: String) throws { }
+    public func deleteKeyBatch(id: String, batchSize: Int) throws { }
 
 }
 

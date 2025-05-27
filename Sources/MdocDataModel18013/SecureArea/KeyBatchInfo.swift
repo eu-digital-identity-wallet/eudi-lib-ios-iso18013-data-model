@@ -16,18 +16,53 @@ limitations under the License.
 
 import Foundation
 
-public struct KeyInfo: Codable, Sendable {
+public struct KeyBatchInfo: Codable, Sendable {
     
-    public init(publicKey: CoseKey, keyPurpose: [KeyPurpose]? = nil, attestation: KeyAttestation? = nil) {
-        //self.publicKey = publicKey
+    public init(secureAreaName: String?, crv: CoseEcCurve, usedCounts: [Int], credentialPolicy: CredentialPolicy, keyPurpose: [KeyPurpose]? = nil, attestation: KeyAttestation? = nil) {
+        self.secureAreaName = secureAreaName
+        self.crv = crv
+        self.usedCounts = usedCounts
+        self.credentialPolicy = credentialPolicy
         self.keyPurpose = keyPurpose
         self.attestation = attestation
     }
     /// public key data
-    // public var publicKey: CoseKey
+    public var crv: CoseEcCurve
     /// Tasks for which key can be used.
     public var keyPurpose: [KeyPurpose]? = KeyPurpose.allCases
     public var attestation: KeyAttestation?
+    public let secureAreaName: String?
+    public var usedCounts: [Int]
+    public let credentialPolicy: CredentialPolicy
+
+    public init?(from data: Data?) {
+        guard let data else { return nil }
+        do { self = try JSONDecoder().decode(KeyBatchInfo.self, from: data) }
+        catch { return nil }
+    }
+
+    public func toData() -> Data? {
+        do { return try JSONEncoder().encode(self) }
+        catch { return nil }
+    }
+    
+    public init(previous: KeyBatchInfo, keyIndex: Int) {
+        self.secureAreaName = previous.secureAreaName
+        self.crv = previous.crv
+        self.credentialPolicy = previous.credentialPolicy
+        var newUsedCounts = previous.usedCounts
+        newUsedCounts[keyIndex] = previous.usedCounts[keyIndex] + 1
+        self.usedCounts = newUsedCounts
+        self.keyPurpose = previous.keyPurpose
+        self.attestation = previous.attestation
+   }
+
+    public func findIndexToUse() -> Int? {
+        guard let result = usedCounts.minWithIndexes() else { return nil }
+        if result.value > 0, credentialPolicy == .oneTimeUse { return nil }
+        return result.indexes.randomElement()
+    }
+    public var batchSize: Int { usedCounts.count }
 }
 
 public struct KeyAttestation: Codable, Sendable {
