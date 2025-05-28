@@ -25,6 +25,8 @@ public protocol SecureKeyStorage: Actor {
     func writeKeyInfo(id: String, dict: [String: Data]) async throws
     // save key data batch info
     func writeKeyDataBatch(id: String, startIndex: Int, dicts: [[String: Data]], keyOptions: KeyOptions?) async throws
-    // delete key info and data
-    func deleteKeyBatch(id: String, batchSize: Int) async throws
+    // delete key data
+    func deleteKeyBatch(id: String, startIndex: Int, batchSize: Int) async throws
+    // delete key info
+    func deleteKeyInfo(id: String) async throws 
 }

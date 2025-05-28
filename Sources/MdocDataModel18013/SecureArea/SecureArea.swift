@@ -38,7 +38,9 @@ public protocol SecureArea: Actor {
     /// unlock key and return unlock data
     func unlockKey(id: String) async throws -> Data?
     /// delete key with id
-    func deleteKeyBatch(id: String, batchSize: Int) async throws
+    func deleteKeyBatch(id: String, startIndex: Int, batchSize: Int) async throws
+    /// delete key info
+    func deleteKeyInfo(id: String) async throws
     /// compute signature, return raw representation
     func signature(id: String, index: Int, algorithm: SigningAlgorithm, dataToSign: Data, unlockData: Data?) async throws -> Data
     /// make key-agreement (shared secret) with other public key (used for encryption and mac computations)
@@ -72,7 +74,7 @@ extension SecureArea {
         return keyInfo
     }
     
-    public func updateKeyBatchInfo(id: String, keyIndex: Int) async throws {
+    public func updateKeyBatchInfo(id: String, keyIndex: Int) async throws -> KeyBatchInfo {
         let storage = await getStorage()
         let keyInfoDict = try await storage.readKeyInfo(id: id)
         guard let keyInfoData = keyInfoDict[kSecValueData as String] else { throw SecureAreaError("Key info not found") }
@@ -80,6 +82,7 @@ extension SecureArea {
         let newKbi = KeyBatchInfo(previous: kbi, keyIndex: keyIndex)
         let descrOld = keyInfoDict[kSecAttrDescription as String] ?? Data()
         try await storage.writeKeyInfo(id: id, dict: [kSecValueData as String: newKbi.toData() ?? Data(), kSecAttrDescription as String: descrOld])
+        return newKbi
     }
 }
 
