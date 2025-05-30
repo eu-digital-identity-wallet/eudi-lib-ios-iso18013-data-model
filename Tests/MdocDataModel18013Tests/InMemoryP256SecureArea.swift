@@ -26,6 +26,7 @@ import Foundation
 import SwiftCBOR
 
 public actor InMemoryP256SecureArea: SecureArea {
+ 
     var storage: any MdocDataModel18013.SecureKeyStorage
     var key: P256.Signing.PrivateKey!
     public nonisolated(unsafe) var x963Key: Data?
@@ -45,6 +46,8 @@ public actor InMemoryP256SecureArea: SecureArea {
    }
 
     public func deleteKeyBatch(id: String, startIndex: Int, batchSize: Int) throws { }
+    
+    public func deleteKeyInfo(id: String) async throws {  }
 
     public func signature(id: String, index: Int, algorithm: MdocDataModel18013.SigningAlgorithm, dataToSign: Data, unlockData: Data?) throws -> Data {
         let signature = try key.signature(for: dataToSign)
@@ -78,6 +81,8 @@ public actor DummySecureKeyStorage: MdocDataModel18013.SecureKeyStorage {
     public func writeKeyDataBatch(id: String, startIndex: Int, dicts: [[String: Data]], keyOptions: KeyOptions?) async throws { }
     
     public func deleteKeyBatch(id: String, startIndex: Int, batchSize: Int) throws { }
+    
+    public func deleteKeyInfo(id: String) async throws {  }
 
 }
 
