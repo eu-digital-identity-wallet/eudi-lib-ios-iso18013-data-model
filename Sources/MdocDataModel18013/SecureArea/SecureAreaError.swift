@@ -17,16 +17,16 @@ limitations under the License.
 import Foundation
 
 /// An error we can throw when something goes wrong.
-public struct SecureAreaError: Error, CustomStringConvertible {
+public struct SecureAreaError: LocalizedError, CustomStringConvertible {
+
     var message: String
 
     public init(_ message: String) {
         self.message = message
     }
 
-    public var description: String {
-        return message
-    }
+    public var description: String  { message }
+    public var errorDescription: String? { message }
 }
 
 extension OSStatus {

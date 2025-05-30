@@ -34,6 +34,7 @@ public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
     public var validFrom: Date?
     public var validUntil: Date?
     public var statusIdentifier: StatusIdentifier?
+    public var secureAreaName: String? 
 	public let family_name: String?
 	public let given_name: String?
 	public let birth_date: String?
@@ -110,11 +111,11 @@ public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
 }
 
 extension EuPidModel {
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
 		self.id = id
         self.createdAt = createdAt;	self.displayName = displayName; self.display = display; self.issuerDisplay = issuerDisplay
         self.credentialIssuerIdentifier = credentialIssuerIdentifier; self.configurationIdentifier = configurationIdentifier
-        self.validFrom = validFrom; self.validUntil = validUntil; self.statusIdentifier = statusIdentifier
+        self.validFrom = validFrom; self.validUntil = validUntil; self.statusIdentifier = statusIdentifier; self.secureAreaName = secureAreaName
 		guard let nameSpaces = Self.getCborSignedItems(issuerSigned) else { return nil }
 		Self.extractCborClaims(nameSpaces, &docClaims, displayNames, mandatory)
 		Self.extractAgeOverValues(nameSpaces, &ageOverXX)

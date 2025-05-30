@@ -19,7 +19,7 @@ import Foundation
 /// Elliptic curve identifiers  from the [IANA COSE registry](https://www.iana.org/assignments/cose/cose.xhtml).
 
 /// This list is a superset of the iOS natively supported curves
-public enum CoseEcCurve: UInt64, Sendable {
+public enum CoseEcCurve: UInt64, Codable, Sendable {
     /// The curve identifier for P-256
     case P256 = 1
     /// The curve identifier for P-384

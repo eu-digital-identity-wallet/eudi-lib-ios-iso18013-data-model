@@ -22,7 +22,7 @@ import Foundation
 import SwiftCBOR
 
 /// COSE_Key as defined in RFC 8152
-public struct CoseKey: Equatable, Sendable {
+public struct CoseKey: Equatable, Codable, Sendable {
 	/// EC identifier
 	public let crv: CoseEcCurve
 	/// key type
@@ -38,11 +38,13 @@ public struct CoseKeyPrivate: Sendable {
 
 	public var key: CoseKey!
     public var privateKeyId: String!
+    public var index: Int!
     public var secureArea: (any SecureArea)!
 
-    public init(privateKeyId: String, secureArea: any SecureArea) {
+    public init(privateKeyId: String, index: Int, secureArea: any SecureArea) {
         logger.info("Loading cose key private with id: \(privateKeyId)")
 		self.privateKeyId = privateKeyId
+        self.index = index
 		self.secureArea = secureArea
 	}
     
@@ -56,8 +58,9 @@ extension CoseKeyPrivate {
 	// make new key
     public mutating func makeKey(curve: CoseEcCurve) async throws {
         let ephemeralKeyId = UUID().uuidString
+        index = 0
         privateKeyId = ephemeralKeyId
-        self.key = try await secureArea.createKey(id: ephemeralKeyId, keyOptions: KeyOptions(curve: curve))
+        self.key = (try await secureArea.createKeyBatch(id: ephemeralKeyId, keyOptions: KeyOptions(curve: curve, credentialPolicy: .rotateUse, batchSize: 1))).first!
 	}
 }
 

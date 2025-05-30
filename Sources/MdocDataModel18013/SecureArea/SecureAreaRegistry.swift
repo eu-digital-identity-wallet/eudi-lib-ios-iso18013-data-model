@@ -29,7 +29,7 @@ public class SecureAreaRegistry: @unchecked Sendable {
     
     public func register(secureArea: any SecureArea) {
         lock.lock()
-        defer {lock.unlock()}
+        defer { lock.unlock() }
         secureAreas[type(of: secureArea).name] = secureArea
     }
     
