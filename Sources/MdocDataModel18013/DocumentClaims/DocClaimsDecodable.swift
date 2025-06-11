@@ -51,6 +51,8 @@ public protocol DocClaimsDecodable: Sendable, AgeAttesting {
     var validUntil: Date? { get }
     /// This identifier is used to check the status of the document.
     var statusIdentifier: StatusIdentifier? { get }
+    /// Secure area name for the saved credentials
+    var secureAreaName: String? { get }
 } // end protocol
 
 /// Methods to extract CBOR values.

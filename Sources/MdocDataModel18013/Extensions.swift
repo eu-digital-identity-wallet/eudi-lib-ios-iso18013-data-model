@@ -121,6 +121,26 @@ extension Array where Element == UInt8 {
 	}
 }
 
+extension Array where Element: Comparable {
+    func minWithIndexes() -> (value: Element, indexes: [Int])? {
+        guard !isEmpty else { return nil }
+        
+        var minValue = self[0]
+        var minIndexes = [0]
+        
+        for (index, value) in enumerated() where index != 0 {
+            if value < minValue {
+                minValue = value
+                minIndexes = [index]
+            } else if value == minValue {
+                minIndexes.append(index)
+            }
+        }
+        
+        return (minValue, minIndexes)
+    }
+}
+
 extension CBOREncodable {
 	public func encode(options: SwiftCBOR.CBOROptions) -> [UInt8] {
 		toCBOR(options: CBOROptions()).encode()
