@@ -23,26 +23,29 @@ public class SecureAreaRegistry: @unchecked Sendable {
     }
     private init() {}
     let lock = NSLock()
-    
+
     public static let shared = SecureAreaRegistry()
     var secureAreas: [String: any SecureArea] = [:]
-    
+
     public func register(secureArea: any SecureArea) {
         lock.lock()
         defer { lock.unlock() }
         secureAreas[type(of: secureArea).name] = secureArea
     }
-    
+
     public func get(name: String?) -> SecureArea {
         if let name, let sa = secureAreas[name] { sa } else { defaultSecurityArea! }
     }
-    
+
     public func get(deviceSecureArea: DeviceSecureArea) -> SecureArea? {
         secureAreas[deviceSecureArea.rawValue]
     }
-    
+
     public var names: [String] { Array(secureAreas.keys) }
+
+    public var values: [any SecureArea] { Array(secureAreas.values) }
+
     public var defaultSecurityArea: (any SecureArea)? {
-        get { get(deviceSecureArea: .secureEnclave) ?? get(deviceSecureArea: .software) }
+        get { get(deviceSecureArea: .secureEnclave) ?? get(deviceSecureArea: .software) ?? secureAreas.first?.value }
     }
 }
