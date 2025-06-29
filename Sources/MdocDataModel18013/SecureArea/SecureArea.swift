@@ -30,6 +30,8 @@ public protocol SecureArea: Actor {
     static var name: String { get }
     /// default Elliptic Curve type for the secure area
     static var defaultEcCurve: CoseEcCurve { get }
+    // supported Elliptic Curve types for the secure area
+    static var supportedEcCurves: [CoseEcCurve] { get }
     /// initialize with a secure-key storage object
     nonisolated static func create(storage: any SecureKeyStorage) -> Self
     /// make an array of keys and return the public keys
