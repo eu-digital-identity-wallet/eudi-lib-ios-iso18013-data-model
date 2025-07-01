@@ -32,9 +32,11 @@ public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
     public var credentialIssuerIdentifier: String?
     public var configurationIdentifier: String?
     public var validFrom: Date?
-    public var validUntil: Date?
+    private var _validUntil: Date?
+    public var validUntil: Date? { if let uc = credentialsUsageCounts, uc.remaining <= 0 { return nil } else { return _validUntil } }
     public var statusIdentifier: StatusIdentifier?
-    public var secureAreaName: String? 
+    public var credentialsUsageCounts: CredentialsUsageCounts?
+    public var secureAreaName: String?
 	public let family_name: String?
 	public let given_name: String?
 	public let birth_date: String?
@@ -115,7 +117,7 @@ extension EuPidModel {
 		self.id = id
         self.createdAt = createdAt;	self.displayName = displayName; self.display = display; self.issuerDisplay = issuerDisplay
         self.credentialIssuerIdentifier = credentialIssuerIdentifier; self.configurationIdentifier = configurationIdentifier
-        self.validFrom = validFrom; self.validUntil = validUntil; self.statusIdentifier = statusIdentifier; self.secureAreaName = secureAreaName
+        self.validFrom = validFrom; self._validUntil = validUntil; self.statusIdentifier = statusIdentifier; self.secureAreaName = secureAreaName
 		guard let nameSpaces = Self.getCborSignedItems(issuerSigned) else { return nil }
 		Self.extractCborClaims(nameSpaces, &docClaims, displayNames, mandatory)
 		Self.extractAgeOverValues(nameSpaces, &ageOverXX)

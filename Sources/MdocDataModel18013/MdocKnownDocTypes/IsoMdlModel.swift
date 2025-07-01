@@ -24,9 +24,11 @@ public struct IsoMdlModel: Decodable, DocClaimsDecodable, Sendable {
     public var credentialIssuerIdentifier: String?
     public var configurationIdentifier: String?
     public var validFrom: Date?
-    public var validUntil: Date?
+    private var _validUntil: Date?
+    public var validUntil: Date? { if let uc = credentialsUsageCounts, uc.remaining <= 0 { return nil } else { return _validUntil } }
     public var statusIdentifier: StatusIdentifier?
-    public var secureAreaName: String? 
+    public var credentialsUsageCounts: CredentialsUsageCounts?
+    public var secureAreaName: String?
 	public var id: String = UUID().uuidString
 	public var createdAt: Date = Date()
 	public var docType: String? = Self.isoDocType
@@ -132,7 +134,7 @@ extension IsoMdlModel {
 	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
         self.id = id; self.createdAt = createdAt; self.displayName = displayName; self.display = display; self.issuerDisplay = issuerDisplay
         self.credentialIssuerIdentifier = credentialIssuerIdentifier; self.configurationIdentifier = configurationIdentifier
-        self.validFrom = validFrom; self.validUntil = validUntil; self.statusIdentifier = statusIdentifier; self.secureAreaName = secureAreaName
+        self.validFrom = validFrom; self._validUntil = validUntil; self.statusIdentifier = statusIdentifier; self.secureAreaName = secureAreaName
   	    guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned, nameSpaces) else { return nil }
 		Self.extractCborClaims(nameSpaceItems, &docClaims, displayNames, mandatory)
 		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems, string: key.rawValue) }
