@@ -9,9 +9,11 @@ public struct GenericMdocModel: DocClaimsDecodable, Sendable {
     public var credentialIssuerIdentifier: String?
     public var configurationIdentifier: String?
     public var validFrom: Date?
-    public var validUntil: Date?
+    private var _validUntil: Date?
+    public var validUntil: Date? { if let uc = credentialsUsageCounts, uc.remaining <= 0 { return nil } else { return _validUntil } }
     public var statusIdentifier: StatusIdentifier?
-    public var secureAreaName: String? 
+    public var credentialsUsageCounts: CredentialsUsageCounts?
+    public var secureAreaName: String?
 	public var id: String = UUID().uuidString
 	public var createdAt: Date = Date()
 	public var docType: String?
@@ -31,7 +33,7 @@ public struct GenericMdocModel: DocClaimsDecodable, Sendable {
         self.credentialIssuerIdentifier = credentialIssuerIdentifier
         self.configurationIdentifier = configurationIdentifier
         self.validFrom = validFrom
-        self.validUntil = validUntil
+        self._validUntil = validUntil
         self.statusIdentifier = statusIdentifier
         self.secureAreaName = secureAreaName
         self.modifiedAt = modifiedAt
@@ -47,7 +49,7 @@ extension GenericMdocModel {
         self.id = id; self.createdAt = createdAt; self.displayName = displayName
         self.display = display; self.issuerDisplay = issuerDisplay
         self.credentialIssuerIdentifier = credentialIssuerIdentifier; self.configurationIdentifier = configurationIdentifier
-        self.validFrom = validFrom; self.validUntil = validUntil; self.statusIdentifier = statusIdentifier; self.secureAreaName = secureAreaName
+        self.validFrom = validFrom; self._validUntil = validUntil; self.statusIdentifier = statusIdentifier; self.secureAreaName = secureAreaName
         self.docType = docType; self.docDataFormat = .cbor
 		if let nameSpaces = Self.getCborSignedItems(issuerSigned) {
 			Self.extractCborClaims(nameSpaces, &docClaims, displayNames, mandatory)
