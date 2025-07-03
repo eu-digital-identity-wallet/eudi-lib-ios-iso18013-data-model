@@ -18,7 +18,7 @@ limitations under the License.
 
 import Foundation
 
-public struct IsoMdlModel: Decodable, DocClaimsDecodable, Sendable {
+public final class IsoMdlModel: Decodable, DocClaimsDecodable, @unchecked Sendable {
     public var display: [DisplayMetadata]?
     public var issuerDisplay: [DisplayMetadata]?
     public var credentialIssuerIdentifier: String?
@@ -31,7 +31,7 @@ public struct IsoMdlModel: Decodable, DocClaimsDecodable, Sendable {
     public var secureAreaName: String?
 	public var id: String = UUID().uuidString
 	public var createdAt: Date = Date()
-	public var docType: String? = Self.isoDocType
+	public let docType: String? = "org.iso.18013.5.1.mDL"
 	public var nameSpaces: [NameSpace]?
 	public var displayName: String? = String("mdl_doctype_name")
 	public var docClaims = [DocClaim]()
@@ -127,14 +127,12 @@ public struct IsoMdlModel: Decodable, DocClaimsDecodable, Sendable {
 		[.familyName, .givenName, .birthDate, .issueDate, .expiryDate, .issuingCountry, .issuingAuthority, .documentNumber, .portrait, .drivingPrivileges, .unDistinguishingSign ]
 	}
 	public var mandatoryElementKeys: [DataElementIdentifier] { Self.isoMandatoryElementKeys }
-}
 
-
-extension IsoMdlModel {
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
         self.id = id; self.createdAt = createdAt; self.displayName = displayName; self.display = display; self.issuerDisplay = issuerDisplay
         self.credentialIssuerIdentifier = credentialIssuerIdentifier; self.configurationIdentifier = configurationIdentifier
         self.validFrom = validFrom; self._validUntil = validUntil; self.statusIdentifier = statusIdentifier; self.secureAreaName = secureAreaName
+        self.credentialsUsageCounts = credentialsUsageCounts
   	    guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned, nameSpaces) else { return nil }
 		Self.extractCborClaims(nameSpaceItems, &docClaims, displayNames, mandatory)
 		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems, string: key.rawValue) }
