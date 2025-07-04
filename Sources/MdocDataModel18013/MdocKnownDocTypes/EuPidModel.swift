@@ -18,7 +18,7 @@ limitations under the License.
 
 import Foundation
 
-public final class EuPidModel: Decodable, DocClaimsDecodable, @unchecked Sendable {
+public final class EuPidModel: Decodable, ObservableObject, DocClaimsDecodable, @unchecked Sendable {
     public var display: [DisplayMetadata]?
     public var issuerDisplay: [DisplayMetadata]?
 	public static let euPidDocType: String = "eu.europa.ec.eudi.pid.1"
@@ -35,7 +35,7 @@ public final class EuPidModel: Decodable, DocClaimsDecodable, @unchecked Sendabl
     private var _validUntil: Date?
     public var validUntil: Date? { if let uc = credentialsUsageCounts, uc.remaining <= 0 { return nil } else { return _validUntil } }
     public var statusIdentifier: StatusIdentifier?
-    public var credentialsUsageCounts: CredentialsUsageCounts?
+    @Published public var credentialsUsageCounts: CredentialsUsageCounts?
     public var secureAreaName: String?
 	public let family_name: String?
 	public let given_name: String?

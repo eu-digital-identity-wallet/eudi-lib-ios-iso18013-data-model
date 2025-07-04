@@ -3,7 +3,7 @@
 
 import Foundation
 
-public final class GenericMdocModel: DocClaimsDecodable, @unchecked Sendable {
+public final class GenericMdocModel: DocClaimsDecodable, ObservableObject, @unchecked Sendable {
     public var display: [DisplayMetadata]?
     public var issuerDisplay: [DisplayMetadata]?
     public var credentialIssuerIdentifier: String?

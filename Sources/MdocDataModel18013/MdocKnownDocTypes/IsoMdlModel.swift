@@ -18,7 +18,7 @@ limitations under the License.
 
 import Foundation
 
-public final class IsoMdlModel: Decodable, DocClaimsDecodable, @unchecked Sendable {
+public final class IsoMdlModel: Decodable, ObservableObject, DocClaimsDecodable, @unchecked Sendable {
     public var display: [DisplayMetadata]?
     public var issuerDisplay: [DisplayMetadata]?
     public var credentialIssuerIdentifier: String?
@@ -27,7 +27,7 @@ public final class IsoMdlModel: Decodable, DocClaimsDecodable, @unchecked Sendab
     private var _validUntil: Date?
     public var validUntil: Date? { if let uc = credentialsUsageCounts, uc.remaining <= 0 { return nil } else { return _validUntil } }
     public var statusIdentifier: StatusIdentifier?
-    public var credentialsUsageCounts: CredentialsUsageCounts?
+    @Published public var credentialsUsageCounts: CredentialsUsageCounts?
     public var secureAreaName: String?
 	public var id: String = UUID().uuidString
 	public var createdAt: Date = Date()
