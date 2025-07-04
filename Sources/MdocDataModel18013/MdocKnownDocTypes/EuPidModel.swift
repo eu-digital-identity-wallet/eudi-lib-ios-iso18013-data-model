@@ -18,15 +18,15 @@ limitations under the License.
 
 import Foundation
 
-public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
+public final class EuPidModel: Decodable, DocClaimsDecodable, @unchecked Sendable {
     public var display: [DisplayMetadata]?
     public var issuerDisplay: [DisplayMetadata]?
 	public static let euPidDocType: String = "eu.europa.ec.eudi.pid.1"
 	public var id: String = UUID().uuidString
 	public var createdAt: Date = Date()
-	public var docType: String? = Self.euPidDocType
+	public let docType: String? = "eu.europa.ec.eudi.pid.1"
 	public var nameSpaces: [NameSpace]?
-	public var displayName: String? = String("eu_pid_doctype_name")
+	public var displayName: String? = "eu_pid_doctype_name"
 	public var modifiedAt: Date?
     public var docDataFormat: DocDataFormat = .cbor
     public var credentialIssuerIdentifier: String?
@@ -110,14 +110,13 @@ public struct EuPidModel: Decodable, DocClaimsDecodable, Sendable {
 	public var docClaims = [DocClaim]()
     public static var pidMandatoryElementKeys: [DataElementIdentifier] { ["age_over_18"] + mandatoryElementCodingKeys.map(\.rawValue) }
 	public var mandatoryElementKeys: [DataElementIdentifier] { Self.pidMandatoryElementKeys }
-}
 
-extension EuPidModel {
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
 		self.id = id
         self.createdAt = createdAt;	self.displayName = displayName; self.display = display; self.issuerDisplay = issuerDisplay
         self.credentialIssuerIdentifier = credentialIssuerIdentifier; self.configurationIdentifier = configurationIdentifier
         self.validFrom = validFrom; self._validUntil = validUntil; self.statusIdentifier = statusIdentifier; self.secureAreaName = secureAreaName
+        self.credentialsUsageCounts = credentialsUsageCounts
 		guard let nameSpaces = Self.getCborSignedItems(issuerSigned) else { return nil }
 		Self.extractCborClaims(nameSpaces, &docClaims, displayNames, mandatory)
 		Self.extractAgeOverValues(nameSpaces, &ageOverXX)

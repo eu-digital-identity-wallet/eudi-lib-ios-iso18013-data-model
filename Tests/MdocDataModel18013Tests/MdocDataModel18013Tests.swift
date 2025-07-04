@@ -95,9 +95,9 @@ final class MdocDataModel18013Tests: XCTestCase {
 	  	let d1 = try XCTUnwrap(docs.first(where: {$0.docType == EuPidModel.euPidDocType}))
 		let d2 = try XCTUnwrap(docs.first(where: {$0.docType == IsoMdlModel.isoDocType}))
 		//let ns1 = d1?.issuerSigned.issuerNameSpaces!.nameSpaces.first
-		let pidObj = try XCTUnwrap(EuPidModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d1.issuerSigned, displayName: "PID", display: nil, issuerDisplay: nil, credentialIssuerIdentifier: nil, configurationIdentifier: nil, validFrom: d1.issuerSigned.validFrom, validUntil: d1.issuerSigned.validUntil, statusIdentifier: d1.issuerSigned.issuerAuth.statusIdentifier, secureAreaName: nil, displayNames: nil, mandatory: nil))
+		let pidObj = try XCTUnwrap(EuPidModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d1.issuerSigned, displayName: "PID", display: nil, issuerDisplay: nil, credentialIssuerIdentifier: nil, configurationIdentifier: nil, validFrom: d1.issuerSigned.validFrom, validUntil: d1.issuerSigned.validUntil, statusIdentifier: d1.issuerSigned.issuerAuth.statusIdentifier, credentialsUsageCounts: nil, secureAreaName: nil, displayNames: nil, mandatory: nil))
 		XCTAssertEqual(pidObj.family_name, "ANDERSSON")
-		let mdlObj = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d2.issuerSigned, displayName: "mDL", display: nil, issuerDisplay: nil, credentialIssuerIdentifier: nil, configurationIdentifier: nil, validFrom: d1.issuerSigned.validFrom, validUntil: d1.issuerSigned.validUntil, statusIdentifier: d1.issuerSigned.issuerAuth.statusIdentifier, secureAreaName: nil, displayNames: nil, mandatory: nil))
+		let mdlObj = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d2.issuerSigned, displayName: "mDL", display: nil, issuerDisplay: nil, credentialIssuerIdentifier: nil, configurationIdentifier: nil, validFrom: d1.issuerSigned.validFrom, validUntil: d1.issuerSigned.validUntil, statusIdentifier: d1.issuerSigned.issuerAuth.statusIdentifier, credentialsUsageCounts: nil, secureAreaName: nil, displayNames: nil, mandatory: nil))
 		XCTAssertEqual(mdlObj.familyName, "ANDERSSON")
 		printDisplayStrings(mdlObj.docClaims)
 	}
@@ -139,7 +139,7 @@ final class MdocDataModel18013Tests: XCTestCase {
 		XCTAssertEqual(doc.deviceSigned?.deviceAuth.coseMacOrSignature.macAlgorithm, Cose.MacAlgorithm.hmac256)
 		XCTAssertEqual(doc.deviceSigned?.deviceAuth.coseMacOrSignature.signature.bytes.toHexString().uppercased(), "E99521A85AD7891B806A07F8B5388A332D92C189A7BF293EE1F543405AE6824D")
         let d1 = dr.documents!.first!
-		let model = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d1.issuerSigned, displayName: "PID", display: nil, issuerDisplay: nil, credentialIssuerIdentifier: nil, configurationIdentifier: nil, validFrom: d1.issuerSigned.validFrom, validUntil: d1.issuerSigned.validUntil, statusIdentifier: d1.issuerSigned.issuerAuth.statusIdentifier, secureAreaName: nil, displayNames: nil, mandatory: nil))
+		let model = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d1.issuerSigned, displayName: "PID", display: nil, issuerDisplay: nil, credentialIssuerIdentifier: nil, configurationIdentifier: nil, validFrom: d1.issuerSigned.validFrom, validUntil: d1.issuerSigned.validUntil, statusIdentifier: d1.issuerSigned.issuerAuth.statusIdentifier, credentialsUsageCounts: nil, secureAreaName: nil, displayNames: nil, mandatory: nil))
 		XCTAssertEqual(model.familyName, "Doe")
 	}
 

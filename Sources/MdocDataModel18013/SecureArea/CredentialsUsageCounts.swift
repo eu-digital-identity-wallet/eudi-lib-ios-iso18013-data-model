@@ -16,7 +16,7 @@ limitations under the License.
 
 import Foundation
 
-public struct CredentialsUsageCounts: Codable, Sendable {
+public struct CredentialsUsageCounts: Codable, Sendable, Hashable {
     public let total: Int
     public let remaining: Int
     public var used: Int  { total - remaining }
