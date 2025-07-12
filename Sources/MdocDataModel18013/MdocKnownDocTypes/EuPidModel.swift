@@ -18,25 +18,10 @@ limitations under the License.
 
 import Foundation
 
-public final class EuPidModel: Decodable, ObservableObject, DocClaimsDecodable, @unchecked Sendable {
-    public var display: [DisplayMetadata]?
-    public var issuerDisplay: [DisplayMetadata]?
+public final class EuPidModel: GenericMdocModel, @unchecked Sendable {
 	public static let euPidDocType: String = "eu.europa.ec.eudi.pid.1"
-	public var id: String = UUID().uuidString
-	public var createdAt: Date = Date()
-	public let docType: String? = "eu.europa.ec.eudi.pid.1"
 	public var nameSpaces: [NameSpace]?
-	public var displayName: String? = "eu_pid_doctype_name"
-	public var modifiedAt: Date?
-    public var docDataFormat: DocDataFormat = .cbor
-    public var credentialIssuerIdentifier: String?
-    public var configurationIdentifier: String?
-    public var validFrom: Date?
-    private var _validUntil: Date?
-    public var validUntil: Date? { if let uc = credentialsUsageCounts, uc.remaining <= 0 { return nil } else { return _validUntil } }
-    public var statusIdentifier: StatusIdentifier?
-    @Published public var credentialsUsageCounts: CredentialsUsageCounts?
-    public var secureAreaName: String?
+
 	public let family_name: String?
 	public let given_name: String?
 	public let birth_date: String?
@@ -106,22 +91,16 @@ public final class EuPidModel: Decodable, ObservableObject, DocClaimsDecodable, 
 	static var mandatoryElementCodingKeys: [CodingKeys] {
 		[.family_name, .given_name, .birth_date]
 	}
-	public var ageOverXX = [Int: Bool]()
-	public var docClaims = [DocClaim]()
     public static var pidMandatoryElementKeys: [DataElementIdentifier] { ["age_over_18"] + mandatoryElementCodingKeys.map(\.rawValue) }
 	public var mandatoryElementKeys: [DataElementIdentifier] { Self.pidMandatoryElementKeys }
 
 	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
-		self.id = id
-        self.createdAt = createdAt;	self.displayName = displayName; self.display = display; self.issuerDisplay = issuerDisplay
-        self.credentialIssuerIdentifier = credentialIssuerIdentifier; self.configurationIdentifier = configurationIdentifier
-        self.validFrom = validFrom; self._validUntil = validUntil; self.statusIdentifier = statusIdentifier; self.secureAreaName = secureAreaName
-        self.credentialsUsageCounts = credentialsUsageCounts
+		
+        // Initialize properties specific to EuPidModel
 		guard let nameSpaces = Self.getCborSignedItems(issuerSigned) else { return nil }
-		Self.extractCborClaims(nameSpaces, &docClaims, displayNames, mandatory)
-		Self.extractAgeOverValues(nameSpaces, &ageOverXX)
 		func getValue<T>(key: EuPidModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaces, string: key.rawValue) }
-		family_name = getValue(key: .family_name)
+		
+        family_name = getValue(key: .family_name)
 		given_name = getValue(key: .given_name)
 		birth_date = getValue(key: .birth_date)
 		family_name_birth = getValue(key: .family_name_birth)
@@ -151,5 +130,12 @@ public final class EuPidModel: Decodable, ObservableObject, DocClaimsDecodable, 
         email_address = getValue(key: .email_address)
         mobile_phone_number = getValue(key: .mobile_phone_number)
         trust_anchor = getValue(key: .trust_anchor)
+        
+        // Call superclass initializer
+        super.init(id: id, createdAt: createdAt, docType: Self.euPidDocType, displayName: displayName ?? "eu_pid_doctype_name", display: display, issuerDisplay: issuerDisplay, credentialIssuerIdentifier: credentialIssuerIdentifier, configurationIdentifier: configurationIdentifier, validFrom: validFrom, validUntil: validUntil, statusIdentifier: statusIdentifier, credentialsUsageCounts: credentialsUsageCounts, secureAreaName: secureAreaName, modifiedAt: nil, ageOverXX: [Int: Bool](), docClaims: [DocClaim](), docDataFormat: .cbor, hashingAlg: nil)
+        
+        // Extract claims and age over values
+        Self.extractCborClaims(nameSpaces, &docClaims, displayNames, mandatory)
+        Self.extractAgeOverValues(nameSpaces, &ageOverXX)
 	}
 }
