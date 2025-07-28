@@ -13,7 +13,7 @@ public class GenericMdocModel: DocClaimsDecodable, ObservableObject, @unchecked 
     public var validUntil: Date? { if let uc = credentialsUsageCounts, uc.remaining <= 0 { return nil } else { return _validUntil } }
     public var statusIdentifier: StatusIdentifier?
     @Published public var credentialsUsageCounts: CredentialsUsageCounts?
-    @Published public var credentialPolicy: CredentialPolicy
+    public var credentialPolicy: CredentialPolicy
     public var secureAreaName: String?
 	public var id: String = UUID().uuidString
 	public var createdAt: Date = Date()
