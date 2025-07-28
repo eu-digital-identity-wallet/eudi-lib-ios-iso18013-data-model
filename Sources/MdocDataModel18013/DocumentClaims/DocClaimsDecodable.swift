@@ -55,6 +55,9 @@ public protocol DocClaimsDecodable: Sendable, AgeAttesting {
     var secureAreaName: String? { get }
     /// Remaining credentials to be used for presentation. If nil, the credentials do not expire.
     var credentialsUsageCounts: CredentialsUsageCounts? { get set }
+    /// The credential policy for the document.
+    /// This defines how the credentials can be used and whether they can be reused.
+    var credentialPolicy: CredentialPolicy { get }
 } // end protocol
 
 /// Methods to extract CBOR values.

@@ -94,12 +94,12 @@ public final class EuPidModel: GenericMdocModel, @unchecked Sendable {
     public static var pidMandatoryElementKeys: [DataElementIdentifier] { ["age_over_18"] + mandatoryElementCodingKeys.map(\.rawValue) }
 	public var mandatoryElementKeys: [DataElementIdentifier] { Self.pidMandatoryElementKeys }
 
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
-		
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, credentialPolicy: CredentialPolicy, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
+
         // Initialize properties specific to EuPidModel
 		guard let nameSpaces = Self.getCborSignedItems(issuerSigned) else { return nil }
 		func getValue<T>(key: EuPidModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaces, string: key.rawValue) }
-		
+
         family_name = getValue(key: .family_name)
 		given_name = getValue(key: .given_name)
 		birth_date = getValue(key: .birth_date)
@@ -130,10 +130,10 @@ public final class EuPidModel: GenericMdocModel, @unchecked Sendable {
         email_address = getValue(key: .email_address)
         mobile_phone_number = getValue(key: .mobile_phone_number)
         trust_anchor = getValue(key: .trust_anchor)
-        
+
         // Call superclass initializer
-        super.init(id: id, createdAt: createdAt, docType: Self.euPidDocType, displayName: displayName ?? "eu_pid_doctype_name", display: display, issuerDisplay: issuerDisplay, credentialIssuerIdentifier: credentialIssuerIdentifier, configurationIdentifier: configurationIdentifier, validFrom: validFrom, validUntil: validUntil, statusIdentifier: statusIdentifier, credentialsUsageCounts: credentialsUsageCounts, secureAreaName: secureAreaName, modifiedAt: nil, ageOverXX: [Int: Bool](), docClaims: [DocClaim](), docDataFormat: .cbor, hashingAlg: nil)
-        
+        super.init(id: id, createdAt: createdAt, docType: Self.euPidDocType, displayName: displayName ?? "eu_pid_doctype_name", display: display, issuerDisplay: issuerDisplay, credentialIssuerIdentifier: credentialIssuerIdentifier, configurationIdentifier: configurationIdentifier, validFrom: validFrom, validUntil: validUntil, statusIdentifier: statusIdentifier, credentialsUsageCounts: credentialsUsageCounts, credentialPolicy: credentialPolicy, secureAreaName: secureAreaName, modifiedAt: nil, ageOverXX: [Int: Bool](), docClaims: [DocClaim](), docDataFormat: .cbor, hashingAlg: nil)
+
         // Extract claims and age over values
         Self.extractCborClaims(nameSpaces, &docClaims, displayNames, mandatory)
         Self.extractAgeOverValues(nameSpaces, &ageOverXX)

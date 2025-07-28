@@ -110,12 +110,12 @@ public final class IsoMdlModel: GenericMdocModel, @unchecked Sendable {
 	}
 	public var mandatoryElementKeys: [DataElementIdentifier] { Self.isoMandatoryElementKeys }
 
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
-        
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, credentialPolicy: CredentialPolicy, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
+
         // Initialize properties specific to IsoMdlModel
         guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned, nameSpaces) else { return nil }
         func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems, string: key.rawValue) }
-        
+
         exp = getValue(key: .exp)
         iat = getValue(key: .iat)
         familyName = getValue(key: .familyName)
@@ -153,10 +153,10 @@ public final class IsoMdlModel: GenericMdocModel, @unchecked Sendable {
         biometricTemplateSignatureSign = getValue(key: .biometricTemplateSignatureSign)
         webapiInfo = getValue(key: .webapiInfo)
         oidcInfo = getValue(key: .oidcInfo)
-        
+
         // Call superclass initializer
-        super.init(id: id, createdAt: createdAt, docType: Self.isoDocType, displayName: displayName ?? "mdl_doctype_name", display: display, issuerDisplay: issuerDisplay, credentialIssuerIdentifier: credentialIssuerIdentifier, configurationIdentifier: configurationIdentifier, validFrom: validFrom, validUntil: validUntil, statusIdentifier: statusIdentifier, credentialsUsageCounts: credentialsUsageCounts, secureAreaName: secureAreaName, modifiedAt: nil, ageOverXX: [Int: Bool](), docClaims: [DocClaim](), docDataFormat: .cbor, hashingAlg: nil)
-        
+        super.init(id: id, createdAt: createdAt, docType: Self.isoDocType, displayName: displayName ?? "mdl_doctype_name", display: display, issuerDisplay: issuerDisplay, credentialIssuerIdentifier: credentialIssuerIdentifier, configurationIdentifier: configurationIdentifier, validFrom: validFrom, validUntil: validUntil, statusIdentifier: statusIdentifier, credentialsUsageCounts: credentialsUsageCounts, credentialPolicy: credentialPolicy, secureAreaName: secureAreaName, modifiedAt: nil, ageOverXX: [Int: Bool](), docClaims: [DocClaim](), docDataFormat: .cbor, hashingAlg: nil)
+
         // Extract claims and age over values
         Self.extractCborClaims(nameSpaceItems, &docClaims, displayNames, mandatory)
         Self.extractAgeOverValues(nameSpaceItems, &ageOverXX)
