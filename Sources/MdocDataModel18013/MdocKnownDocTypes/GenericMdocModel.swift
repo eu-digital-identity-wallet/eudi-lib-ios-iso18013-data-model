@@ -3,13 +3,13 @@
 
 import Foundation
 
-public final class GenericMdocModel: DocClaimsDecodable, @unchecked Sendable {
+public class GenericMdocModel: DocClaimsDecodable, ObservableObject, @unchecked Sendable {
     public var display: [DisplayMetadata]?
     public var issuerDisplay: [DisplayMetadata]?
     public var credentialIssuerIdentifier: String?
     public var configurationIdentifier: String?
     public var validFrom: Date?
-    private var _validUntil: Date?
+    internal var _validUntil: Date?
     public var validUntil: Date? { if let uc = credentialsUsageCounts, uc.remaining <= 0 { return nil } else { return _validUntil } }
     public var statusIdentifier: StatusIdentifier?
     @Published public var credentialsUsageCounts: CredentialsUsageCounts?
