@@ -119,10 +119,10 @@ extension CoseKey {
 
 /// A COSE_Key exchange pair
 public struct CoseKeyExchange: Sendable {
-	public let publicKey: CoseKey
+	public let publicKey: CoseKey?
 	public var privateKey: CoseKeyPrivate
 
-	public init(publicKey: CoseKey, privateKey: CoseKeyPrivate) {
+	public init(publicKey: CoseKey?, privateKey: CoseKeyPrivate) {
 		self.publicKey = publicKey
 		self.privateKey = privateKey
 	}
