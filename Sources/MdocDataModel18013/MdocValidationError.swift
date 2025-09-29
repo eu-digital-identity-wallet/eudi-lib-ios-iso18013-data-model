@@ -21,7 +21,6 @@ public enum MdocValidationError: LocalizedError, Sendable {
     case cborDecodingError
     case invalidCbor(String)
     case missingField(String, String)
-    case connectionMethodHttpInvalidCbor(String)
 
     public var errorDescription: String? {
         switch self {
@@ -31,8 +30,6 @@ public enum MdocValidationError: LocalizedError, Sendable {
             return NSLocalizedString("Invalid CBOR format in \(component)", comment: "Error message for invalid CBOR format")
         case .missingField(let component, let field):
             return NSLocalizedString("Missing field in \(component): \(field)", comment: "Error message for missing field")
-        case .connectionMethodHttpInvalidCbor(let reason):
-            return NSLocalizedString("Invalid CBOR format in connection method HTTP: \(reason)", comment: "Error message for invalid CBOR format in connection method HTTP")
         }
     }
 }

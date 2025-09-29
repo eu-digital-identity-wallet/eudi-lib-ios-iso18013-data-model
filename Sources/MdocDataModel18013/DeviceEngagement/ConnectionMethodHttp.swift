@@ -25,12 +25,12 @@ public struct ConnectionMethodHttp: Sendable  {
 
 extension ConnectionMethodHttp: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case let .array(arr) = cbor, arr.count == 3 else { throw .connectionMethodHttpInvalidCbor("Connection method is not an array of 3 items") }
-		guard case let .unsignedInt(type) = arr[0], case let .unsignedInt(version) = arr[1] else { throw .connectionMethodHttpInvalidCbor("First two items are not numbers") }
-		guard case let .map(options) = arr[2] else { throw .connectionMethodHttpInvalidCbor("Third item is not a map") }
-		guard type == Constants.METHOD_TYPE else { throw .connectionMethodHttpInvalidCbor("Unexpected method type \(type)") }
-		guard version <= Constants.METHOD_MAX_VERSION else { throw .connectionMethodHttpInvalidCbor("Unsupported options version \(version)") }
-		guard case let .utf8String(url) = options[.unsignedInt(Constants.OPTION_KEY_URI_WEBSITE)] else { throw .connectionMethodHttpInvalidCbor("Options does not contain uri of website") }
+		guard case let .array(arr) = cbor, arr.count == 3 else { throw .invalidCbor("Connection method is not an array of 3 items") }
+		guard case let .unsignedInt(type) = arr[0], case let .unsignedInt(version) = arr[1] else { throw .invalidCbor("Connection method: First two items are not numbers") }
+		guard case let .map(options) = arr[2] else { throw .invalidCbor("Connection method: Third item is not a map") }
+		guard type == Constants.METHOD_TYPE else { throw .invalidCbor("Connection method: Unexpected method type \(type)") }
+		guard version <= Constants.METHOD_MAX_VERSION else { throw .invalidCbor("Connection method: Unsupported options version \(version)") }
+		guard case let .utf8String(url) = options[.unsignedInt(Constants.OPTION_KEY_URI_WEBSITE)] else { throw .invalidCbor("Connection method: Options does not contain uri of website") }
 		self.init(url)
 	}
 }
