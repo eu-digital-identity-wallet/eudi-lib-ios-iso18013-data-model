@@ -51,19 +51,18 @@ final class MdocDataModel18013Tests: XCTestCase {
 
     func testDecodeDrivingPrivileges() throws {
         //test decoding according to test data
-        let dps = try XCTUnwrap(DrivingPrivileges(data: AnnexdTestData.d21.bytes))
-        print(dps)
+        let dps = try DrivingPrivileges(data: AnnexdTestData.d21.bytes)
         XCTAssertEqual(dps[0].vehicleCategoryCode, "A");  XCTAssertEqual(dps[0].issueDate, "2018-08-09");  XCTAssertEqual(dps[0].expiryDate, "2024-10-20")
         XCTAssertEqual(dps[1].vehicleCategoryCode, "B");  XCTAssertEqual(dps[1].issueDate, "2017-02-23");  XCTAssertEqual(dps[1].expiryDate, "2024-10-20")
         // test encoding
         let cborDps = dps.toCBOR(options: CBOROptions())
-        let dps2 = try XCTUnwrap(DrivingPrivileges(cbor: cborDps))
+        let dps2 = try DrivingPrivileges(cbor: cborDps)
         XCTAssertEqual(dps2[0].vehicleCategoryCode, "A");  XCTAssertEqual(dps2[0].issueDate, "2018-08-09");  XCTAssertEqual(dps2[0].expiryDate, "2024-10-20")
         XCTAssertEqual(dps2[1].vehicleCategoryCode, "B");  XCTAssertEqual(dps2[1].issueDate, "2017-02-23");  XCTAssertEqual(dps2[1].expiryDate, "2024-10-20")
     }
 
 	func testDecodeIssuerAuth() throws {
-		let ia = try XCTUnwrap(IssuerAuth(data: AnnexdTestData.d52.bytes))
+		let ia = try IssuerAuth(data: AnnexdTestData.d52.bytes)
 		XCTAssertEqual(ia.mso.digestAlgorithm, "SHA-256")
 		XCTAssertEqual(ia.mso.valueDigests[IsoMdlModel.isoNamespace]?.digestIDs.count, 13)
 		XCTAssertEqual(ia.mso.valueDigests["org.iso.18013.5.1.US"]?.digestIDs.count, 4)
@@ -72,14 +71,14 @@ final class MdocDataModel18013Tests: XCTestCase {
 
     // test based on D.4.1.1 mdoc request section of the ISO/IEC FDIS 18013-5 document
 	func testDecodeDeviceRequest() throws {
-		let dr = try XCTUnwrap(DeviceRequest(data: AnnexdTestData.d411.bytes))
+		let dr = try DeviceRequest(data: AnnexdTestData.d411.bytes)
 		let testItems = ["family_name", "document_number", "driving_privileges", "issue_date", "expiry_date", "portrait"].sorted()
         XCTAssertEqual(dr.version, "1.0")
         XCTAssertEqual(dr.docRequests.first?.itemsRequest.requestNameSpaces[IsoMdlModel.isoNamespace]?.elementIdentifiers.sorted(), testItems)
 		// test encode
 		let cborDr = dr.toCBOR(options: CBOROptions())
 		// test if successfully encoded
-		let dr2 = try XCTUnwrap(DeviceRequest(cbor: cborDr))
+		let dr2 = try DeviceRequest(cbor: cborDr)
 		XCTAssertEqual(dr2.docRequests.first?.itemsRequest.requestNameSpaces[IsoMdlModel.isoNamespace]?.elementIdentifiers.sorted(), testItems)
 		// test iso make request
 		let isoKeys: [IsoMdlModel.CodingKeys] = [.familyName, .documentNumber, .drivingPrivileges, .issueDate, .expiryDate, .portrait]
@@ -135,9 +134,9 @@ final class MdocDataModel18013Tests: XCTestCase {
 		XCTAssertEqual(valueDigests1[0]!.toHexString().localizedUppercase, "75167333B47B6C2BFB86ECCC1F438CF57AF055371AC55E1E359E20F254ADCEBF")
 		XCTAssertEqual(valueDigests2.digestIDs.count, 4)
 		XCTAssert(isoNS.count > 0)
-		XCTAssertEqual(doc.deviceSigned?.nameSpacesRawData.count, 1); XCTAssertEqual(doc.deviceSigned?.nameSpacesRawData[0], 160) // {} A0 empty dic
-		XCTAssertEqual(doc.deviceSigned?.deviceAuth.coseMacOrSignature.macAlgorithm, Cose.MacAlgorithm.hmac256)
-		XCTAssertEqual(doc.deviceSigned?.deviceAuth.coseMacOrSignature.signature.bytes.toHexString().uppercased(), "E99521A85AD7891B806A07F8B5388A332D92C189A7BF293EE1F543405AE6824D")
+		XCTAssertEqual(doc.deviceSigned.nameSpacesRawData.count, 1); XCTAssertEqual(doc.deviceSigned.nameSpacesRawData[0], 160) // {} A0 empty dic
+		XCTAssertEqual(doc.deviceSigned.deviceAuth.coseMacOrSignature.macAlgorithm, Cose.MacAlgorithm.hmac256)
+		XCTAssertEqual(doc.deviceSigned.deviceAuth.coseMacOrSignature.signature.bytes.toHexString().uppercased(), "E99521A85AD7891B806A07F8B5388A332D92C189A7BF293EE1F543405AE6824D")
         let d1 = dr.documents!.first!
 		let model = try XCTUnwrap(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d1.issuerSigned, displayName: "PID", display: nil, issuerDisplay: nil, credentialIssuerIdentifier: nil, configurationIdentifier: nil, validFrom: d1.issuerSigned.validFrom, validUntil: d1.issuerSigned.validUntil, statusIdentifier: d1.issuerSigned.issuerAuth.statusIdentifier, credentialsUsageCounts: nil, credentialPolicy: .rotateUse, secureAreaName: nil, displayNames: nil, mandatory: nil))
 		XCTAssertEqual(model.familyName, "Doe")
@@ -145,16 +144,16 @@ final class MdocDataModel18013Tests: XCTestCase {
 
 	func testEncodeDeviceResponse() throws {
 		let cborIn = try XCTUnwrap(try CBOR.decode(AnnexdTestData.d412.bytes))
-		print("Input CBOR", cborIn.description, "\n\n")
-		let dr = try XCTUnwrap(DeviceResponse(cbor: cborIn))
+		let dr = try DeviceResponse(cbor: cborIn)
 		let cborDr = dr.toCBOR(options: CBOROptions())
-		print("Re-encoded CBOR", cborDr.description, "\n\n")
-
+        // test if successfully encoded
+        let dr2 = try DeviceResponse(cbor: cborDr)
+        XCTAssertEqual(dr2.version, "1.0")
 	}
 
   #if os(iOS)
     func testGenerateBLEengageQRCodeImage() async throws {
-        var de = try XCTUnwrap(DeviceEngagement(isBleServer: true))
+        var de = try DeviceEngagement(isBleServer: true)
         try await de.makePrivateKey(crv: .P256, secureArea: InMemoryP256SecureArea(storage: DummySecureKeyStorage()))
         XCTAssertNotNil(de.getQrCodePayload())
         let strQR = de.qrCode
@@ -212,7 +211,6 @@ final class MdocDataModel18013Tests: XCTestCase {
 		let drPid = try XCTUnwrap(DeviceResponse(data: [UInt8](pidData)))
 		let drSample = DeviceResponse(version: drPid.version, documents: drMdl.documents! + drPid.documents!,
 			documentErrors: nil, status: drPid.status)
-		print(Data(drSample.encode(options: CBOROptions())).base64EncodedString())
 	}
 
 	func testUUIDFromBytes() {
