@@ -39,10 +39,10 @@ public struct DeviceSigned: Sendable {
 extension DeviceSigned: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .map(m) = cbor else { throw .invalidCbor("device signed") }
-		guard case let .tagged(t, cdns) = m[Keys.nameSpaces], t == .encodedCBORDataItem, case let .byteString(bs) = cdns else { throw .invalidCbor("device signed") }
+		guard case let .tagged(t, cdns) = m[Keys.nameSpaces], t == .encodedCBORDataItem, case let .byteString(bs) = cdns else { throw .missingField("DeviceSigned", Keys.nameSpaces.rawValue) }
 		guard let obj = try? CBOR.decode(bs) else { throw MdocValidationError.cborDecodingError }
         nameSpaces = try DeviceNameSpaces(cbor: obj)
-		guard let cdu = m[Keys.deviceAuth] else { throw .invalidCbor("device signed") }
+		guard let cdu = m[Keys.deviceAuth] else { throw .missingField("DeviceSigned", Keys.deviceAuth.rawValue) }
 		deviceAuth = try DeviceAuth(cbor: cdu)
 		nameSpacesRawData = bs
 	}

@@ -46,11 +46,11 @@ public struct Document: Sendable {
 extension Document: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case .map(let cd) = cbor else { throw .invalidCbor("document") }
-		guard case .utf8String(let dt) = cd[Keys.docType] else { throw .invalidCbor("document") }
+		guard case .utf8String(let dt) = cd[Keys.docType] else { throw .missingField("Document", Keys.docType.rawValue) }
 		docType = dt
-		guard let cis = cd[Keys.issuerSigned] else { throw .invalidCbor("document") }
+		guard let cis = cd[Keys.issuerSigned] else { throw .missingField("Document", Keys.issuerSigned.rawValue) }
 		issuerSigned = try IssuerSigned(cbor: cis)
-		guard let cds = cd[Keys.deviceSigned] else { throw .invalidCbor("document") }
+		guard let cds = cd[Keys.deviceSigned] else { throw .missingField("Document", Keys.deviceSigned.rawValue) }
 		deviceSigned = try DeviceSigned(cbor: cds)
 		if let ce = cd[Keys.errors] { errors = try Errors(cbor: ce) } else { errors = nil }
 	}
