@@ -85,11 +85,11 @@ extension CoseKey: CBORDecodable {
 	public init(cbor obj: CBOR) throws(MdocValidationError) {
 		guard let calg = obj[-1], case let CBOR.unsignedInt(ralg) = calg, let alg = CoseEcCurve(rawValue: ralg) else { throw .invalidCbor("COSE key") }
 		crv = alg
-		guard let ckty = obj[1], case let CBOR.unsignedInt(rkty) = ckty else { throw .coseKeyMissingField(Keys.kty.rawValue) }
+		guard let ckty = obj[1], case let CBOR.unsignedInt(rkty) = ckty else { throw .missingField("CoseKey", Keys.kty.rawValue) }
 		kty = rkty
-		guard let cx = obj[-2], case let CBOR.byteString(rx) = cx else { throw .coseKeyMissingField(Keys.x.rawValue) }
+		guard let cx = obj[-2], case let CBOR.byteString(rx) = cx else { throw .missingField("CoseKey", Keys.x.rawValue) }
 		x = rx
-		guard let cy = obj[-3], case let CBOR.byteString(ry) = cy else { throw .coseKeyMissingField(Keys.y.rawValue) }
+		guard let cy = obj[-3], case let CBOR.byteString(ry) = cy else { throw .missingField("CoseKey", Keys.y.rawValue) }
 		y = ry
 	}
 }

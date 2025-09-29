@@ -44,7 +44,7 @@ public struct DeviceKeyInfo:Sendable {
 extension DeviceKeyInfo: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .map(v) = cbor else { throw MdocValidationError.invalidCbor("device key info") }
-		guard let cdk = v[Keys.deviceKey] else { throw MdocValidationError.deviceKeyInfoMissingField("deviceKey") }
+		guard let cdk = v[Keys.deviceKey] else { throw MdocValidationError.missingField("DeviceKeyInfo", "deviceKey") }
 		deviceKey = try CoseKey(cbor: cdk)
 		if let cka = v[Keys.keyAuthorizations] { keyAuthorizations = try KeyAuthorizations(cbor: cka) } else { keyAuthorizations = nil }
 		keyInfo = v[Keys.keyInfo]

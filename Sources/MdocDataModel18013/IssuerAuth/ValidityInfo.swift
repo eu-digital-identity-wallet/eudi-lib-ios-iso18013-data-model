@@ -44,11 +44,11 @@ public struct ValidityInfo: Sendable {
 extension ValidityInfo: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .map(v) = cbor else { throw .invalidCbor("validity info") }
-		guard case .tagged(let t, let cs) = v[Keys.signed], t == .standardDateTimeString, case let .utf8String(s) = cs else { throw .validityInfoMissingField(Keys.signed.rawValue) }
+		guard case .tagged(let t, let cs) = v[Keys.signed], t == .standardDateTimeString, case let .utf8String(s) = cs else { throw .missingField("ValidityInfo", Keys.signed.rawValue) }
 		signed = s
-		guard case .tagged(let t, let cvf) = v[Keys.validFrom], t == .standardDateTimeString, case let .utf8String(vf) = cvf else { throw .validityInfoMissingField(Keys.validFrom.rawValue) }
+		guard case .tagged(let t, let cvf) = v[Keys.validFrom], t == .standardDateTimeString, case let .utf8String(vf) = cvf else { throw .missingField("ValidityInfo", Keys.validFrom.rawValue) }
 		validFrom = vf
-		guard case .tagged(let t, let cvu) = v[Keys.validUntil], t == .standardDateTimeString, case let .utf8String(vu) = cvu else { throw .validityInfoMissingField(Keys.validUntil.rawValue) }
+		guard case .tagged(let t, let cvu) = v[Keys.validUntil], t == .standardDateTimeString, case let .utf8String(vu) = cvu else { throw .missingField("ValidityInfo", Keys.validUntil.rawValue) }
 		validUntil = vu
 		if case .tagged(let t, let ceu) = v[Keys.expectedUpdate], t == .standardDateTimeString, case let .utf8String(eu) = ceu { expectedUpdate = eu } else { expectedUpdate = nil }
 	}

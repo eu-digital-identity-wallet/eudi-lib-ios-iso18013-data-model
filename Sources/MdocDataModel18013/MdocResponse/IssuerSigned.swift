@@ -38,7 +38,7 @@ extension IssuerSigned: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .map(m) = cbor else { throw .invalidCbor("issuer signed") }
 		if let cn = m[Keys.nameSpaces] { issuerNameSpaces = try IssuerNameSpaces(cbor: cn) } else { issuerNameSpaces = nil }
-		guard let cia = m[Keys.issuerAuth] else { throw .issuerSignedMissingField(Keys.issuerAuth.rawValue) }
+		guard let cia = m[Keys.issuerAuth] else { throw .missingField("IssuerSigned", Keys.issuerAuth.rawValue) }
         issuerAuth = try IssuerAuth(cbor: cia)
 	}
 }

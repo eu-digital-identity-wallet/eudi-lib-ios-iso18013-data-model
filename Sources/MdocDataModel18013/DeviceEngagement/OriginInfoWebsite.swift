@@ -41,8 +41,8 @@ extension OriginInfoWebsite: CBOREncodable {
 extension OriginInfoWebsite: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .map(tS) = cbor else { throw .invalidCbor("origin info website") }
-		guard case let .unsignedInt(nsCat) = tS["cat"] else { throw .originInfoWebsiteMissingField("cat") }
-		guard case let .map(nsDetails) = tS["Details"], case let .utf8String(nsUrl) = nsDetails["baseUrl"] else { throw .originInfoWebsiteMissingField("baseUrl") }
+		guard case let .unsignedInt(nsCat) = tS["cat"] else { throw .missingField("OriginInfoWebsite", "cat") }
+		guard case let .map(nsDetails) = tS["Details"], case let .utf8String(nsUrl) = nsDetails["baseUrl"] else { throw .missingField("OriginInfoWebsite", "baseUrl") }
 		self.init(baseUrl: nsUrl, cat: nsCat)
 	}
 }

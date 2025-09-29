@@ -36,9 +36,9 @@ public struct ItemsRequest: Sendable {
 extension ItemsRequest: CBORDecodable {
     public init(cbor: CBOR) throws(MdocValidationError) {
         guard case let .map(m) = cbor else { throw .invalidCbor("items request") }
-        guard case let .utf8String(dt) = m[Keys.docType] else { throw .itemsRequestMissingField(Keys.docType.rawValue) }
+        guard case let .utf8String(dt) = m[Keys.docType] else { throw .missingField("ItemsRequest", Keys.docType.rawValue) }
         docType = dt
-        guard let cns = m[Keys.nameSpaces]  else { throw .itemsRequestMissingField(Keys.nameSpaces.rawValue) }
+        guard let cns = m[Keys.nameSpaces]  else { throw .missingField("ItemsRequest", Keys.nameSpaces.rawValue) }
         requestNameSpaces = try RequestNameSpaces(cbor: cns)
         requestInfo = m[Keys.requestInfo]
     }

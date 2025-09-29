@@ -66,17 +66,17 @@ extension MobileSecurityObject: CBORDecodable {
 
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .map(v) = cbor else { throw .invalidCbor("mobile security object") }
-		guard case let .utf8String(s) = v[Keys.version] else { throw .msoMissingField(Keys.version.rawValue) }
+		guard case let .utf8String(s) = v[Keys.version] else { throw .missingField("MobileSecurityObject", Keys.version.rawValue) }
 		version = s
-		guard case let .utf8String(da) = v[Keys.digestAlgorithm] else { throw .msoMissingField(Keys.digestAlgorithm.rawValue) }
+		guard case let .utf8String(da) = v[Keys.digestAlgorithm] else { throw .missingField("MobileSecurityObject", Keys.digestAlgorithm.rawValue) }
 		digestAlgorithm = da
-		guard let cvd = v[Keys.valueDigests] else { throw .msoMissingField(Keys.valueDigests.rawValue) }
+		guard let cvd = v[Keys.valueDigests] else { throw .missingField("MobileSecurityObject", Keys.valueDigests.rawValue) }
 		valueDigests = try ValueDigests(cbor: cvd)
-		guard let cdki = v[Keys.deviceKeyInfo] else { throw .msoMissingField(Keys.deviceKeyInfo.rawValue) }
+		guard let cdki = v[Keys.deviceKeyInfo] else { throw .missingField("MobileSecurityObject", Keys.deviceKeyInfo.rawValue) }
 		deviceKeyInfo = try DeviceKeyInfo(cbor: cdki)
-		guard case let .utf8String(dt) = v[Keys.docType] else { throw .msoMissingField(Keys.docType.rawValue) }
+		guard case let .utf8String(dt) = v[Keys.docType] else { throw .missingField("MobileSecurityObject", Keys.docType.rawValue) }
 		docType = dt
-		guard let cvi = v[Keys.validityInfo] else { throw .msoMissingField(Keys.validityInfo.rawValue) }
+		guard let cvi = v[Keys.validityInfo] else { throw .missingField("MobileSecurityObject", Keys.validityInfo.rawValue) }
 		validityInfo = try ValidityInfo(cbor: cvi)
 	}
 }
