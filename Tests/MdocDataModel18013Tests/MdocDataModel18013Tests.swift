@@ -23,7 +23,7 @@ import OrderedCollections
 struct MdocDataModel18013Tests {
 	static let pkb64 = "pQECIAEhWCBoHIiBQnDRMLUT4yOLqJ1l8mrfNIgrjNnFq4RyZgxSmiJYIGD/Sabu6GejaR4eTiym1JkyjnBNcJ+f59pN+lCEyhVyI1ggC6EPCKyGci++LGWUX3fXpPFW6pYO8pyyKLMKs1qF0jo="
     static let pk = CoseKeyPrivate(p256data: pkb64)!
-    
+
     @Test func basicExample() throws {
         // Swift Testing Documentation
         // https://developer.apple.com/documentation/testing
