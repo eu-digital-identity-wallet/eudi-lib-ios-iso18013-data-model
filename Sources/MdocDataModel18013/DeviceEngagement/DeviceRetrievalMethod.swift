@@ -24,7 +24,7 @@ import SwiftCBOR
 /// Additionally, may contain extra info for each connection.
 public enum DeviceRetrievalMethod: Equatable, Sendable {
     static var version: UInt64 { 1 }
-    
+
     case qr
     case nfc(maxLenCommand: UInt64, maxLenResponse: UInt64)
     case ble(isBleServer: Bool, uuid: UUID)
@@ -54,26 +54,26 @@ extension DeviceRetrievalMethod: CBOREncodable {
 }
 
 extension DeviceRetrievalMethod: CBORDecodable {
-    public init?(cbor: CBOR) {
-        guard case let .array(arr) = cbor, arr.count >= 2 else { return nil }
-        guard case let .unsignedInt(type) = arr[0] else { return nil }
-        guard case let .unsignedInt(v) = arr[1], v == Self.version else { return nil }
+    public init(cbor: CBOR) throws(MdocValidationError) {
+        guard case let .array(arr) = cbor, arr.count >= 2 else { throw .deviceRetrievalMethodInvalidCbor }
+        guard case let .unsignedInt(type) = arr[0] else { throw .deviceRetrievalMethodInvalidCbor }
+        guard case let .unsignedInt(v) = arr[1], v == Self.version else { throw .deviceRetrievalMethodInvalidCbor }
         switch type {
         case 0:
             self = .qr
         case 1:
-            guard case let .map(options) = arr[2] else { return nil }
-            guard case let .unsignedInt(mlc) = options[0], case let .unsignedInt(mlr) = options[1]  else { return nil }
+            guard case let .map(options) = arr[2] else { throw .deviceRetrievalMethodInvalidCbor }
+            guard case let .unsignedInt(mlc) = options[0], case let .unsignedInt(mlr) = options[1]  else { throw .deviceRetrievalMethodInvalidCbor }
             self = .nfc(maxLenCommand: mlc, maxLenResponse: mlr)
         case 2:
-            guard case let .map(options) = arr[2] else { return nil }
+            guard case let .map(options) = arr[2] else { throw .deviceRetrievalMethodInvalidCbor }
             if case let .boolean(b) = options[0], b, case let .byteString(bytes) = options[10], let uuid = UUID(uuidBytes: bytes) {
                 self = .ble(isBleServer: b, uuid: uuid)
             } else if case let .boolean(b) = options[1], b, case let .byteString(bytes) = options[11], let uuid = UUID(uuidBytes: bytes) {
                 self = .ble(isBleServer: !b, uuid: uuid)
-            } else { return nil }
-        default: return nil
+            } else { throw .deviceRetrievalMethodInvalidCbor }
+        default: throw .deviceRetrievalMethodInvalidCbor
         }
     }
-    
+
 }

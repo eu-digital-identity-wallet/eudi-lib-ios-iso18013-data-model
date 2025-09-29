@@ -24,7 +24,7 @@ public struct Document: Sendable {
 
 	public let docType: DocType
 	public let issuerSigned: IssuerSigned
-	public let deviceSigned: DeviceSigned? // todo: make mandatory
+	public let deviceSigned: DeviceSigned
 	/// error codes for data elements that are not returned
 	public let errors: Errors?
 
@@ -35,7 +35,7 @@ public struct Document: Sendable {
 		case errors
 	}
 
-	public init(docType: DocType, issuerSigned: IssuerSigned, deviceSigned: DeviceSigned? = nil, errors: Errors? = nil) {
+	public init(docType: DocType, issuerSigned: IssuerSigned, deviceSigned: DeviceSigned, errors: Errors? = nil) {
 		self.docType = docType
 		self.issuerSigned = issuerSigned
 		self.deviceSigned = deviceSigned
@@ -44,15 +44,15 @@ public struct Document: Sendable {
 }
 
 extension Document: CBORDecodable {
-	public init?(cbor: CBOR) {
-		guard case .map(let cd) = cbor else { return nil }
-		guard case .utf8String(let dt) = cd[Keys.docType] else { return nil }
+	public init(cbor: CBOR) throws(MdocValidationError) {
+		guard case .map(let cd) = cbor else { throw .documentInvalidCbor }
+		guard case .utf8String(let dt) = cd[Keys.docType] else { throw .documentInvalidCbor }
 		docType = dt
-		guard let cis = cd[Keys.issuerSigned], let `is` = IssuerSigned(cbor: cis) else { return nil }
-		issuerSigned = `is`
-		//guard let cds = cd[Keys.deviceSigned], let ds = DeviceSigned(cbor: cds) else { return nil }; deviceSigned = ds
-		if let cds = cd[Keys.deviceSigned], let ds = DeviceSigned(cbor: cds) { deviceSigned = ds } else { deviceSigned = nil };
-		if let ce = cd[Keys.errors], let e = Errors(cbor: ce) { errors = e} else { errors = nil }
+		guard let cis = cd[Keys.issuerSigned] else { throw .documentInvalidCbor }
+		issuerSigned = try IssuerSigned(cbor: cis)
+		guard let cds = cd[Keys.deviceSigned] else { throw .documentInvalidCbor }
+		deviceSigned = try DeviceSigned(cbor: cds)
+		if let ce = cd[Keys.errors] { errors = try Errors(cbor: ce) } else { errors = nil }
 	}
 }
 
@@ -61,8 +61,8 @@ extension Document: CBOREncodable {
 		var cbor = OrderedDictionary<CBOR, CBOR>()
 		cbor[.utf8String(Keys.docType.rawValue)] = .utf8String(docType)
 		cbor[.utf8String(Keys.issuerSigned.rawValue)] = issuerSigned.toCBOR(options: options)
-		if let dsign = deviceSigned { cbor[.utf8String(Keys.deviceSigned.rawValue)] = dsign.toCBOR(options: options) }
-		if let errors { cbor[.utf8String(Keys.errors.rawValue)] = errors.toCBOR(options: options) }
+		cbor[.utf8String(Keys.deviceSigned.rawValue)] = deviceSigned.toCBOR(options: options)
+		if let errors = errors { cbor[.utf8String(Keys.errors.rawValue)] = errors.toCBOR(options: options) }
 		return .map(cbor)
 	}
 }

@@ -105,21 +105,21 @@ extension IssuerSignedItem {
 }
 
 extension IssuerSignedItem: CBORDecodable {
-	public init?(data: [UInt8]) {
-        guard let cbor = try? CBOR.decode(data) else { return nil }
-        self.init(cbor: cbor)
+	public init(data: [UInt8]) throws(MdocValidationError) {
+        guard let cbor = try? CBOR.decode(data) else { throw .issuerSignedItemInvalidCbor }
+        try self.init(cbor: cbor)
         rawData = data
     }
 
-	public init?(cbor: CBOR) {
-		guard case .map(let cd) = cbor else { return nil }
-        guard case .unsignedInt(let did) = cd[Keys.digestID] else { return nil }
+	public init(cbor: CBOR) throws(MdocValidationError) {
+		guard case .map(let cd) = cbor else { throw .issuerSignedItemInvalidCbor }
+        guard case .unsignedInt(let did) = cd[Keys.digestID] else { throw .issuerSignedItemMissingField(Keys.digestID.rawValue) }
         digestID = did
-        guard case .byteString(let r) = cd[Keys.random] else { return nil }
+        guard case .byteString(let r) = cd[Keys.random] else { throw .issuerSignedItemMissingField(Keys.random.rawValue) }
         random = r
-        guard case .utf8String(let ei) = cd[Keys.elementIdentifier] else { return nil }
+        guard case .utf8String(let ei) = cd[Keys.elementIdentifier] else { throw .issuerSignedItemMissingField(Keys.elementIdentifier.rawValue) }
         elementIdentifier = ei
-        guard let ev = cd[Keys.elementValue] else { return nil }
+        guard let ev = cd[Keys.elementValue] else { throw .issuerSignedItemMissingField(Keys.elementValue.rawValue) }
         elementValue = ev
     }
 }

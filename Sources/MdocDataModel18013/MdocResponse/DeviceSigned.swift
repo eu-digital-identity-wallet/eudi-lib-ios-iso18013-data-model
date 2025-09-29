@@ -28,7 +28,7 @@ public struct DeviceSigned: Sendable {
 		case nameSpaces
 		case deviceAuth
 	}
-	
+
 	public init(deviceAuth: DeviceAuth) {
 		nameSpaces = DeviceNameSpaces(deviceNameSpaces: [:])
 		nameSpacesRawData = CBOR.map([:]).encode()
@@ -37,12 +37,13 @@ public struct DeviceSigned: Sendable {
 }
 
 extension DeviceSigned: CBORDecodable {
-	public init?(cbor: CBOR) {
-		guard case let .map(m) = cbor else { return nil }
-		guard case let .tagged(t, cdns) = m[Keys.nameSpaces], t == .encodedCBORDataItem, case let .byteString(bs) = cdns, let dns = DeviceNameSpaces(data: bs) else { return nil }
-		nameSpaces = dns
-		guard let cdu = m[Keys.deviceAuth], let du = DeviceAuth(cbor: cdu) else { return nil }
-		deviceAuth = du
+	public init(cbor: CBOR) throws(MdocValidationError) {
+		guard case let .map(m) = cbor else { throw .deviceRequestInvalidCbor }
+		guard case let .tagged(t, cdns) = m[Keys.nameSpaces], t == .encodedCBORDataItem, case let .byteString(bs) = cdns else { throw .deviceRequestInvalidCbor }
+		guard let obj = try? CBOR.decode(bs) else { throw MdocValidationError.cborDecodingError }
+        nameSpaces = try DeviceNameSpaces(cbor: obj)
+		guard let cdu = m[Keys.deviceAuth] else { throw .deviceRequestInvalidCbor }
+		deviceAuth = try DeviceAuth(cbor: cdu)
 		nameSpacesRawData = bs
 	}
 }
@@ -63,14 +64,14 @@ public struct DeviceNameSpaces: Sendable {
 }
 
 extension DeviceNameSpaces: CBORDecodable {
-	public init?(cbor: CBOR) {
-		guard case let .map(m) = cbor else { return nil }
-		let dnsPairs = m.compactMap { (k: CBOR, v: CBOR) -> (NameSpace, DeviceSignedItems)?  in
-			guard case .utf8String(let ns) = k else { return nil }
-			guard let dsi = DeviceSignedItems(cbor: v) else { return nil }
+	public init(cbor: CBOR) throws(MdocValidationError) {
+		guard case let .map(m) = cbor else { throw .deviceSignedInvalidCbor }
+		let dnsPairs = try m.map { (k: CBOR, v: CBOR) throws(MdocValidationError) -> (NameSpace, DeviceSignedItems)  in
+			guard case .utf8String(let ns) = k else { throw .deviceSignedInvalidCbor }
+			let dsi = try DeviceSignedItems(cbor: v)
 			return (ns,dsi)
 		}
-		let dns = Dictionary(dnsPairs, uniquingKeysWith: { (first, _) in first })
+		let dns: [NameSpace : DeviceSignedItems] = Dictionary(dnsPairs, uniquingKeysWith: { (first, _) in first })
 		deviceNameSpaces = dns
 	}
 }
@@ -82,14 +83,14 @@ public struct DeviceSignedItems: Sendable {
 }
 
 extension DeviceSignedItems: CBORDecodable {
-	public init?(cbor: CBOR) {
-		guard case let .map(m) = cbor else { return nil }
-		let dsiPairs = m.compactMap { (k: CBOR, v: CBOR) -> (DataElementIdentifier, DataElementValue)?  in
-			guard case .utf8String(let dei) = k else { return nil }
+	public init(cbor: CBOR) throws(MdocValidationError) {
+		guard case let .map(m) = cbor else { throw .deviceSignedInvalidCbor }
+		let dsiPairs = try m.map { (k: CBOR, v: CBOR) throws(MdocValidationError) -> (DataElementIdentifier, DataElementValue)  in
+			guard case .utf8String(let dei) = k else { throw .deviceSignedInvalidCbor }
 			return (dei,v)
 		}
 		let dsi = Dictionary(dsiPairs, uniquingKeysWith: { (first, _) in first })
-		if dsi.count == 0 { return nil }
+		if dsi.count == 0 { throw .deviceSignedInvalidCbor }
 		deviceSignedItems = dsi
 	}
 }

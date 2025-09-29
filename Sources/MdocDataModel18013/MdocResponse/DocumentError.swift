@@ -20,7 +20,7 @@ import OrderedCollections
 
 /// Error codes for documents that are not returned
 public struct DocumentError: Sendable {
-	
+
 	public let docErrors: [DocType: ErrorCode]
 	public subscript(dt: DocType) -> ErrorCode? { docErrors[dt] }
 
@@ -30,15 +30,15 @@ public struct DocumentError: Sendable {
 }
 
 extension DocumentError: CBORDecodable {
-	public init?(cbor: CBOR) {
-		guard case let .map(e) = cbor else { return nil }
-		let dePairs = e.compactMap { (k: CBOR, v: CBOR) -> (DocType, ErrorCode)?  in
-			guard case .utf8String(let dt) = k else { return nil }
-			guard case .unsignedInt(let ec) = v else { return nil }
+	public init(cbor: CBOR) throws(MdocValidationError) {
+		guard case let .map(e) = cbor else { throw MdocValidationError.documentErrorInvalidCbor }
+		let dePairs = try e.map { (k: CBOR, v: CBOR) throws(MdocValidationError) -> (DocType, ErrorCode)  in
+			guard case .utf8String(let dt) = k else { throw .documentErrorInvalidCbor }
+			guard case .unsignedInt(let ec) = v else { throw .documentErrorInvalidCbor }
 			return (dt,ec)
 		}
 		let de = Dictionary(dePairs, uniquingKeysWith: { (first, _) in first })
-		if de.count == 0 { return nil }
+		if de.count == 0 { throw .documentErrorInvalidCbor }
 		docErrors = de
 	}
 }

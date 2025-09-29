@@ -22,19 +22,19 @@ import OrderedCollections
 public struct RequestNameSpaces: Sendable {
     public let nameSpaces: [NameSpace: RequestDataElements]
     public subscript(ns: String)-> RequestDataElements? { nameSpaces[ns] }
-} 
+}
 
- 
+
 extension RequestNameSpaces: CBORDecodable {
-	public init?(cbor: CBOR) {
-  		guard case let .map(e) = cbor else { return nil }
-		let dePairs = e.compactMap { (k: CBOR, v: CBOR) -> (NameSpace, RequestDataElements)?  in
-			guard case .utf8String(let ns) = k else { return nil }
-			guard let rde = RequestDataElements(cbor: v) else { return nil }
+	public init(cbor: CBOR) throws(MdocValidationError) {
+  		guard case let .map(e) = cbor else { throw .requestNameSpacesInvalidCbor }
+		let dePairs = try e.map { (k: CBOR, v: CBOR)  throws(MdocValidationError) -> (NameSpace, RequestDataElements)   in
+			guard case .utf8String(let ns) = k else { throw .requestNameSpacesInvalidCbor }
+			let rde = try RequestDataElements(cbor: v)
 			return (ns, rde)
-		}      
+		}
         let de = Dictionary(dePairs, uniquingKeysWith: { (first, _) in first })
-		if de.count == 0 { return nil }
+		if de.count == 0 { throw .requestNameSpacesInvalidCbor }
 		nameSpaces = de
     }
 }

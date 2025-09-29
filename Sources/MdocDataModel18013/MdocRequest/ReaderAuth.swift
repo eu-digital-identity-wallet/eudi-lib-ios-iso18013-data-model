@@ -22,18 +22,18 @@ struct ReaderAuth: Sendable {
 	/// encoded data
     let coseSign1: Cose
 	/// one or more certificates
-	let x5chain: [[UInt8]] 
+	let x5chain: [[UInt8]]
 }
 
 extension ReaderAuth: CBORDecodable {
-    init?(cbor: CBOR) {
+    init(cbor: CBOR) throws(MdocValidationError) {
         // The signature is contained in an untagged COSE_Sign1 structure as defined in RFC 8152 and identified
-        guard let cose = Cose(type: .sign1, cbor: cbor) else { return nil }
+        guard let cose = Cose(type: .sign1, cbor: cbor) else { throw .readerAuthInvalidCbor }
         coseSign1 = cose
-	    guard let ch = cose.unprotectedHeader?.rawHeader, case let .map(mch) = ch  else { return nil }
+	    guard let ch = cose.unprotectedHeader?.rawHeader, case let .map(mch) = ch  else { throw .readerAuthInvalidCbor }
 		if case let .byteString(bs) = mch[.unsignedInt(33)] { x5chain = [bs] }
 		else if case let .array(a) = mch[.unsignedInt(33)] { x5chain = a.compactMap { if case let .byteString(bs) = $0 { return bs } else { return nil } } }
-		else { return nil }
+		else { throw .readerAuthInvalidCbor }
     }
 }
 

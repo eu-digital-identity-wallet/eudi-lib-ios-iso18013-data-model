@@ -43,14 +43,14 @@ public struct IssuerAuth: Sendable {
 /// Encoded as `Cose` ( COSE Sign1). The payload is the MSO
 extension IssuerAuth: CBORDecodable {
 
-	public init?(cbor: CBOR) {
-		guard let cose = Cose(type: .sign1, cbor: cbor) else { logger.error("IssuerAuth cbor error"); return nil}
-		guard case let .byteString(bs) = cose.payload, let m = MobileSecurityObject(data: bs), let va = cose.verifyAlgorithm else { return nil}
-		mso = m; msoRawData = bs; verifyAlgorithm = va; signature = cose.signature; statusIdentifier = StatusIdentifier(data: bs)
-		guard let ch = cose.unprotectedHeader?.rawHeader, case let .map(mch) = ch  else { return nil }
+	public init(cbor: CBOR) throws(MdocValidationError) {
+		guard let cose = Cose(type: .sign1, cbor: cbor) else { throw .issuerAuthInvalidCbor }
+		guard case let .byteString(bs) = cose.payload, let va = cose.verifyAlgorithm else { throw .issuerAuthInvalidCbor }
+		mso = try MobileSecurityObject(data: bs); msoRawData = bs; verifyAlgorithm = va; signature = cose.signature; statusIdentifier = StatusIdentifier(data: bs)
+		guard let ch = cose.unprotectedHeader?.rawHeader, case let .map(mch) = ch  else { throw .issuerAuthInvalidCbor }
 		if case let .byteString(bs) = mch[.unsignedInt(33)] { iaca = [bs] }
 		else if case let .array(a) = mch[.unsignedInt(33)] { iaca = a.compactMap { if case let .byteString(bs) = $0 { return bs } else { return nil } } }
-		else { return nil }
+		else { throw .issuerAuthInvalidCbor }
 	}
 }
 

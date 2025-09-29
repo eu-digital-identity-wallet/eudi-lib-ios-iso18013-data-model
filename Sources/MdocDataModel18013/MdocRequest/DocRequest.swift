@@ -32,12 +32,13 @@ public struct DocRequest: Sendable {
 }
 
 extension DocRequest: CBORDecodable {
-    public init?(cbor: CBOR) {
-        guard case let .map(m) = cbor else { return nil }
+    public init(cbor: CBOR) throws(MdocValidationError) {
+        guard case let .map(m) = cbor else { throw .docRequestInvalidCbor }
         // item-request-bytes: tagged(24, items request)
-        guard case let .tagged(_, cirb) = m[Keys.itemsRequest], case let .byteString(bs) = cirb, let ir = ItemsRequest(data: bs)  else { return nil }
-        itemsRequestRawData = bs; itemsRequest = ir
-        if let ra = m[Keys.readerAuth] { readerAuthRawCBOR = ra; readerAuth = ReaderAuth(cbor: ra) } else { readerAuthRawCBOR = nil; readerAuth = nil }
+        guard case let .tagged(t, cirb) = m[Keys.itemsRequest], t == .encodedCBORDataItem, case let .byteString(bs) = cirb else { throw .docRequestInvalidCbor }
+        do { itemsRequest = try ItemsRequest(data: bs) } catch { throw .docRequestInvalidCbor }
+        itemsRequestRawData = bs
+        if let ra = m[Keys.readerAuth] { readerAuthRawCBOR = ra; readerAuth = try ReaderAuth(cbor: ra) } else { readerAuthRawCBOR = nil; readerAuth = nil }
     }
 }
 

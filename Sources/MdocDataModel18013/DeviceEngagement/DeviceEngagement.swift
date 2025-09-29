@@ -20,9 +20,9 @@ import Foundation
 import SwiftCBOR
 #if canImport(CryptoKit)
 import CryptoKit
-#else 
+#else
 import Crypto
-#endif 
+#endif
 
 /// Device engagement information
 ///
@@ -51,7 +51,7 @@ public struct DeviceEngagement: Sendable {
     public var privateKey: CoseKeyPrivate?
 	public var qrCoded: [UInt8]?
 
-	
+
 	/// Generate device engagement
 	/// - Parameters
 	///    - isBleServer: true for BLE mdoc peripheral server mode, false for BLE mdoc central client mode
@@ -61,18 +61,18 @@ public struct DeviceEngagement: Sendable {
         if let isBleServer { deviceRetrievalMethods = [.ble(isBleServer: isBleServer, uuid: UUID())] }
 	}
 	/// initialize from cbor data
-	public init?(data: [UInt8]) {
-		guard let obj = try? CBOR.decode(data) else { return nil }
-		self.init(cbor: obj)
+	public init(data: [UInt8]) throws {
+		guard let obj = try? CBOR.decode(data) else { throw MdocValidationError.deviceEngagementInvalidCbor }
+		try self.init(cbor: obj)
 	}
-    
+
     public mutating func makePrivateKey(crv: CoseEcCurve, secureArea: any SecureArea) async throws {
         var pk = CoseKeyPrivate(secureArea: secureArea)
         try await pk.makeKey(curve: crv)
         privateKey = pk
         security = Security(deviceKey: pk.key)
     }
-	
+
 	public var isBleServer: Bool? {
 		guard let deviceRetrievalMethods else { return nil}
 		for case let .ble(isBleServer, _) in deviceRetrievalMethods {
@@ -80,7 +80,7 @@ public struct DeviceEngagement: Sendable {
 		}
 		return nil
 	}
-	
+
 	public var ble_uuid: String? {
 		guard let deviceRetrievalMethods else { return nil}
 		for case let .ble(_, uuid) in deviceRetrievalMethods {
@@ -95,7 +95,7 @@ extension DeviceEngagement: CBOREncodable {
 		var res = CBOR.map([0: .utf8String(version), 1: security.toCBOR(options: options)])
 		if let drms = deviceRetrievalMethods { res[2] = .array(drms.map { $0.toCBOR(options: options)}) }
 		if let sro = serverRetrievalOptions { res[3] = sro.toCBOR(options: options) }
-		if let oi = originInfos { 	res[5] = .array(oi.map {$0.toCBOR(options: CBOROptions()) }) }
+		if let oi = originInfos { res[5] = .array(oi.map {$0.toCBOR(options: CBOROptions()) }) }
 		if let rfus = self.rfus { for (i,r) in rfus.enumerated() { res[.negativeInt(UInt64(i))] = .utf8String(r) } }
 		logger.debug("DE: \(res.encode().toHexString())")
 		return res
@@ -103,14 +103,15 @@ extension DeviceEngagement: CBOREncodable {
 }
 
 extension DeviceEngagement: CBORDecodable {
-	public init?(cbor: CBOR) {
-		guard case let .map(map) = cbor else { return nil }
-		guard let cv = map[0], case let .utf8String(v) = cv, v.prefix(2) == "1." else { return nil }
-		guard let cs = map[1], let s = Security(cbor: cs) else { return nil }
-		if let cdrms = map[2], case let .array(drms) = cdrms, drms.count > 0 { deviceRetrievalMethods = drms.compactMap(DeviceRetrievalMethod.init(cbor:)) }
-		if let csro = map[3], let sro = ServerRetrievalOptions.init(cbor: csro) { serverRetrievalOptions = sro }
-		if case let .array(obj5) = map[5] { originInfos = obj5.compactMap(OriginInfoWebsite.init(cbor:)) }
-		version = v; security = s
+	public init(cbor: CBOR) throws(MdocValidationError) {
+		guard case let .map(map) = cbor else { throw .deviceEngagementInvalidCbor }
+		guard let cv = map[0], case let .utf8String(v) = cv, v.prefix(2) == "1." else { throw .deviceEngagementInvalidCbor }
+		guard let cs = map[1] else { throw .deviceEngagementInvalidCbor }
+        security = try Security(cbor: cs)
+		if let cdrms = map[2], case let .array(drms) = cdrms, drms.count > 0 { deviceRetrievalMethods = try drms.map(DeviceRetrievalMethod.init(cbor:)) }
+		if let csro = map[3] { serverRetrievalOptions = try ServerRetrievalOptions.init(cbor: csro) } else { serverRetrievalOptions = nil }
+		if case let .array(obj5) = map[5] { originInfos = try obj5.map(OriginInfoWebsite.init(cbor:)) }
+		version = v
 	}
 }
 

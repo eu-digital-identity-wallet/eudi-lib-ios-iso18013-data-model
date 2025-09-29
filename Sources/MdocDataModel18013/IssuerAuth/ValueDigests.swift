@@ -24,18 +24,18 @@ import OrderedCollections
 public struct ValueDigests: Sendable {
 	public let valueDigests: [NameSpace: DigestIDs]
 	public subscript(ns: NameSpace) -> DigestIDs? {valueDigests[ns] }
-	
+
 	public init(valueDigests: [NameSpace : DigestIDs]) {
 		self.valueDigests = valueDigests
 	}
 }
 
 extension ValueDigests: CBORDecodable {
-	public init?(cbor: CBOR) {
-		guard case let .map(d) = cbor else { return nil }
+	public init(cbor: CBOR) throws(MdocValidationError) {
+		guard case let .map(d) = cbor else { throw .valueDigestsInvalidCbor }
 		var temp = [NameSpace: DigestIDs]()
 		for (k,v) in d {
-			if case .utf8String(let ns) = k, let dis = DigestIDs(cbor: v) { temp[ns] = dis}
+			if case .utf8String(let ns) = k  { temp[ns] = try DigestIDs(cbor: v)}
 		}
 		valueDigests = temp
 	}

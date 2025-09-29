@@ -35,10 +35,10 @@ extension ServerRetrievalOption: CBOREncodable {
 }
 
 extension ServerRetrievalOption: CBORDecodable {
-	public init?(cbor: CBOR) {
-        guard case let .array(arr) = cbor, arr.count > 2 else { return nil }
-        guard case let .unsignedInt(v) = arr[0], v == Self.versionImpl else { return nil }
-        guard case let .utf8String(u) = arr[1], case let .utf8String(t) = arr[2] else { return nil }
+	public init(cbor: CBOR) throws(MdocValidationError) {
+        guard case let .array(arr) = cbor, arr.count > 2 else { throw .deviceKeyInfoInvalidCbor }
+        guard case let .unsignedInt(v) = arr[0], v == Self.versionImpl else { throw .deviceKeyInfoInvalidCbor }
+        guard case let .utf8String(u) = arr[1], case let .utf8String(t) = arr[2] else { throw .deviceKeyInfoInvalidCbor }
         version = v; url = u; token = t
     }
 }
