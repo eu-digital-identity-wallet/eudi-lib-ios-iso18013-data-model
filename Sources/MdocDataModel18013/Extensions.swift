@@ -163,7 +163,7 @@ extension CBOR {
 		return bytes
 	}
 	public func decodeTagged<T: CBORDecodable>(_ t: T.Type = T.self) throws -> T {
-		guard case let CBOR.tagged(tag, cborEncoded) = self, tag == .encodedCBORDataItem, case let .byteString(bytes) = cborEncoded else {  throw MdocValidationError. }
+		guard case let CBOR.tagged(tag, cborEncoded) = self, tag == .encodedCBORDataItem, case let .byteString(bytes) = cborEncoded else {  throw MdocValidationError.cborDecodingError }
 		return try T.init(data: bytes)
 	}
 
