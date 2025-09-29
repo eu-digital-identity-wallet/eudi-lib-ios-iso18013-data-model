@@ -45,9 +45,9 @@ extension ServerRetrievalOptions: CBOREncodable {
 
 extension ServerRetrievalOptions: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-        guard case let .map(map) = cbor else { throw .serverRetrievalMethodInvalidCbor }
+        guard case let .map(map) = cbor else { throw .invalidCbor("server retrieval method") }
         if let cborW = map[.utf8String(Keys.webApi.rawValue)] { webAPI = try ServerRetrievalOption(cbor: cborW) }
         if let cborO = map[.utf8String(Keys.oidc.rawValue)] { oIDC = try ServerRetrievalOption(cbor: cborO) }
-        if isEmpty { throw .serverRetrievalMethodInvalidCbor }
+        if isEmpty { throw .invalidCbor("server retrieval method") }
     }
 }

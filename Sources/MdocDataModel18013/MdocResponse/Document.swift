@@ -45,12 +45,12 @@ public struct Document: Sendable {
 
 extension Document: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case .map(let cd) = cbor else { throw .documentInvalidCbor }
-		guard case .utf8String(let dt) = cd[Keys.docType] else { throw .documentInvalidCbor }
+		guard case .map(let cd) = cbor else { throw .invalidCbor("document") }
+		guard case .utf8String(let dt) = cd[Keys.docType] else { throw .invalidCbor("document") }
 		docType = dt
-		guard let cis = cd[Keys.issuerSigned] else { throw .documentInvalidCbor }
+		guard let cis = cd[Keys.issuerSigned] else { throw .invalidCbor("document") }
 		issuerSigned = try IssuerSigned(cbor: cis)
-		guard let cds = cd[Keys.deviceSigned] else { throw .documentInvalidCbor }
+		guard let cds = cd[Keys.deviceSigned] else { throw .invalidCbor("document") }
 		deviceSigned = try DeviceSigned(cbor: cds)
 		if let ce = cd[Keys.errors] { errors = try Errors(cbor: ce) } else { errors = nil }
 	}

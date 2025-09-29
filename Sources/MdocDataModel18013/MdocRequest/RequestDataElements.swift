@@ -29,14 +29,14 @@ public struct RequestDataElements: Sendable {
 
 extension RequestDataElements: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-  		guard case let .map(e) = cbor else { throw .requestDataElementsInvalidCbor }
+  		guard case let .map(e) = cbor else { throw .invalidCbor("request data elements") }
 		let dePairs = try e.map { (k: CBOR, v: CBOR)  throws(MdocValidationError) -> (DataElementIdentifier, Bool) in
-			guard case .utf8String(let dei) = k else { throw .requestDataElementsInvalidCbor }
-			guard case .boolean(let ir) = v else { throw .requestDataElementsInvalidCbor }
+			guard case .utf8String(let dei) = k else { throw .invalidCbor("request data elements") }
+			guard case .boolean(let ir) = v else { throw .invalidCbor("request data elements") }
 			return (dei, ir)
 		}
         let de = Dictionary(dePairs, uniquingKeysWith: { (first, _) in first })
-		if de.count == 0 { throw .requestDataElementsInvalidCbor }
+		if de.count == 0 { throw .invalidCbor("request data elements") }
 		dataElements = de
     }
 }

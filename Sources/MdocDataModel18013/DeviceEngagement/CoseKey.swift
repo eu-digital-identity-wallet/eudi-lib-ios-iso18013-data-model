@@ -37,7 +37,6 @@ public struct CoseKey: Equatable, Codable, Sendable {
         case kty
         case x
         case y
-        case d
     }
 }
 
@@ -60,9 +59,6 @@ public struct CoseKeyPrivate: Sendable {
         self.secureArea = secureArea
     }
 
-    public enum Keys: String {
-        case d
-    }
 }
 
 extension CoseKeyPrivate {
@@ -87,7 +83,7 @@ extension CoseKey: CBOREncodable {
 
 extension CoseKey: CBORDecodable {
 	public init(cbor obj: CBOR) throws(MdocValidationError) {
-		guard let calg = obj[-1], case let CBOR.unsignedInt(ralg) = calg, let alg = CoseEcCurve(rawValue: ralg) else { throw .coseKeyInvalidCbor }
+		guard let calg = obj[-1], case let CBOR.unsignedInt(ralg) = calg, let alg = CoseEcCurve(rawValue: ralg) else { throw .invalidCbor("COSE key") }
 		crv = alg
 		guard let ckty = obj[1], case let CBOR.unsignedInt(rkty) = ckty else { throw .coseKeyMissingField(Keys.kty.rawValue) }
 		kty = rkty

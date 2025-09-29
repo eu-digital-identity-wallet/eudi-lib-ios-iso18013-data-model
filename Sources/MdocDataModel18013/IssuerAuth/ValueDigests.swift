@@ -32,7 +32,7 @@ public struct ValueDigests: Sendable {
 
 extension ValueDigests: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case let .map(d) = cbor else { throw .valueDigestsInvalidCbor }
+		guard case let .map(d) = cbor else { throw .invalidCbor("value digests") }
 		var temp = [NameSpace: DigestIDs]()
 		for (k,v) in d {
 			if case .utf8String(let ns) = k  { temp[ns] = try DigestIDs(cbor: v)}

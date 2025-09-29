@@ -106,13 +106,13 @@ extension IssuerSignedItem {
 
 extension IssuerSignedItem: CBORDecodable {
 	public init(data: [UInt8]) throws(MdocValidationError) {
-        guard let cbor = try? CBOR.decode(data) else { throw .issuerSignedItemInvalidCbor }
+        guard let cbor = try? CBOR.decode(data) else { throw .invalidCbor("issuer signed item") }
         try self.init(cbor: cbor)
         rawData = data
     }
 
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case .map(let cd) = cbor else { throw .issuerSignedItemInvalidCbor }
+		guard case .map(let cd) = cbor else { throw .invalidCbor("issuer signed item") }
         guard case .unsignedInt(let did) = cd[Keys.digestID] else { throw .issuerSignedItemMissingField(Keys.digestID.rawValue) }
         digestID = did
         guard case .byteString(let r) = cd[Keys.random] else { throw .issuerSignedItemMissingField(Keys.random.rawValue) }

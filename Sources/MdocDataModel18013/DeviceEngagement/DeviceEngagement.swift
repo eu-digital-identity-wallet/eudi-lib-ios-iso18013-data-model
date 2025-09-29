@@ -62,7 +62,7 @@ public struct DeviceEngagement: Sendable {
 	}
 	/// initialize from cbor data
 	public init(data: [UInt8]) throws {
-		guard let obj = try? CBOR.decode(data) else { throw MdocValidationError.deviceEngagementInvalidCbor }
+		guard let obj = try? CBOR.decode(data) else { throw MdocValidationError.invalidCbor("device engagement") }
 		try self.init(cbor: obj)
 	}
 
@@ -104,9 +104,9 @@ extension DeviceEngagement: CBOREncodable {
 
 extension DeviceEngagement: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case let .map(map) = cbor else { throw .deviceEngagementInvalidCbor }
-		guard let cv = map[0], case let .utf8String(v) = cv, v.prefix(2) == "1." else { throw .deviceEngagementInvalidCbor }
-		guard let cs = map[1] else { throw .deviceEngagementInvalidCbor }
+		guard case let .map(map) = cbor else { throw .invalidCbor("device engagement") }
+		guard let cv = map[0], case let .utf8String(v) = cv, v.prefix(2) == "1." else { throw .invalidCbor("device engagement") }
+		guard let cs = map[1] else { throw .invalidCbor("device engagement") }
         security = try Security(cbor: cs)
 		if let cdrms = map[2], case let .array(drms) = cdrms, drms.count > 0 { deviceRetrievalMethods = try drms.map(DeviceRetrievalMethod.init(cbor:)) }
 		if let csro = map[3] { serverRetrievalOptions = try ServerRetrievalOptions.init(cbor: csro) } else { serverRetrievalOptions = nil }

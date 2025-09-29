@@ -27,14 +27,14 @@ public struct RequestNameSpaces: Sendable {
 
 extension RequestNameSpaces: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-  		guard case let .map(e) = cbor else { throw .requestNameSpacesInvalidCbor }
+  		guard case let .map(e) = cbor else { throw .invalidCbor("request name spaces") }
 		let dePairs = try e.map { (k: CBOR, v: CBOR)  throws(MdocValidationError) -> (NameSpace, RequestDataElements)   in
-			guard case .utf8String(let ns) = k else { throw .requestNameSpacesInvalidCbor }
+			guard case .utf8String(let ns) = k else { throw .invalidCbor("request name spaces") }
 			let rde = try RequestDataElements(cbor: v)
 			return (ns, rde)
 		}
         let de = Dictionary(dePairs, uniquingKeysWith: { (first, _) in first })
-		if de.count == 0 { throw .requestNameSpacesInvalidCbor }
+		if de.count == 0 { throw .invalidCbor("request name spaces") }
 		nameSpaces = de
     }
 }

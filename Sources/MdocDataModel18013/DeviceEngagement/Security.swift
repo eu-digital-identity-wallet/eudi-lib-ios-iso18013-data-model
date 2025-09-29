@@ -41,8 +41,8 @@ extension Security: CBOREncodable {
 
 extension Security: CBORDecodable {
 	init(cbor: CBOR) throws(MdocValidationError) {
-		guard case let .array(arr) = cbor, arr.count > 1 else { throw .securityInvalidCbor }
-		guard case let .unsignedInt(v) = arr[0], v == Self.cipherSuiteIdentifier else { throw .securityInvalidCbor }
-		do { deviceKey = try arr[1].decodeTagged(CoseKey.self) } catch { throw .securityInvalidCbor }
+		guard case let .array(arr) = cbor, arr.count > 1 else { throw .invalidCbor("security") }
+		guard case let .unsignedInt(v) = arr[0], v == Self.cipherSuiteIdentifier else { throw .invalidCbor("security") }
+		do { deviceKey = try arr[1].decodeTagged(CoseKey.self) } catch { throw .invalidCbor("security") }
 	}
 }

@@ -44,13 +44,13 @@ public struct IssuerAuth: Sendable {
 extension IssuerAuth: CBORDecodable {
 
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard let cose = Cose(type: .sign1, cbor: cbor) else { throw .issuerAuthInvalidCbor }
-		guard case let .byteString(bs) = cose.payload, let va = cose.verifyAlgorithm else { throw .issuerAuthInvalidCbor }
+		guard let cose = Cose(type: .sign1, cbor: cbor) else { throw .invalidCbor("issuer auth") }
+		guard case let .byteString(bs) = cose.payload, let va = cose.verifyAlgorithm else { throw .invalidCbor("issuer auth") }
 		mso = try MobileSecurityObject(data: bs); msoRawData = bs; verifyAlgorithm = va; signature = cose.signature; statusIdentifier = StatusIdentifier(data: bs)
-		guard let ch = cose.unprotectedHeader?.rawHeader, case let .map(mch) = ch  else { throw .issuerAuthInvalidCbor }
+		guard let ch = cose.unprotectedHeader?.rawHeader, case let .map(mch) = ch  else { throw .invalidCbor("issuer auth") }
 		if case let .byteString(bs) = mch[.unsignedInt(33)] { iaca = [bs] }
 		else if case let .array(a) = mch[.unsignedInt(33)] { iaca = a.compactMap { if case let .byteString(bs) = $0 { return bs } else { return nil } } }
-		else { throw .issuerAuthInvalidCbor }
+		else { throw .invalidCbor("issuer auth") }
 	}
 }
 

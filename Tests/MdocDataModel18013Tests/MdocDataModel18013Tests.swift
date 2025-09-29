@@ -211,6 +211,7 @@ final class MdocDataModel18013Tests: XCTestCase {
 		let drPid = try XCTUnwrap(DeviceResponse(data: [UInt8](pidData)))
 		let drSample = DeviceResponse(version: drPid.version, documents: drMdl.documents! + drPid.documents!,
 			documentErrors: nil, status: drPid.status)
+        XCTAssertEqual(drSample.documents!.count, 2)
 	}
 
 	func testUUIDFromBytes() {

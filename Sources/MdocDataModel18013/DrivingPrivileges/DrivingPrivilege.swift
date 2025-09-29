@@ -41,7 +41,7 @@ public struct DrivingPrivilege: Codable, Sendable {
 
 extension DrivingPrivilege: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-        guard case let .utf8String(v) = cbor[.utf8String(CodingKeys.vehicleCategoryCode.rawValue)] else { throw .drivingPrivilegeInvalidCbor }
+        guard case let .utf8String(v) = cbor[.utf8String(CodingKeys.vehicleCategoryCode.rawValue)] else { throw .invalidCbor("driving privilege") }
         vehicleCategoryCode = v
         if let id = cbor[.utf8String(CodingKeys.issueDate.rawValue)]?.decodeFullDate() { issueDate = id} else { issueDate = nil }
         if let ed = cbor[.utf8String(CodingKeys.expiryDate.rawValue)]?.decodeFullDate() { expiryDate = ed} else { expiryDate = nil }

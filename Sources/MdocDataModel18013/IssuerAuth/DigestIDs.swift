@@ -32,12 +32,12 @@ public struct DigestIDs: Sendable {
 
 extension DigestIDs: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case let .map(d) = cbor else { throw MdocValidationError.valueDigestsInvalidCbor }
+		guard case let .map(d) = cbor else { throw MdocValidationError.invalidCbor("value digests") }
 		var temp = [DigestID: [UInt8]]()
 		for (k,v) in d {
 			if case .unsignedInt(let ui) = k, case .byteString(let ud) = v { temp[ui] = ud}
 		}
-		guard temp.count > 0 else  { throw MdocValidationError.valueDigestsInvalidCbor }
+		guard temp.count > 0 else  { throw MdocValidationError.invalidCbor("value digests") }
 		digestIDs = temp
 	}
 }

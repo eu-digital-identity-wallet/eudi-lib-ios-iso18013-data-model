@@ -45,13 +45,13 @@ public struct DeviceRequest: Sendable {
 
 extension DeviceRequest: CBORDecodable {
     public init(cbor: CBOR) throws(MdocValidationError) {
-        guard case let .map(m) = cbor else { throw .deviceRequestInvalidCbor }
+        guard case let .map(m) = cbor else { throw .invalidCbor("device request") }
         guard case let .utf8String(v) = m[Keys.version] else { throw .deviceRequestMissingField(Keys.version.rawValue) }
         version = v
-		if v.count == 0 || v.prefix(1) != "1" { throw .deviceRequestInvalidCbor }
+		if v.count == 0 || v.prefix(1) != "1" { throw .invalidCbor("device request") }
         guard case let .array(cdrs) = m[Keys.docRequests] else { throw .deviceRequestMissingField(Keys.docRequests.rawValue) }
-        do { docRequests = try cdrs.map { try DocRequest(cbor: $0) } } catch { throw .deviceRequestInvalidCbor }
-        guard docRequests.count > 0 else { throw .deviceRequestInvalidCbor }
+        do { docRequests = try cdrs.map { try DocRequest(cbor: $0) } } catch { throw .invalidCbor("device request") }
+        guard docRequests.count > 0 else { throw .invalidCbor("device request") }
     }
 }
 

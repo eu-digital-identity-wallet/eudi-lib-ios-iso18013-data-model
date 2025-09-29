@@ -38,11 +38,11 @@ public struct DeviceSigned: Sendable {
 
 extension DeviceSigned: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case let .map(m) = cbor else { throw .deviceRequestInvalidCbor }
-		guard case let .tagged(t, cdns) = m[Keys.nameSpaces], t == .encodedCBORDataItem, case let .byteString(bs) = cdns else { throw .deviceRequestInvalidCbor }
+		guard case let .map(m) = cbor else { throw .invalidCbor("device signed") }
+		guard case let .tagged(t, cdns) = m[Keys.nameSpaces], t == .encodedCBORDataItem, case let .byteString(bs) = cdns else { throw .invalidCbor("device signed") }
 		guard let obj = try? CBOR.decode(bs) else { throw MdocValidationError.cborDecodingError }
         nameSpaces = try DeviceNameSpaces(cbor: obj)
-		guard let cdu = m[Keys.deviceAuth] else { throw .deviceRequestInvalidCbor }
+		guard let cdu = m[Keys.deviceAuth] else { throw .invalidCbor("device signed") }
 		deviceAuth = try DeviceAuth(cbor: cdu)
 		nameSpacesRawData = bs
 	}
@@ -65,9 +65,9 @@ public struct DeviceNameSpaces: Sendable {
 
 extension DeviceNameSpaces: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case let .map(m) = cbor else { throw .deviceSignedInvalidCbor }
+		guard case let .map(m) = cbor else { throw .invalidCbor("device signed") }
 		let dnsPairs = try m.map { (k: CBOR, v: CBOR) throws(MdocValidationError) -> (NameSpace, DeviceSignedItems)  in
-			guard case .utf8String(let ns) = k else { throw .deviceSignedInvalidCbor }
+			guard case .utf8String(let ns) = k else { throw .invalidCbor("device signed") }
 			let dsi = try DeviceSignedItems(cbor: v)
 			return (ns,dsi)
 		}
@@ -84,13 +84,13 @@ public struct DeviceSignedItems: Sendable {
 
 extension DeviceSignedItems: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case let .map(m) = cbor else { throw .deviceSignedInvalidCbor }
+		guard case let .map(m) = cbor else { throw .invalidCbor("device signed") }
 		let dsiPairs = try m.map { (k: CBOR, v: CBOR) throws(MdocValidationError) -> (DataElementIdentifier, DataElementValue)  in
-			guard case .utf8String(let dei) = k else { throw .deviceSignedInvalidCbor }
+			guard case .utf8String(let dei) = k else { throw .invalidCbor("device signed") }
 			return (dei,v)
 		}
 		let dsi = Dictionary(dsiPairs, uniquingKeysWith: { (first, _) in first })
-		if dsi.count == 0 { throw .deviceSignedInvalidCbor }
+		if dsi.count == 0 { throw .invalidCbor("device signed") }
 		deviceSignedItems = dsi
 	}
 }

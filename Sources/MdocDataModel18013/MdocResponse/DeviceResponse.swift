@@ -52,8 +52,8 @@ public struct DeviceResponse: Sendable {
 
 extension DeviceResponse: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case .map(let cd) = cbor else { throw .deviceResponseInvalidCbor }
-		guard case .utf8String(let v) = cd[Keys.version] else { throw .documentInvalidCbor }
+		guard case .map(let cd) = cbor else { throw .invalidCbor("device response") }
+		guard case .utf8String(let v) = cd[Keys.version] else { throw .invalidCbor("document") }
 		version = v
 		if case let .array(ds) = cd[Keys.documents] {
 			let ds = try ds.map { d  throws(MdocValidationError) in try Document(cbor:d) }
@@ -63,7 +63,7 @@ extension DeviceResponse: CBORDecodable {
 			let de = try are.map { d throws(MdocValidationError) in try DocumentError(cbor:d) }
 			if de.count > 0 { self.documentErrors = de } else { self.documentErrors = nil }
 		}  else { documentErrors = nil }
-		guard case .unsignedInt(let st) = cd[Keys.status] else { throw .deviceResponseInvalidCbor }
+		guard case .unsignedInt(let st) = cd[Keys.status] else { throw .invalidCbor("device response") }
 		status = st
 	}
 }

@@ -33,10 +33,10 @@ public struct DocRequest: Sendable {
 
 extension DocRequest: CBORDecodable {
     public init(cbor: CBOR) throws(MdocValidationError) {
-        guard case let .map(m) = cbor else { throw .docRequestInvalidCbor }
+        guard case let .map(m) = cbor else { throw .invalidCbor("document request") }
         // item-request-bytes: tagged(24, items request)
-        guard case let .tagged(t, cirb) = m[Keys.itemsRequest], t == .encodedCBORDataItem, case let .byteString(bs) = cirb else { throw .docRequestInvalidCbor }
-        do { itemsRequest = try ItemsRequest(data: bs) } catch { throw .docRequestInvalidCbor }
+        guard case let .tagged(t, cirb) = m[Keys.itemsRequest], t == .encodedCBORDataItem, case let .byteString(bs) = cirb else { throw .invalidCbor("document request") }
+        do { itemsRequest = try ItemsRequest(data: bs) } catch { throw .invalidCbor("document request") }
         itemsRequestRawData = bs
         if let ra = m[Keys.readerAuth] { readerAuthRawCBOR = ra; readerAuth = try ReaderAuth(cbor: ra) } else { readerAuthRawCBOR = nil; readerAuth = nil }
     }

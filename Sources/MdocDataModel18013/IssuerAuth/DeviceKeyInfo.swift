@@ -43,7 +43,7 @@ public struct DeviceKeyInfo:Sendable {
 
 extension DeviceKeyInfo: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case let .map(v) = cbor else { throw MdocValidationError.deviceKeyInfoInvalidCbor }
+		guard case let .map(v) = cbor else { throw MdocValidationError.invalidCbor("device key info") }
 		guard let cdk = v[Keys.deviceKey] else { throw MdocValidationError.deviceKeyInfoMissingField("deviceKey") }
 		deviceKey = try CoseKey(cbor: cdk)
 		if let cka = v[Keys.keyAuthorizations] { keyAuthorizations = try KeyAuthorizations(cbor: cka) } else { keyAuthorizations = nil }
@@ -74,7 +74,7 @@ struct KeyAuthorizations: Sendable {
 
 extension KeyAuthorizations: CBORDecodable {
 	init(cbor: CBOR) throws(MdocValidationError) {
-		guard case let .map(v) = cbor else { throw MdocValidationError.keyAuthorizationsInvalidCbor }
+		guard case let .map(v) = cbor else { throw MdocValidationError.invalidCbor("key authorizations") }
 		var ans: AuthorizedNameSpaces? = nil
 		if case let .array(ar) = v[Keys.nameSpaces] {
 			ans = ar.compactMap { if case let .utf8String(s) = $0 { return s} else { return nil} }

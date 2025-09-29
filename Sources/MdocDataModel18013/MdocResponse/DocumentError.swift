@@ -31,14 +31,14 @@ public struct DocumentError: Sendable {
 
 extension DocumentError: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case let .map(e) = cbor else { throw MdocValidationError.documentErrorInvalidCbor }
+		guard case let .map(e) = cbor else { throw MdocValidationError.invalidCbor("document error") }
 		let dePairs = try e.map { (k: CBOR, v: CBOR) throws(MdocValidationError) -> (DocType, ErrorCode)  in
-			guard case .utf8String(let dt) = k else { throw .documentErrorInvalidCbor }
-			guard case .unsignedInt(let ec) = v else { throw .documentErrorInvalidCbor }
+			guard case .utf8String(let dt) = k else { throw .invalidCbor("document error") }
+			guard case .unsignedInt(let ec) = v else { throw .invalidCbor("document error") }
 			return (dt,ec)
 		}
 		let de = Dictionary(dePairs, uniquingKeysWith: { (first, _) in first })
-		if de.count == 0 { throw .documentErrorInvalidCbor }
+		if de.count == 0 { throw .invalidCbor("document error") }
 		docErrors = de
 	}
 }

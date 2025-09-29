@@ -58,14 +58,14 @@ public struct MobileSecurityObject: Sendable {
 extension MobileSecurityObject: CBORDecodable {
 	public init(data: [UInt8]) throws(MdocValidationError) {
 		// MobileSecurityObjectBytes = #6.24(bstr .cbor MobileSecurityObject)
-		guard let obj = try? CBOR.decode(data) else { throw .msoInvalidCbor }
-		guard case let CBOR.tagged(tag, cborEncoded) = obj, tag == .encodedCBORDataItem, case let .byteString(bytes) = cborEncoded else { throw .msoInvalidCbor }
-		guard let cbor = try? CBOR.decode(bytes) else { throw .msoInvalidCbor }
+		guard let obj = try? CBOR.decode(data) else { throw .invalidCbor("mobile security object") }
+		guard case let CBOR.tagged(tag, cborEncoded) = obj, tag == .encodedCBORDataItem, case let .byteString(bytes) = cborEncoded else { throw .invalidCbor("mobile security object") }
+		guard let cbor = try? CBOR.decode(bytes) else { throw .invalidCbor("mobile security object") }
 		try self.init(cbor: cbor)
 	}
 
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case let .map(v) = cbor else { throw .msoInvalidCbor }
+		guard case let .map(v) = cbor else { throw .invalidCbor("mobile security object") }
 		guard case let .utf8String(s) = v[Keys.version] else { throw .msoMissingField(Keys.version.rawValue) }
 		version = s
 		guard case let .utf8String(da) = v[Keys.digestAlgorithm] else { throw .msoMissingField(Keys.digestAlgorithm.rawValue) }
