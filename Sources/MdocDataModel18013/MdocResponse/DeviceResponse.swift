@@ -34,7 +34,7 @@ public struct DeviceResponse: Sendable {
 	/// An array of all returned document errors
 	public let documentErrors: [DocumentError]?
 	public let status: UInt64
-	
+
 	enum Keys: String {
 		case version
 		case documents
@@ -51,19 +51,19 @@ public struct DeviceResponse: Sendable {
 }
 
 extension DeviceResponse: CBORDecodable {
-	public init?(cbor: CBOR) {
-		guard case .map(let cd) = cbor else { return nil }
-		guard case .utf8String(let v) = cd[Keys.version] else { return nil }
+	public init(cbor: CBOR) throws(MdocValidationError) {
+		guard case .map(let cd) = cbor else { throw .invalidCbor("device response") }
+		guard case .utf8String(let v) = cd[Keys.version] else { throw .missingField("DeviceResponse", Keys.version.rawValue) }
 		version = v
-		if case let .array(ar) = cd[Keys.documents] {
-			let ds = ar.compactMap { Document(cbor:$0) }
-			if ds.count > 0 { documents = ds } else { documents = nil }
+		if case let .array(ds) = cd[Keys.documents] {
+			let ds = try ds.map { d  throws(MdocValidationError) in try Document(cbor:d) }
+			if ds.count > 0 { self.documents = ds } else { self.documents = nil }
 		} else { documents = nil }
 		if case let .array(are) = cd[Keys.documentErrors] {
-			let de = are.compactMap { DocumentError(cbor:$0) }
-			if de.count > 0 { documentErrors = de } else { documentErrors = nil }
+			let de = try are.map { d throws(MdocValidationError) in try DocumentError(cbor:d) }
+			if de.count > 0 { self.documentErrors = de } else { self.documentErrors = nil }
 		}  else { documentErrors = nil }
-		guard case .unsignedInt(let st) = cd[Keys.status] else { return nil }
+		guard case .unsignedInt(let st) = cd[Keys.status] else { throw .missingField("DeviceResponse", Keys.status.rawValue) }
 		status = st
 	}
 }

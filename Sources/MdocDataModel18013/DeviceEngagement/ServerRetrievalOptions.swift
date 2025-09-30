@@ -27,7 +27,7 @@ public struct ServerRetrievalOptions: Equatable, Sendable  {
 	public var webAPI: ServerRetrievalOption?
 	public var oIDC: ServerRetrievalOption?
 	public var isEmpty:Bool { webAPI == nil && oIDC == nil }
-    
+
     enum Keys : String {
         case webApi
         case oidc
@@ -44,10 +44,10 @@ extension ServerRetrievalOptions: CBOREncodable {
 }
 
 extension ServerRetrievalOptions: CBORDecodable {
-	public init?(cbor: CBOR) {
-        guard case let .map(map) = cbor else { return nil }
-        if let cborW = map[.utf8String(Keys.webApi.rawValue)] { webAPI = ServerRetrievalOption(cbor: cborW) }
-        if let cborO = map[.utf8String(Keys.oidc.rawValue)] { oIDC = ServerRetrievalOption(cbor: cborO) }
-        if isEmpty { return nil }
+	public init(cbor: CBOR) throws(MdocValidationError) {
+        guard case let .map(map) = cbor else { throw .invalidCbor("server retrieval method") }
+        if let cborW = map[.utf8String(Keys.webApi.rawValue)] { webAPI = try ServerRetrievalOption(cbor: cborW) }
+        if let cborO = map[.utf8String(Keys.oidc.rawValue)] { oIDC = try ServerRetrievalOption(cbor: cborO) }
+        if isEmpty { throw .invalidCbor("server retrieval method") }
     }
 }

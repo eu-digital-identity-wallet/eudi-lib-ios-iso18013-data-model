@@ -124,10 +124,10 @@ extension Array where Element == UInt8 {
 extension Array where Element: Comparable {
     func minWithIndexes() -> (value: Element, indexes: [Int])? {
         guard !isEmpty else { return nil }
-        
+
         var minValue = self[0]
         var minIndexes = [0]
-        
+
         for (index, value) in enumerated() where index != 0 {
             if value < minValue {
                 minValue = value
@@ -136,7 +136,7 @@ extension Array where Element: Comparable {
                 minIndexes.append(index)
             }
         }
-        
+
         return (minValue, minIndexes)
     }
 }
@@ -151,9 +151,9 @@ extension CBOREncodable {
 }
 
 extension CBORDecodable {
-	public init?(data: [UInt8]) {
-		guard let obj = try? CBOR.decode(data) else { return nil }
-		self.init(cbor: obj)
+	public init(data: [UInt8]) throws {
+		guard let obj = try CBOR.decode(data) else { throw MdocValidationError.cborDecodingError }
+		try self.init(cbor: obj)
 	}
 }
 
@@ -162,9 +162,9 @@ extension CBOR {
 		guard case let CBOR.tagged(tag, cborEncoded) = self, tag == .encodedCBORDataItem, case let .byteString(bytes) = cborEncoded else {  return nil }
 		return bytes
 	}
-	public func decodeTagged<T: CBORDecodable>(_ t: T.Type = T.self) -> T? {
-		guard case let CBOR.tagged(tag, cborEncoded) = self, tag == .encodedCBORDataItem, case let .byteString(bytes) = cborEncoded else {  return nil }
-		return .init(data: bytes)
+	public func decodeTagged<T: CBORDecodable>(_ t: T.Type = T.self) throws -> T {
+		guard case let CBOR.tagged(tag, cborEncoded) = self, tag == .encodedCBORDataItem, case let .byteString(bytes) = cborEncoded else {  throw MdocValidationError.cborDecodingError }
+		return try T.init(data: bytes)
 	}
 
 	public func decodeFullDate() -> String? {
@@ -298,8 +298,8 @@ extension CBOR {
 	}
 
 	public func getTypedValue<T>() -> T? {
-		if T.self == ServerRetrievalOption.self { return ServerRetrievalOption(cbor: self) as? T }
-		else if T.self == DrivingPrivileges.self { return DrivingPrivileges(cbor: self) as? T }
+		if T.self == ServerRetrievalOption.self { return try? ServerRetrievalOption(cbor: self) as? T }
+		else if T.self == DrivingPrivileges.self { return try? DrivingPrivileges(cbor: self) as? T }
 		else if case let .tagged(tag, cbor) = self {
 			if T.self == String.self, tag.rawValue == 1004 || tag == .standardDateTimeString {
 				let strDate = cbor.unwrap() as? String
@@ -393,7 +393,7 @@ extension OrderedDictionary where Key == String, Value == Any {
 }
 
 public protocol CBORDecodable {
-	init?(cbor: CBOR)
+	init(cbor: CBOR) throws
 }
 
 extension IssuerSignedItem {

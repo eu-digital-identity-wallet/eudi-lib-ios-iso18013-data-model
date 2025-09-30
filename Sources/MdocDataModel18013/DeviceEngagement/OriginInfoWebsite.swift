@@ -39,10 +39,10 @@ extension OriginInfoWebsite: CBOREncodable {
 }
 
 extension OriginInfoWebsite: CBORDecodable {
-	public init?(cbor: CBOR) {
-		guard case let .map(tS) = cbor else { return nil } // throw AppError.cbor("Top-level CBOR is not an map")}
-		guard case let .unsignedInt(nsCat) = tS["cat"] else { return nil } // throw AppError.cbor("cat not found")};
-		guard case let .map(nsDetails) = tS["Details"], case let .utf8String(nsUrl) = nsDetails["baseUrl"] else { return nil } //throw AppError.cbor("CBOR does not contain a url field")};
+	public init(cbor: CBOR) throws(MdocValidationError) {
+		guard case let .map(tS) = cbor else { throw .invalidCbor("origin info website") }
+		guard case let .unsignedInt(nsCat) = tS["cat"] else { throw .missingField("OriginInfoWebsite", "cat") }
+		guard case let .map(nsDetails) = tS["Details"], case let .utf8String(nsUrl) = nsDetails["baseUrl"] else { throw .missingField("OriginInfoWebsite", "baseUrl") }
 		self.init(baseUrl: nsUrl, cat: nsCat)
 	}
 }

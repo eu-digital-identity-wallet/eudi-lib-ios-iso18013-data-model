@@ -30,7 +30,7 @@ public struct DrivingPrivilege: Codable, Sendable {
 	public let expiryDate: String?
     /// Array of code info
 	public let codes: [DrivingPrivilegeCode]?
-    
+
     enum CodingKeys: String, CodingKey, CaseIterable {
         case vehicleCategoryCode = "vehicle_category_code"
         case issueDate = "issue_date"
@@ -40,12 +40,12 @@ public struct DrivingPrivilege: Codable, Sendable {
 }
 
 extension DrivingPrivilege: CBORDecodable {
-	public init?(cbor: CBOR) {
-        guard case let .utf8String(v) = cbor[.utf8String(CodingKeys.vehicleCategoryCode.rawValue)] else { return nil }
+	public init(cbor: CBOR) throws(MdocValidationError) {
+        guard case let .utf8String(v) = cbor[.utf8String(CodingKeys.vehicleCategoryCode.rawValue)] else { throw .invalidCbor("driving privilege") }
         vehicleCategoryCode = v
         if let id = cbor[.utf8String(CodingKeys.issueDate.rawValue)]?.decodeFullDate() { issueDate = id} else { issueDate = nil }
         if let ed = cbor[.utf8String(CodingKeys.expiryDate.rawValue)]?.decodeFullDate() { expiryDate = ed} else { expiryDate = nil }
-        if case let .array(ac) = cbor[.utf8String(CodingKeys.codes.rawValue)] { codes = ac.compactMap(DrivingPrivilegeCode.init(cbor:)) } else { codes = nil }
+        if case let .array(ac) = cbor[.utf8String(CodingKeys.codes.rawValue)] { codes = try ac.map(DrivingPrivilegeCode.init(cbor:)) } else { codes = nil }
     }
 }
 
