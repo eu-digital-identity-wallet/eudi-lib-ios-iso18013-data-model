@@ -23,17 +23,16 @@ public struct IssuerAuth: Sendable {
 	public let mso: MobileSecurityObject
 	public let msoRawData: [UInt8]
     public let statusIdentifier: StatusIdentifier?
-	/// one or more certificates
 	public let verifyAlgorithm: Cose.VerifyAlgorithm
 	public let signature: Data
-	public let iaca: [[UInt8]]
+	public let x5chain: [[UInt8]]
 
-	public init(mso: MobileSecurityObject, msoRawData: [UInt8], verifyAlgorithm: Cose.VerifyAlgorithm, signature: Data, iaca: [[UInt8]], statusIdentifier: StatusIdentifier?) {
+	public init(mso: MobileSecurityObject, msoRawData: [UInt8], verifyAlgorithm: Cose.VerifyAlgorithm, signature: Data, x5chain: [[UInt8]], statusIdentifier: StatusIdentifier?) {
 		self.mso = mso
 		self.msoRawData = msoRawData
 		self.verifyAlgorithm = verifyAlgorithm
 		self.signature = signature
-		self.iaca = iaca
+		self.x5chain = x5chain
         self.statusIdentifier = statusIdentifier
 	}
 }
@@ -44,19 +43,21 @@ public struct IssuerAuth: Sendable {
 extension IssuerAuth: CBORDecodable {
 
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard let cose = Cose(type: .sign1, cbor: cbor) else { throw .invalidCbor("issuer auth") }
-		guard case let .byteString(bs) = cose.payload, let va = cose.verifyAlgorithm else { throw .invalidCbor("issuer auth") }
+		guard let cose = Cose(type: .sign1, cbor: cbor) else { throw .invalidCbor("Issuer auth must be a Sign1 message") }
+		guard case let .byteString(bs) = cose.payload, let va = cose.verifyAlgorithm else { throw .invalidCbor("Issuer auth must contain a valid payload and verification algorithm") }
 		mso = try MobileSecurityObject(data: bs); msoRawData = bs; verifyAlgorithm = va; signature = cose.signature; statusIdentifier = StatusIdentifier(data: bs)
-		guard let ch = cose.unprotectedHeader?.rawHeader, case let .map(mch) = ch  else { throw .invalidCbor("issuer auth") }
-		if case let .byteString(bs) = mch[.unsignedInt(33)] { iaca = [bs] }
-		else if case let .array(a) = mch[.unsignedInt(33)] { iaca = a.compactMap { if case let .byteString(bs) = $0 { return bs } else { return nil } } }
-		else { throw .invalidCbor("issuer auth") }
+		guard let ch = cose.unprotectedHeader?.rawHeader, case let .map(mch) = ch  else { throw .invalidCbor("Issuer auth must contain a valid unprotected header") }
+		if case let .byteString(bs) = mch[.unsignedInt(33)]
+        { x5chain = [bs] }
+		else if case let .array(a) = mch[.unsignedInt(33)]
+        { x5chain = try a.map { cbs throws(MdocValidationError) in if case let .byteString(bs) = cbs { return bs } else { throw .invalidCbor("x5chain array elements must be byte strings") } } }
+		else { throw .invalidCbor("Issuer auth must contain a valid x5chain") }
 	}
 }
 
 extension IssuerAuth: CBOREncodable {
 	public func toCBOR(options: SwiftCBOR.CBOROptions) -> SwiftCBOR.CBOR {
-		let unprotectedHeaderCbor = CBOR.map([.unsignedInt(33): iaca.count == 1 ? CBOR.byteString(iaca[0]) : CBOR.array(iaca.map { CBOR.byteString($0) })])
+		let unprotectedHeaderCbor = CBOR.map([.unsignedInt(33): x5chain.count == 1 ? CBOR.byteString(x5chain[0]) : CBOR.array(x5chain.map { CBOR.byteString($0) })])
 		let cose = Cose(type: .sign1, algorithm: verifyAlgorithm.rawValue, payloadData: Data(msoRawData), unprotectedHeaderCbor:  unprotectedHeaderCbor, signature: signature)
 		return cose.toCBOR(options: options)
 	}
