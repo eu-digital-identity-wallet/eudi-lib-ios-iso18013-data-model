@@ -31,12 +31,14 @@ public struct IssuerNameSpaces: Sendable {
 
 extension IssuerNameSpaces: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case let .map(m) = cbor else { throw .invalidCbor("issuer signed") }
+		guard case let .map(m) = cbor else { throw .invalidCbor("issuer namespaces") }
 		var temp = [NameSpace: [IssuerSignedItem]]()
 		for (k,v) in m {
 			guard case let .utf8String(ns) = k, case let .array(ar) = v else { continue }
 			let items = try ar.map { c throws(MdocValidationError) -> IssuerSignedItem in
-				guard case let .tagged(tg, cbs) = c, tg == .encodedCBORDataItem, case let .byteString(bs) = cbs else { throw .invalidCbor("issuer signed") }
+				guard case let .tagged(tg, cbs) = c, tg == .encodedCBORDataItem, case let .byteString(bs) = cbs else {
+                    throw .invalidCbor("issuer signed item '\(k)'")
+                }
 				return try IssuerSignedItem(data: bs)
 			}
 			temp[ns] = items
