@@ -67,7 +67,7 @@ extension CoseKeyPrivate {
         let ephemeralKeyId = UUID().uuidString
         index = 0
         privateKeyId = ephemeralKeyId
-        self.key = (try await secureArea.createKeyBatch(id: ephemeralKeyId, keyOptions: KeyOptions(curve: curve))).first!
+        self.key = (try await secureArea.createKeyBatch(id: ephemeralKeyId, credentialOptions: CredentialOptions(credentialPolicy: .rotateUse, batchSize: 1), keyOptions: KeyOptions(curve: curve))).first!
 	}
 }
 

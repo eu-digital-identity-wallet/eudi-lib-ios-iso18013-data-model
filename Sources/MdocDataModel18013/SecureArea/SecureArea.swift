@@ -36,7 +36,7 @@ public protocol SecureArea: Actor {
     nonisolated static func create(storage: any SecureKeyStorage) -> Self
     /// make an array of keys and return the public keys
     /// The public keys are passed to the Open4VCI module
-    func createKeyBatch(id: String, keyOptions: KeyOptions?) async throws -> [CoseKey]
+    func createKeyBatch(id: String, credentialOptions: CredentialOptions, keyOptions: KeyOptions?) async throws -> [CoseKey]
     /// unlock key and return unlock data
     func unlockKey(id: String) async throws -> Data?
     /// delete key with id
@@ -66,7 +66,7 @@ extension SecureArea {
         return nil
     }
     public func defaultSigningAlgorithm(ecCurve: CoseEcCurve) -> SigningAlgorithm { ecCurve.defaultSigningAlgorithm }
-    
+
     /// returns information about the key with the given key
     public func getKeyBatchInfo(id: String) async throws -> KeyBatchInfo {
         let storage = await getStorage()
@@ -75,7 +75,7 @@ extension SecureArea {
         guard let keyInfo = KeyBatchInfo(from: keyInfoData) else { throw SecureAreaError("Key info wrong format") }
         return keyInfo
     }
-    
+
     public func updateKeyBatchInfo(id: String, keyIndex: Int) async throws -> KeyBatchInfo {
         let storage = await getStorage()
         let keyInfoDict = try await storage.readKeyInfo(id: id)
