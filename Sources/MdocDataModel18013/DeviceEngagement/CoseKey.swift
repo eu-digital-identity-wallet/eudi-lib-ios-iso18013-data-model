@@ -15,9 +15,9 @@ limitations under the License.
 */
 #if canImport(CryptoKit)
 import CryptoKit
-#else 
+#else
 import Crypto
-#endif 
+#endif
 import Foundation
 import SwiftCBOR
 
@@ -31,6 +31,13 @@ public struct CoseKey: Equatable, Codable, Sendable {
     public let x: [UInt8]
 	/// value of y-coordinate
     public let y: [UInt8]
+
+    public enum Keys: String {
+        case crv
+        case kty
+        case x
+        case y
+    }
 }
 
 /// COSE_Key + private key
@@ -47,11 +54,11 @@ public struct CoseKeyPrivate: Sendable {
         self.index = index
 		self.secureArea = secureArea
 	}
-    
+
     public init(secureArea: any SecureArea) {
         self.secureArea = secureArea
     }
-    
+
 }
 
 extension CoseKeyPrivate {
@@ -60,7 +67,7 @@ extension CoseKeyPrivate {
         let ephemeralKeyId = UUID().uuidString
         index = 0
         privateKeyId = ephemeralKeyId
-        self.key = (try await secureArea.createKeyBatch(id: ephemeralKeyId, keyOptions: KeyOptions(curve: curve, credentialPolicy: .rotateUse, batchSize: 1))).first!
+        self.key = (try await secureArea.createKeyBatch(id: ephemeralKeyId, credentialOptions: CredentialOptions(credentialPolicy: .rotateUse, batchSize: 1), keyOptions: KeyOptions(curve: curve))).first!
 	}
 }
 
@@ -75,14 +82,14 @@ extension CoseKey: CBOREncodable {
 }
 
 extension CoseKey: CBORDecodable {
-	public init?(cbor obj: CBOR) {
-		guard let calg = obj[-1], case let CBOR.unsignedInt(ralg) = calg, let alg = CoseEcCurve(rawValue: ralg) else { return nil }
+	public init(cbor obj: CBOR) throws(MdocValidationError) {
+		guard let calg = obj[-1], case let CBOR.unsignedInt(ralg) = calg, let alg = CoseEcCurve(rawValue: ralg) else { throw .invalidCbor("COSE key") }
 		crv = alg
-		guard let ckty = obj[1], case let CBOR.unsignedInt(rkty) = ckty else { return nil }
+		guard let ckty = obj[1], case let CBOR.unsignedInt(rkty) = ckty else { throw .missingField("CoseKey", Keys.kty.rawValue) }
 		kty = rkty
-		guard let cx = obj[-2], case let CBOR.byteString(rx) = cx else { return nil }
+		guard let cx = obj[-2], case let CBOR.byteString(rx) = cx else { throw .missingField("CoseKey", Keys.x.rawValue) }
 		x = rx
-		guard let cy = obj[-3], case let CBOR.byteString(ry) = cy else { return nil }
+		guard let cy = obj[-3], case let CBOR.byteString(ry) = cy else { throw .missingField("CoseKey", Keys.y.rawValue) }
 		y = ry
 	}
 }
@@ -106,7 +113,7 @@ extension CoseKey {
 		keyData.append(Data(y))
 		return keyData as Data
 	}
-    
+
     public func toSecKey() throws -> SecKey {
         var error: Unmanaged<CFError>?
         guard let publicKey = SecKeyCreateWithData(getx963Representation() as NSData, [kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom, kSecAttrKeyClass: kSecAttrKeyClassPublic] as NSDictionary, &error) else {
@@ -119,10 +126,10 @@ extension CoseKey {
 
 /// A COSE_Key exchange pair
 public struct CoseKeyExchange: Sendable {
-	public let publicKey: CoseKey
+	public let publicKey: CoseKey?
 	public var privateKey: CoseKeyPrivate
 
-	public init(publicKey: CoseKey, privateKey: CoseKeyPrivate) {
+	public init(publicKey: CoseKey?, privateKey: CoseKeyPrivate) {
 		self.publicKey = publicKey
 		self.privateKey = privateKey
 	}

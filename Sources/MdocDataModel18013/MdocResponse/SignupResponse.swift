@@ -22,19 +22,24 @@ public struct SignUpResponse: Codable, Sendable {
 	public let response: String?
 	public let pin: String?
 	public let privateKey: String?
-	
+
 	/// Device response decoded from base64-encoded string
 	public var deviceResponse: DeviceResponse? {
 		guard let b64 = response, let d = Data(base64Encoded: b64) else { return nil }
-		return DeviceResponse(data: d.bytes)
+		do {
+			return try DeviceResponse(data: d.bytes)
+		} catch {
+            logger.error("Failed to decode device response from signup response: \(error)")
+			return nil
+		}
 	}
-	
+
 	enum CodingKeys: String, CodingKey {
 		case response
 		case pin
 		case privateKey
 	}
-	
+
 	/// Decompose CBOR device responses from data
 	///
 	/// A data file may contain signup responses with many documents (doc.types).

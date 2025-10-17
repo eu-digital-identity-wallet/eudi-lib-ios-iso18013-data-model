@@ -29,7 +29,7 @@ public struct StatusIdentifier: Codable, Sendable {
 extension StatusIdentifier {
     public init?(data msoRawData: [UInt8]) {
 		guard let obj = try? CBOR.decode(msoRawData) else { return nil }
-		guard case let CBOR.tagged(tag, cborEncoded) = obj, tag.rawValue == 24, case let .byteString(bytes) = cborEncoded else { return nil }
+		guard case let CBOR.tagged(tag, cborEncoded) = obj, tag == .encodedCBORDataItem, case let .byteString(bytes) = cborEncoded else { return nil }
 		guard let cbor = try? CBOR.decode(bytes), case let .map(m) = cbor, case let .map(status) = m[.utf8String("status")] else { return nil }
 		if case let .map(status_list) = status[.utf8String("status_list")], case let .unsignedInt(idx) = status_list[.utf8String("idx")], case let .utf8String(uri) = status_list[.utf8String("uri")] {
 			self.idx = Int(idx); uriString = uri

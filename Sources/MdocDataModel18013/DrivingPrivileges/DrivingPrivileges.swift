@@ -26,9 +26,9 @@ public struct DrivingPrivileges: Codable, Sendable {
 }
 
 extension DrivingPrivileges: CBORDecodable {
-	public init?(cbor: CBOR) {
-		guard case let .array(dp) = cbor else { return nil }
-		drivingPrivileges = dp.compactMap(DrivingPrivilege.init(cbor:))
+	public init(cbor: CBOR) throws(MdocValidationError) {
+		guard case let .array(dps) = cbor else { throw .invalidCbor("driving privileges") }
+		drivingPrivileges = try dps.map { dp throws(MdocValidationError) in try DrivingPrivilege(cbor: dp) }
 	}
 }
 

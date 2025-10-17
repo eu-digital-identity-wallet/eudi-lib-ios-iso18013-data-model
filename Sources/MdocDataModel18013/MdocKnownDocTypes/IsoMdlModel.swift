@@ -18,25 +18,10 @@ limitations under the License.
 
 import Foundation
 
-public struct IsoMdlModel: Decodable, DocClaimsDecodable, Sendable {
-    public var display: [DisplayMetadata]?
-    public var issuerDisplay: [DisplayMetadata]?
-    public var credentialIssuerIdentifier: String?
-    public var configurationIdentifier: String?
-    public var validFrom: Date?
-    public var validUntil: Date?
-    public var statusIdentifier: StatusIdentifier?
-    public var secureAreaName: String? 
-	public var id: String = UUID().uuidString
-	public var createdAt: Date = Date()
-	public var docType: String? = Self.isoDocType
+public final class IsoMdlModel: GenericMdocModel, @unchecked Sendable {
 	public var nameSpaces: [NameSpace]?
-	public var displayName: String? = String("mdl_doctype_name")
-	public var docClaims = [DocClaim]()
-	public var modifiedAt: Date?
 	public static var isoDocType: String { "org.iso.18013.5.1.mDL" }
 	public static var isoNamespace: String { "org.iso.18013.5.1" }
-    public var docDataFormat: DocDataFormat = .cbor
 
 	let exp: UInt64?
 	let iat: UInt64?
@@ -63,7 +48,6 @@ public struct IsoMdlModel: Decodable, DocClaimsDecodable, Sendable {
 	public let residentState: String?
 	public let residentPostalCode: String?
 	public let ageInYears: UInt64?
-	public var ageOverXX = [Int: Bool]()
 	public let ageBirthYear: UInt64?
 	public let portrait: [UInt8]?
 	public let unDistinguishingSign: String?
@@ -125,54 +109,56 @@ public struct IsoMdlModel: Decodable, DocClaimsDecodable, Sendable {
 		[.familyName, .givenName, .birthDate, .issueDate, .expiryDate, .issuingCountry, .issuingAuthority, .documentNumber, .portrait, .drivingPrivileges, .unDistinguishingSign ]
 	}
 	public var mandatoryElementKeys: [DataElementIdentifier] { Self.isoMandatoryElementKeys }
-}
 
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, credentialPolicy: CredentialPolicy, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
 
-extension IsoMdlModel {
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
-        self.id = id; self.createdAt = createdAt; self.displayName = displayName; self.display = display; self.issuerDisplay = issuerDisplay
-        self.credentialIssuerIdentifier = credentialIssuerIdentifier; self.configurationIdentifier = configurationIdentifier
-        self.validFrom = validFrom; self.validUntil = validUntil; self.statusIdentifier = statusIdentifier; self.secureAreaName = secureAreaName
-  	    guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned, nameSpaces) else { return nil }
-		Self.extractCborClaims(nameSpaceItems, &docClaims, displayNames, mandatory)
-		func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems, string: key.rawValue) }
-		Self.extractAgeOverValues(nameSpaceItems, &ageOverXX)
-		exp = getValue(key: .exp)
-		iat = getValue(key: .iat)
-		familyName = getValue(key: .familyName)
-		givenName = getValue(key: .givenName)
-		birthDate = getValue(key: .birthDate)
-		birthPlace = getValue(key: .birthPlace)
-		issueDate = getValue(key: .issueDate)
-		expiryDate = getValue(key: .expiryDate)
-		issuingCountry = getValue(key: .issuingCountry)
-		issuingAuthority = getValue(key: .issuingAuthority)
-		documentNumber = getValue(key: .documentNumber)
-		administrativeNumber = getValue(key: .administrativeNumber)
-		drivingPrivileges = getValue(key: .drivingPrivileges)
-		nationality = getValue(key: .nationality)
-		eyeColour = getValue(key: .eyeColour)
-		hairColour = getValue(key: .hairColour)
-		height = getValue(key: .height)
-		weight = getValue(key: .weight)
-		sex = getValue(key: .sex)
-		residentAddress = getValue(key: .residentAddress)
-		residentCountry = getValue(key: .residentCountry)
-		residentCity = getValue(key: .residentCity)
-		residentState = getValue(key: .residentState)
-		residentPostalCode = getValue(key: .residentPostalCode)
-		ageInYears = getValue(key: .ageInYears)
-		ageBirthYear = getValue(key: .ageBirthYear)
-		portrait = getValue(key: .portrait)
-		unDistinguishingSign = getValue(key: .unDistinguishingSign)
-		issuingJurisdiction = getValue(key: .issuingJurisdiction)
-		portraitCaptureDate = getValue(key: .portraitCaptureDate)
-		familyNameNationalCharacter = getValue(key: .familyNameNationalCharacter)
-		givenNameNationalCharacter = getValue(key: .givenNameNationalCharacter)
-		signatureUsualMark = getValue(key: .signatureUsualMark)
-		biometricTemplateFace = getValue(key: .biometricTemplateFace)
-		biometricTemplateSignatureSign = getValue(key: .biometricTemplateSignatureSign)
-		webapiInfo = getValue(key: .webapiInfo)
-		oidcInfo = getValue(key: .oidcInfo)
-	}
+        // Initialize properties specific to IsoMdlModel
+        guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned, nameSpaces) else { return nil }
+        func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems, string: key.rawValue) }
+
+        exp = getValue(key: .exp)
+        iat = getValue(key: .iat)
+        familyName = getValue(key: .familyName)
+        givenName = getValue(key: .givenName)
+        birthDate = getValue(key: .birthDate)
+        birthPlace = getValue(key: .birthPlace)
+        issueDate = getValue(key: .issueDate)
+        expiryDate = getValue(key: .expiryDate)
+        issuingCountry = getValue(key: .issuingCountry)
+        issuingAuthority = getValue(key: .issuingAuthority)
+        documentNumber = getValue(key: .documentNumber)
+        administrativeNumber = getValue(key: .administrativeNumber)
+        drivingPrivileges = getValue(key: .drivingPrivileges)
+        nationality = getValue(key: .nationality)
+        eyeColour = getValue(key: .eyeColour)
+        hairColour = getValue(key: .hairColour)
+        height = getValue(key: .height)
+        weight = getValue(key: .weight)
+        sex = getValue(key: .sex)
+        residentAddress = getValue(key: .residentAddress)
+        residentCountry = getValue(key: .residentCountry)
+        residentCity = getValue(key: .residentCity)
+        residentState = getValue(key: .residentState)
+        residentPostalCode = getValue(key: .residentPostalCode)
+        ageInYears = getValue(key: .ageInYears)
+        ageBirthYear = getValue(key: .ageBirthYear)
+        portrait = getValue(key: .portrait)
+        unDistinguishingSign = getValue(key: .unDistinguishingSign)
+        issuingJurisdiction = getValue(key: .issuingJurisdiction)
+        portraitCaptureDate = getValue(key: .portraitCaptureDate)
+        familyNameNationalCharacter = getValue(key: .familyNameNationalCharacter)
+        givenNameNationalCharacter = getValue(key: .givenNameNationalCharacter)
+        signatureUsualMark = getValue(key: .signatureUsualMark)
+        biometricTemplateFace = getValue(key: .biometricTemplateFace)
+        biometricTemplateSignatureSign = getValue(key: .biometricTemplateSignatureSign)
+        webapiInfo = getValue(key: .webapiInfo)
+        oidcInfo = getValue(key: .oidcInfo)
+
+        // Call superclass initializer
+        super.init(id: id, createdAt: createdAt, docType: Self.isoDocType, displayName: displayName ?? "mdl_doctype_name", display: display, issuerDisplay: issuerDisplay, credentialIssuerIdentifier: credentialIssuerIdentifier, configurationIdentifier: configurationIdentifier, validFrom: validFrom, validUntil: validUntil, statusIdentifier: statusIdentifier, credentialsUsageCounts: credentialsUsageCounts, credentialPolicy: credentialPolicy, secureAreaName: secureAreaName, modifiedAt: nil, ageOverXX: [Int: Bool](), docClaims: [DocClaim](), docDataFormat: .cbor, hashingAlg: nil)
+
+        // Extract claims and age over values
+        Self.extractCborClaims(nameSpaceItems, &docClaims, displayNames, mandatory)
+        Self.extractAgeOverValues(nameSpaceItems, &ageOverXX)
+    }
 }

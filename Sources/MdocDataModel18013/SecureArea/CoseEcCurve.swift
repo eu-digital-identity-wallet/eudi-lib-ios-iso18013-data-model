@@ -133,10 +133,12 @@ public enum CoseEcCurve: UInt64, Codable, Sendable {
 }
 
 /// signing algorithm
-public enum SigningAlgorithm: String, Sendable {
+public enum SigningAlgorithm: String, Sendable, Hashable {
     case ES256
     case ES384
     case ES512
     case EDDSA
     case UNSET
+    
+    public var order: Int { switch self { case .ES256: 1; case .ES384: 2; case .ES512: 3; case .EDDSA: 4; default: 0 } }
 }

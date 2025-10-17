@@ -20,28 +20,30 @@ import OrderedCollections
 
 /// Returned data elements for each namespace
 public struct IssuerNameSpaces: Sendable {
-	
+
 	public let nameSpaces: [NameSpace: [IssuerSignedItem]]
 	public subscript(ns: String) -> [IssuerSignedItem]? { nameSpaces[ns] }
-	
+
 	public init(nameSpaces: [NameSpace: [IssuerSignedItem]]) {
 		self.nameSpaces = nameSpaces
 	}
 }
 
 extension IssuerNameSpaces: CBORDecodable {
-	public init?(cbor: CBOR) {
-		guard case let .map(m) = cbor else { return nil }
+	public init(cbor: CBOR) throws(MdocValidationError) {
+		guard case let .map(m) = cbor else { throw .invalidCbor("issuer namespaces") }
 		var temp = [NameSpace: [IssuerSignedItem]]()
 		for (k,v) in m {
 			guard case let .utf8String(ns) = k, case let .array(ar) = v else { continue }
-			let items = ar.compactMap { c -> IssuerSignedItem? in
-				guard case let .tagged(tg, cbs) = c, tg == .encodedCBORDataItem, case let .byteString(bs) = cbs, let isi = IssuerSignedItem(data: bs) else { return nil }
-				return isi
+			let items = try ar.map { c throws(MdocValidationError) -> IssuerSignedItem in
+				guard case let .tagged(tg, cbs) = c, tg == .encodedCBORDataItem, case let .byteString(bs) = cbs else {
+                    throw .invalidCbor("issuer signed item '\(k)'")
+                }
+				return try IssuerSignedItem(data: bs)
 			}
 			temp[ns] = items
 		}
-		guard temp.count > 0 else { return nil }
+		guard temp.count > 0 else { throw .invalidCbor("document") }
 		nameSpaces = temp
 	}
 }

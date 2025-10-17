@@ -3,15 +3,18 @@
 
 import Foundation
 
-public struct GenericMdocModel: DocClaimsDecodable, Sendable {
+public class GenericMdocModel: DocClaimsDecodable, ObservableObject, @unchecked Sendable {
     public var display: [DisplayMetadata]?
     public var issuerDisplay: [DisplayMetadata]?
     public var credentialIssuerIdentifier: String?
     public var configurationIdentifier: String?
     public var validFrom: Date?
-    public var validUntil: Date?
+    internal var _validUntil: Date?
+    public var validUntil: Date? { if let uc = credentialsUsageCounts, uc.remaining <= 0 { return nil } else { return _validUntil } }
     public var statusIdentifier: StatusIdentifier?
-    public var secureAreaName: String? 
+    @Published public var credentialsUsageCounts: CredentialsUsageCounts?
+    public var credentialPolicy: CredentialPolicy
+    public var secureAreaName: String?
 	public var id: String = UUID().uuidString
 	public var createdAt: Date = Date()
 	public var docType: String?
@@ -22,7 +25,7 @@ public struct GenericMdocModel: DocClaimsDecodable, Sendable {
     public var docDataFormat: DocDataFormat
     public var hashingAlg: String?
 
-    public init(id: String = UUID().uuidString, createdAt: Date = Date(), docType: String?, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]? = nil, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, secureAreaName: String?, modifiedAt: Date?, ageOverXX: [Int : Bool] = [Int: Bool](), docClaims: [DocClaim] = [DocClaim](), docDataFormat: DocDataFormat, hashingAlg: String?) {
+    public init(id: String = UUID().uuidString, createdAt: Date = Date(), docType: String?, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]? = nil, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, credentialPolicy: CredentialPolicy, secureAreaName: String?, modifiedAt: Date?, ageOverXX: [Int : Bool] = [Int: Bool](), docClaims: [DocClaim] = [DocClaim](), docDataFormat: DocDataFormat, hashingAlg: String?) {
         self.id = id
         self.createdAt = createdAt
         self.docType = docType
@@ -31,23 +34,24 @@ public struct GenericMdocModel: DocClaimsDecodable, Sendable {
         self.credentialIssuerIdentifier = credentialIssuerIdentifier
         self.configurationIdentifier = configurationIdentifier
         self.validFrom = validFrom
-        self.validUntil = validUntil
+        self._validUntil = validUntil
         self.statusIdentifier = statusIdentifier
         self.secureAreaName = secureAreaName
+        self.credentialsUsageCounts = credentialsUsageCounts
+        self.credentialPolicy = credentialPolicy
         self.modifiedAt = modifiedAt
         self.ageOverXX = ageOverXX
         self.docClaims = docClaims
         self.docDataFormat = docDataFormat
     }
-}
 
-extension GenericMdocModel {
-
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, docType: String, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
+	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, docType: String, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, credentialPolicy: CredentialPolicy, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
         self.id = id; self.createdAt = createdAt; self.displayName = displayName
         self.display = display; self.issuerDisplay = issuerDisplay
         self.credentialIssuerIdentifier = credentialIssuerIdentifier; self.configurationIdentifier = configurationIdentifier
-        self.validFrom = validFrom; self.validUntil = validUntil; self.statusIdentifier = statusIdentifier; self.secureAreaName = secureAreaName
+        self.validFrom = validFrom; self._validUntil = validUntil; self.statusIdentifier = statusIdentifier; self.secureAreaName = secureAreaName
+        self.credentialsUsageCounts = credentialsUsageCounts
+        self.credentialPolicy = credentialPolicy
         self.docType = docType; self.docDataFormat = .cbor
 		if let nameSpaces = Self.getCborSignedItems(issuerSigned) {
 			Self.extractCborClaims(nameSpaces, &docClaims, displayNames, mandatory)

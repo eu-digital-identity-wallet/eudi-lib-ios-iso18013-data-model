@@ -26,7 +26,7 @@ import Foundation
 import SwiftCBOR
 
 public actor InMemoryP256SecureArea: SecureArea {
- 
+
     var storage: any MdocDataModel18013.SecureKeyStorage
     var key: P256.Signing.PrivateKey!
     public nonisolated(unsafe) var x963Key: Data?
@@ -34,19 +34,23 @@ public actor InMemoryP256SecureArea: SecureArea {
     init(storage: any MdocDataModel18013.SecureKeyStorage) {
         self.storage = storage
     }
+
     nonisolated public static func create(storage: any MdocDataModel18013.SecureKeyStorage) -> InMemoryP256SecureArea {
         InMemoryP256SecureArea(storage: storage)
     }
+
+    public static var supportedEcCurves: [MdocDataModel18013.CoseEcCurve] { [.P256] }
+
     public func getStorage() async -> any MdocDataModel18013.SecureKeyStorage { storage }
-  
-    public func createKeyBatch(id: String, keyOptions: KeyOptions?) async throws -> [CoseKey] {
+
+    public func createKeyBatch(id: String, credentialOptions: CredentialOptions, keyOptions: KeyOptions?) async throws -> [CoseKey] {
         key = if let x963Key { try P256.Signing.PrivateKey(x963Representation: x963Key) } else { P256.Signing.PrivateKey() }
         guard SecKeyCreateWithData(key.x963Representation as NSData, [kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom, kSecAttrKeyClass: kSecAttrKeyClassPrivate] as NSDictionary, nil) != nil else {  throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey : "Error creating private key"])  }
         return [CoseKey(crv: .P256, x963Representation: key.publicKey.x963Representation)]
    }
 
     public func deleteKeyBatch(id: String, startIndex: Int, batchSize: Int) throws { }
-    
+
     public func deleteKeyInfo(id: String) async throws {  }
 
     public func signature(id: String, index: Int, algorithm: MdocDataModel18013.SigningAlgorithm, dataToSign: Data, unlockData: Data?) throws -> Data {
@@ -79,9 +83,9 @@ public actor DummySecureKeyStorage: MdocDataModel18013.SecureKeyStorage {
     public func writeKeyInfo(id: String, dict: [String : Data]) throws {  }
 
     public func writeKeyDataBatch(id: String, startIndex: Int, dicts: [[String: Data]], keyOptions: KeyOptions?) async throws { }
-    
+
     public func deleteKeyBatch(id: String, startIndex: Int, batchSize: Int) throws { }
-    
+
     public func deleteKeyInfo(id: String) async throws {  }
 
 }
@@ -89,7 +93,7 @@ public actor DummySecureKeyStorage: MdocDataModel18013.SecureKeyStorage {
 extension MdocDataModel18013.CoseKeyPrivate {
   // decode cbor string
     public init?(p256data base64: String) {
-            guard let d = Data(base64Encoded: base64), let obj = try? CBOR.decode([UInt8](d)), let coseKey = CoseKey(cbor: obj), let cd = obj[-4], case let CBOR.byteString(rd) = cd else { return nil }
+        guard let d = Data(base64Encoded: base64), let obj = try? CBOR.decode([UInt8](d)), let coseKey = try? CoseKey(cbor: obj), let cd = obj[-4], case let CBOR.byteString(rd) = cd else { return nil }
         let sampleSA = InMemoryP256SecureArea(storage: DummySecureKeyStorage())
         let keyData = NSMutableData(bytes: [0x04], length: [0x04].count)
         keyData.append(Data(coseKey.x)); keyData.append(Data(coseKey.y));  keyData.append(Data(rd))

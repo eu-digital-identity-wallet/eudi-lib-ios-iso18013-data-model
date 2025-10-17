@@ -21,29 +21,29 @@ public typealias ErrorItems = [DataElementIdentifier: ErrorCode]
 
 /// Error codes for each namespace for items that are not returned
 public struct Errors: Sendable {
-	
+
 	public let errors: [NameSpace: ErrorItems]
 	public subscript(ns: String) -> ErrorItems? { errors[ns] }
-	
+
 	public init(errors: [NameSpace : ErrorItems]) {
 		self.errors = errors
 	}
 }
 
 extension Errors: CBORDecodable {
-	public init?(cbor: CBOR) {
-        guard case let .map(e) = cbor else { return nil }
-        if e.count == 0 { return nil }
-        let pairs = e.compactMap { (key: CBOR, value: CBOR) -> (NameSpace, ErrorItems)? in
-            guard case .utf8String(let ns) = key else { return nil }
-            guard case .map(let m) = value else { return nil }
-            let eiPairs = m.compactMap { (k: CBOR, v: CBOR) -> (DataElementIdentifier, ErrorCode)?  in
-                guard case .utf8String(let dei) = k else { return nil }
-                guard case .unsignedInt(let ec) = v else { return nil }
-                return (dei,ec)
+	public init(cbor: CBOR) throws(MdocValidationError) {
+        guard case let .map(e) = cbor else { throw .invalidCbor("errors") }
+        if e.count == 0 { throw .invalidCbor("errors") }
+        let pairs = try e.map { (key: CBOR, value: CBOR) throws(MdocValidationError) -> (NameSpace, ErrorItems) in
+            guard case .utf8String(let ns) = key else { throw .invalidCbor("errors") }
+            guard case .map(let m) = value else { throw .invalidCbor("errors") }
+            let eiPairs = try m.map { (k: CBOR, v: CBOR) throws(MdocValidationError) -> (DataElementIdentifier, ErrorCode) in
+                guard case .utf8String(let dei) = k else { throw .invalidCbor("errors") }
+                guard case .unsignedInt(let ec) = v else { throw .invalidCbor("errors") }
+                return (dei, ec)
             }
             let ei = Dictionary(eiPairs, uniquingKeysWith: { (first, _) in first })
-            if ei.count == 0 { return nil }
+            if ei.count == 0 { throw .invalidCbor("errors") }
             return (ns, ei)
         }
         errors = Dictionary(pairs, uniquingKeysWith: { (first, _) in first })

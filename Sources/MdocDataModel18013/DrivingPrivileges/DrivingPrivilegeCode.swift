@@ -25,7 +25,7 @@ public struct DrivingPrivilegeCode: Codable, Sendable {
 	public let code: String
 	public let sign: String?
 	public let value: String?
-    
+
     enum CodingKeys: String, CodingKey, CaseIterable {
         case code = "code"
         case sign = "sign"
@@ -34,8 +34,8 @@ public struct DrivingPrivilegeCode: Codable, Sendable {
 }
 
 extension DrivingPrivilegeCode: CBORDecodable {
-	public init?(cbor: CBOR) {
-        guard case let .utf8String(c) = cbor[.utf8String(CodingKeys.code.rawValue)] else { return nil }
+	public init(cbor: CBOR) throws(MdocValidationError) {
+        guard case let .utf8String(c) = cbor[.utf8String(CodingKeys.code.rawValue)] else { throw .invalidCbor("driving privilege code") }
         code = c
         if case let .utf8String(s) = cbor[.utf8String(CodingKeys.sign.rawValue)] { sign = s} else { sign = nil }
         if case let .utf8String(v) = cbor[.utf8String(CodingKeys.value.rawValue)] { value = v} else { value = nil }
