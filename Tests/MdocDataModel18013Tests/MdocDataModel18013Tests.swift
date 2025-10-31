@@ -152,17 +152,17 @@ struct MdocDataModel18013Tests {
 
   #if os(iOS)
     @Test func generateBLEengageQRCodeImage() async throws {
-        var de = try DeviceEngagement(isBleServer: true)
+        var de = try #require(DeviceEngagement(isBleServer: true))
         try await de.makePrivateKey(crv: .P256, secureArea: InMemoryP256SecureArea(storage: DummySecureKeyStorage()))
-        #expect(de.getQrCodePayload() != nil)
+        #expect(de.getQrCodePayload().count > 0)
         let strQR = de.qrCode
 		#expect(DeviceEngagement.getQrCodeImage(qrCode: strQR, inputCorrectionLevel: .m) != nil)
     }
 
     @Test func generateBLEengageQRCodePayload() async throws {
-        var de = try DeviceEngagement(isBleServer: true)
+        var de = try #require(DeviceEngagement(isBleServer: true))
         try await de.makePrivateKey(crv: .P256, secureArea: InMemoryP256SecureArea(storage: DummySecureKeyStorage()))
-        #expect(de.getQrCodePayload() != nil)
+        #expect(de.getQrCodePayload().count > 0)
     }
   #endif
 
