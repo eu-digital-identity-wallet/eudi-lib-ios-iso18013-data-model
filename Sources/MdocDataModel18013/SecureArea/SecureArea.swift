@@ -37,6 +37,8 @@ public protocol SecureArea: Actor {
     /// make an array of keys and return the public keys
     /// The public keys are passed to the Open4VCI module
     func createKeyBatch(id: String, credentialOptions: CredentialOptions, keyOptions: KeyOptions?) async throws -> [CoseKey]
+    /// get the public key at an index
+    func getPublicKey(id: String, index: Int, curve: CoseEcCurve) async throws -> CoseKey
     /// unlock key and return unlock data
     func unlockKey(id: String) async throws -> Data?
     /// delete key with id
