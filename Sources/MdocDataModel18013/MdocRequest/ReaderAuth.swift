@@ -18,7 +18,7 @@ import Foundation
 import SwiftCBOR
 
 /// Reader authentication structure encoded as Cose Sign1
-struct ReaderAuth: Sendable {
+public struct ReaderAuth: Sendable {
 	/// encoded data
     let coseSign1: Cose
 	/// one or more certificates
@@ -26,7 +26,7 @@ struct ReaderAuth: Sendable {
 }
 
 extension ReaderAuth: CBORDecodable {
-    init(cbor: CBOR) throws(MdocValidationError) {
+    public init(cbor: CBOR) throws(MdocValidationError) {
         // The signature is contained in an untagged COSE_Sign1 structure as defined in RFC 8152 and identified
         guard let cose = Cose(type: .sign1, cbor: cbor) else { throw .invalidCbor("reader authentication") }
         coseSign1 = cose
@@ -38,7 +38,7 @@ extension ReaderAuth: CBORDecodable {
 }
 
 extension ReaderAuth: CBOREncodable {
-	func toCBOR(options: CBOROptions) -> CBOR {
+	public func toCBOR(options: CBOROptions) -> CBOR {
         coseSign1.toCBOR(options: options)
     }
 }

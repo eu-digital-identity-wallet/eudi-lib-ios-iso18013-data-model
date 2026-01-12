@@ -22,7 +22,7 @@ public struct DocRequest: Sendable {
     public let itemsRequest: ItemsRequest
     public let itemsRequestRawData: [UInt8]? // items-request raw data NOT tagged
 	/// Used for mdoc reader authentication
-    let readerAuth: ReaderAuth?
+    public  let readerAuth: ReaderAuth?
     public let readerAuthRawCBOR: CBOR?
 
     enum Keys: String {
