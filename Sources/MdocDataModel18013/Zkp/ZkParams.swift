@@ -52,6 +52,26 @@ public enum ZkParam: CBORDecodable, CBOREncodable, Sendable, Equatable {
             return .utf8String(value)
         }
     }
+    
+    public var intValue: Int64? {
+        if case let .intParam(value) = self { return value }
+        return nil
+    }
+    
+    public var doubleValue: Double? {
+        if case let .doubleParam(value) = self { return value }
+        return nil
+    }
+    
+    public var boolValue: Bool? {
+        if case let .boolParam(value) = self { return value }
+        return nil
+    }
+    
+    public var stringValue: String? {
+        if case let .stringParam(value) = self { return value }
+        return nil
+    }
 }
 /// ZkParams: { * tstr => Ext }
 public typealias ZkParams = OrderedDictionary<String, ZkParam>
