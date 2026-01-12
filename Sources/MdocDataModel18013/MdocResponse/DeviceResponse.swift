@@ -28,9 +28,12 @@ import OrderedCollections
 /// ```
 public struct DeviceResponse: Sendable {
 	public let version: String
-	public static let defaultVersion = "1.0"
+	public static let version1 = "1.0"
+	public static let version2 = "1.1"
 	/// An array of all returned documents
 	public let documents: [Document]?
+	/// An array of all returned ZK documents
+	public let zkDocuments: [ZkDocument]?
 	/// An array of all returned document errors
 	public let documentErrors: [DocumentError]?
 	public let status: UInt64
@@ -38,13 +41,15 @@ public struct DeviceResponse: Sendable {
 	enum Keys: String {
 		case version
 		case documents
+		case zkDocuments
 		case documentErrors
 		case status
 	}
 
-	public init(version: String? = nil, documents: [Document]? = nil, documentErrors: [DocumentError]? = nil, status: UInt64) {
-		self.version = version ?? Self.defaultVersion
+	public init(version: String? = nil, documents: [Document]? = nil, zkDocuments: [ZkDocument]? = nil, documentErrors: [DocumentError]? = nil, status: UInt64) {
+		self.version = version ?? (zkDocuments != nil ? Self.version2 : Self.version1)
 		self.documents = documents
+		self.zkDocuments = zkDocuments
 		self.documentErrors = documentErrors
 		self.status = status
 	}
@@ -59,6 +64,10 @@ extension DeviceResponse: CBORDecodable {
 			let ds = try ds.map { d  throws(MdocValidationError) in try Document(cbor:d) }
 			if ds.count > 0 { self.documents = ds } else { self.documents = nil }
 		} else { documents = nil }
+		if case let .array(zkd) = cd[Keys.zkDocuments] {
+			let zk = try zkd.map { d throws(MdocValidationError) in try ZkDocument(cbor:d) }
+			if zk.count > 0 { self.zkDocuments = zk } else { self.zkDocuments = nil }
+		} else { zkDocuments = nil }
 		if case let .array(are) = cd[Keys.documentErrors] {
 			let de = try are.map { d throws(MdocValidationError) in try DocumentError(cbor:d) }
 			if de.count > 0 { self.documentErrors = de } else { self.documentErrors = nil }
@@ -73,6 +82,7 @@ extension DeviceResponse: CBOREncodable {
 		var cbor = OrderedDictionary<CBOR, CBOR>()
 		cbor[.utf8String(Keys.version.rawValue)] = .utf8String(version)
 		if let ds = documents { cbor[.utf8String(Keys.documents.rawValue)] = ds.toCBOR(options: options) }
+		if let zk = zkDocuments { cbor[.utf8String(Keys.zkDocuments.rawValue)] = .array(zk.map {$0.toCBOR(options: options)}) }
 		if let de = documentErrors { cbor[.utf8String(Keys.documentErrors.rawValue)] = .array(de.map {$0.toCBOR(options: options)}) }
 		cbor[.utf8String(Keys.status.rawValue)] = .unsignedInt(status)
 		return .map(cbor)
