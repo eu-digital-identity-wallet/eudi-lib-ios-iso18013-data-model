@@ -46,12 +46,12 @@ public struct DeviceResponse: Sendable {
 		case status
 	}
 
-	public init(version: String? = nil, documents: [Document]? = nil, zkDocuments: [ZkDocument]? = nil, documentErrors: [DocumentError]? = nil, status: UInt64) {
+	public init(version: String? = nil, documents: [Document]? = nil, zkDocuments: [ZkDocument]? = nil, documentErrors: [DocumentError]? = nil, status: UInt64? = nil) {
 		self.version = version ?? (zkDocuments != nil ? Self.version2 : Self.version1)
 		self.documents = documents
 		self.zkDocuments = zkDocuments
 		self.documentErrors = documentErrors
-		self.status = status
+		self.status = status ?? 0
 	}
 }
 
