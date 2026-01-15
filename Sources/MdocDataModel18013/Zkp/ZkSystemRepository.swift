@@ -1,7 +1,7 @@
 import Foundation
 
 /// A repository of ZkSystemProtocol implementations.
-public struct ZkSystemRepository {
+public struct ZkSystemRepository: Sendable {
     private var systems: [any ZkSystemProtocol] = []
     
     public init(systems: [any ZkSystemProtocol] = []) {

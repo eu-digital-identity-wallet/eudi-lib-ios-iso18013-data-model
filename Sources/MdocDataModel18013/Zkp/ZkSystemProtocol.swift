@@ -3,7 +3,7 @@ import SwiftCBOR
 
 /// Protocol representing a Zero-Knowledge Proof system that can generate and verify proofs
 /// for identity documents according to the ISO/IEC 18013-5 standard.
-public protocol ZkSystemProtocol {
+public protocol ZkSystemProtocol: Sendable {
     /// The unique name identifying this ZK system implementation.
     var name: String { get }
 
