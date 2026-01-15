@@ -1,5 +1,5 @@
 {
-  "originHash" : "3eabeceaaff7aca7549bf2b21745ba3028b27e5d8114e6f543dfbdd023912f1c",
+  "originHash" : "bb2d2f51ea6fcb8e9402c16f8bc57ac1feced0863778e10dd591598e1b36718f",
   "pins" : [
     {
       "identity" : "swift-collections",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "revision" : "9cb486020ebf03bfa5b5df985387a14a98744537",
-        "version" : "1.6.1"
+        "revision" : "7ee16e465622412764b0ff0c1301801dc71b8f61",
+        "version" : "1.9.0"
       }
     },
     {
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/niscy-eudiw/SwiftCBOR.git",
       "state" : {
-        "revision" : "2c8c55273d4c4aae21bb46c2afbae79ee072eff4",
-        "version" : "0.6.2"
+        "revision" : "7d6271345212f3864309666b6eb9f9941be6873d",
+        "version" : "0.6.3"
       }
     }
   ],

@@ -14,8 +14,8 @@ let package = Package(
             targets: ["MdocDataModel18013"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/niscy-eudiw/SwiftCBOR.git", from: "0.6.2"),
-        .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
+        .package(url: "https://github.com/niscy-eudiw/SwiftCBOR.git", from: "0.6.3"),
+        .package(url: "https://github.com/apple/swift-log.git", from: "1.9.0"),
     ] + cryptoPD
     ,
 
