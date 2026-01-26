@@ -17,12 +17,12 @@ public protocol ZkSystemProtocol: Sendable {
     /// - Parameters:
     ///   - zkSystemSpec: The system spec indicating which ZK circuit or rules to use
     ///   - docBytes: The bytes of the document to generate a proof for.
-    ///   - x: The x coordinate used in the proof generation.
-    ///   - y: The y coordinate used in the proof generation.
+    ///   - x: The x coordinate used in the proof generation (optional, can be computed from issuer public certificate).
+    ///   - y: The y coordinate used in the proof generation (optional, can be computed from issuer public certificate).
     ///   - sessionTranscriptBytes: The bytes of the Session Transcript used for the document.
     ///   - timestamp: The timestamp for the proof generation
     /// - Returns: A ZkDocument containing the resulting proof and metadata
-    func generateProof(zkSystemSpec: ZkSystemSpec, docBytes: [UInt8], x: String, y: String, sessionTranscriptBytes: [UInt8], timestamp: Date) throws -> ZkDocument
+    func generateProof(zkSystemSpec: ZkSystemSpec, docBytes: [UInt8], x: String?, y: String?, sessionTranscriptBytes: [UInt8], timestamp: Date) throws -> ZkDocument
 
     /// Verifies a zero-knowledge proof in the given zkDocument using the provided session context.
     ///
