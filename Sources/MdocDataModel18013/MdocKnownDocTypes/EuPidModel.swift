@@ -18,6 +18,8 @@ limitations under the License.
 
 import Foundation
 
+/// SAFETY INVARIANT: Inherits @unchecked Sendable safety guarantees from GenericMdocModel.
+/// See GenericMdocModel documentation for details on thread-safety requirements.
 public final class EuPidModel: GenericMdocModel, @unchecked Sendable {
 	public static let euPidDocType: String = "eu.europa.ec.eudi.pid.1"
 

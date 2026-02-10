@@ -16,16 +16,23 @@ limitations under the License.
 
 import Foundation
 
+/// Registry for managing SecureArea implementations.
+///
+/// SAFETY INVARIANT (@unchecked Sendable):
+/// This class is marked @unchecked Sendable because it contains mutable state (secureAreas dictionary)
+/// that must be accessed from multiple threads. All access to the secureAreas dictionary is
+/// protected by an NSLock to ensure thread-safe read and write operations.
+/// The lock must be held for the entire duration of any operation that reads or modifies secureAreas.
 public class SecureAreaRegistry: @unchecked Sendable {
     public enum DeviceSecureArea: String, CaseIterable {
         case secureEnclave = "SecureEnclave"
         case software = "Software"
     }
     private init() {}
-    let lock = NSLock()
+    private let lock = NSLock()
 
     public static let shared = SecureAreaRegistry()
-    var secureAreas: [String: any SecureArea] = [:]
+    private var secureAreas: [String: any SecureArea] = [:]
 
     public func register(secureArea: any SecureArea) {
         lock.lock()
@@ -34,18 +41,38 @@ public class SecureAreaRegistry: @unchecked Sendable {
     }
 
     public func get(name: String?) -> SecureArea {
-        if let name, let sa = secureAreas[name] { sa } else { defaultSecurityArea! }
+        lock.lock()
+        defer { lock.unlock() }
+        if let name, let sa = secureAreas[name] { return sa } else { return defaultSecurityArea! }
     }
 
     public func get(deviceSecureArea: DeviceSecureArea) -> SecureArea? {
-        secureAreas[deviceSecureArea.rawValue]
+        lock.lock()
+        defer { lock.unlock() }
+        return secureAreas[deviceSecureArea.rawValue]
     }
 
-    public var names: [String] { Array(secureAreas.keys) }
+    public var names: [String] {
+        lock.lock()
+        defer { lock.unlock() }
+        return Array(secureAreas.keys)
+    }
 
-    public var values: [any SecureArea] { Array(secureAreas.values) }
+    public var values: [any SecureArea] {
+        lock.lock()
+        defer { lock.unlock() }
+        return Array(secureAreas.values)
+    }
 
     public var defaultSecurityArea: (any SecureArea)? {
-        get { get(deviceSecureArea: .secureEnclave) ?? get(deviceSecureArea: .software) ?? secureAreas.first?.value }
+        lock.lock()
+        defer { lock.unlock() }
+        if let sa = secureAreas[DeviceSecureArea.secureEnclave.rawValue] {
+            return sa
+        } else if let sa = secureAreas[DeviceSecureArea.software.rawValue] {
+            return sa
+        } else {
+            return secureAreas.first?.value
+        }
     }
 }

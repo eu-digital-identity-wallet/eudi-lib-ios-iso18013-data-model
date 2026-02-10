@@ -18,6 +18,8 @@ limitations under the License.
 
 import Foundation
 
+/// SAFETY INVARIANT: Inherits @unchecked Sendable safety guarantees from GenericMdocModel.
+/// See GenericMdocModel documentation for details on thread-safety requirements.
 public final class IsoMdlModel: GenericMdocModel, @unchecked Sendable {
 	public static var isoDocType: String { "org.iso.18013.5.1.mDL" }
 	public static var isoNamespace: String { "org.iso.18013.5.1" }

@@ -3,6 +3,9 @@
 
 import Foundation
 
+/// SAFETY INVARIANT (@unchecked Sendable):
+/// This class is marked @unchecked Sendable because it contains a mutable property (credentialsUsageCounts)
+/// that may be updated after initialization. Updates to this property must be performed by external code that ensures proper synchronization.
 public class GenericMdocModel: DocClaimsDecodable, @unchecked Sendable {
     public let display: [DisplayMetadata]?
     public let issuerDisplay: [DisplayMetadata]?
