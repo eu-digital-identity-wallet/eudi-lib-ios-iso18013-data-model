@@ -18,7 +18,7 @@ limitations under the License.
 
 import Foundation
 
-public final class EuPidModel: GenericMdocModel, @unchecked Sendable {
+public final class EuPidModel: GenericMdocModel {
 	public static let euPidDocType: String = "eu.europa.ec.eudi.pid.1"
 	public var nameSpaces: [NameSpace]?
 

@@ -18,7 +18,7 @@ limitations under the License.
 
 import Foundation
 
-public final class IsoMdlModel: GenericMdocModel, @unchecked Sendable {
+public final class IsoMdlModel: GenericMdocModel {
 	public var nameSpaces: [NameSpace]?
 	public static var isoDocType: String { "org.iso.18013.5.1.mDL" }
 	public static var isoNamespace: String { "org.iso.18013.5.1" }

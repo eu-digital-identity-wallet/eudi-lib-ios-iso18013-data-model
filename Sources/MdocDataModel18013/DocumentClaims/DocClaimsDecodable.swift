@@ -22,7 +22,7 @@ import SwiftCBOR
 /// A conforming type represents claims data.
 ///
 /// Can be decoded by CBOR or SD-JWT data
-public protocol DocClaimsDecodable: Sendable, AgeAttesting {
+public protocol DocClaimsDecodable: AgeAttesting {
 	/// The unique identifier of the document.
 	var id: String { get }
 	/// The date and time the document was created.

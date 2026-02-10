@@ -27,7 +27,12 @@ let package = Package(
             dependencies: [
                 "SwiftCBOR",
                 .product(name: "Logging", package: "swift-log")
-                ] + cryptoTD),
+                ] + cryptoTD,
+            swiftSettings: [
+        		.enableUpcomingFeature("InferIsolatedConformances"),
+        		.enableUpcomingFeature("NonisolatedNonsendingByDefault")
+    		],
+        ),
         .testTarget(
             name: "MdocDataModel18013Tests",
             dependencies: ["MdocDataModel18013"], resources: [.process("Resources")]),
