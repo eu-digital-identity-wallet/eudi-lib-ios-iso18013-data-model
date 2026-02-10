@@ -3,29 +3,30 @@
 
 import Foundation
 
-public class GenericMdocModel: DocClaimsDecodable, ObservableObject {
-    public var display: [DisplayMetadata]?
-    public var issuerDisplay: [DisplayMetadata]?
-    public var credentialIssuerIdentifier: String?
-    public var configurationIdentifier: String?
-    public var validFrom: Date?
-    internal var _validUntil: Date?
+public class GenericMdocModel: DocClaimsDecodable, @unchecked Sendable {
+    public let display: [DisplayMetadata]?
+    public let issuerDisplay: [DisplayMetadata]?
+    public let credentialIssuerIdentifier: String?
+    public let configurationIdentifier: String?
+    public let validFrom: Date?
+    internal let _validUntil: Date?
     public var validUntil: Date? { if let uc = credentialsUsageCounts, uc.remaining <= 0 { return nil } else { return _validUntil } }
-    public var statusIdentifier: StatusIdentifier?
-    @Published public var credentialsUsageCounts: CredentialsUsageCounts?
-    public var credentialPolicy: CredentialPolicy
-    public var secureAreaName: String?
-	public var id: String = UUID().uuidString
-	public var createdAt: Date = Date()
-	public var docType: String?
-	public var displayName: String?
-	public var modifiedAt: Date?
-	public var ageOverXX = [Int: Bool]()
-	public var docClaims = [DocClaim]()
-    public var docDataFormat: DocDataFormat
-    public var hashingAlg: String?
+    public let statusIdentifier: StatusIdentifier?
+    public var credentialsUsageCounts: CredentialsUsageCounts?
+    public let credentialPolicy: CredentialPolicy
+    public let secureAreaName: String?
+	public let id: String
+	public let createdAt: Date 
+	public let docType: String?
+	public let displayName: String?
+	public let modifiedAt: Date?
+	public let ageOverXX: [Int: Bool]
+	public let docClaims: [DocClaim]
+    public let docDataFormat: DocDataFormat
+    public let hashingAlg: String?
+	public let nameSpaces: [NameSpace]?
 
-    public init(id: String = UUID().uuidString, createdAt: Date = Date(), docType: String?, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]? = nil, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, credentialPolicy: CredentialPolicy, secureAreaName: String?, modifiedAt: Date?, ageOverXX: [Int : Bool] = [Int: Bool](), docClaims: [DocClaim] = [DocClaim](), docDataFormat: DocDataFormat, hashingAlg: String?) {
+    public init(id: String = UUID().uuidString, createdAt: Date = Date(), docType: String?, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]? = nil, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, credentialPolicy: CredentialPolicy, secureAreaName: String?, modifiedAt: Date?, ageOverXX: [Int : Bool], docClaims: [DocClaim], docDataFormat: DocDataFormat, hashingAlg: String?, nameSpaces: [NameSpace]?) {
         self.id = id
         self.createdAt = createdAt
         self.docType = docType
@@ -43,18 +44,42 @@ public class GenericMdocModel: DocClaimsDecodable, ObservableObject {
         self.ageOverXX = ageOverXX
         self.docClaims = docClaims
         self.docDataFormat = docDataFormat
+        self.hashingAlg = hashingAlg
+        self.nameSpaces = nameSpaces
     }
 
 	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, docType: String, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, credentialPolicy: CredentialPolicy, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
-        self.id = id; self.createdAt = createdAt; self.displayName = displayName
+        self.id = id; self.createdAt = createdAt
+        self.modifiedAt = nil
+        self.displayName = displayName
         self.display = display; self.issuerDisplay = issuerDisplay
-        self.credentialIssuerIdentifier = credentialIssuerIdentifier; self.configurationIdentifier = configurationIdentifier
+        self.credentialIssuerIdentifier = credentialIssuerIdentifier
+         self.configurationIdentifier = configurationIdentifier
         self.validFrom = validFrom; self._validUntil = validUntil; self.statusIdentifier = statusIdentifier; self.secureAreaName = secureAreaName
         self.credentialsUsageCounts = credentialsUsageCounts
         self.credentialPolicy = credentialPolicy
-        self.docType = docType; self.docDataFormat = .cbor
-		if let nameSpaces = Self.getCborSignedItems(issuerSigned) {
-			Self.extractCborClaims(nameSpaces, &docClaims, displayNames, mandatory)
-		}
+        self.docType = docType
+        self.docDataFormat = .cbor
+        self.hashingAlg = nil
+		if let nameSpaceItems = Self.getCborSignedItems(issuerSigned) {
+            let extracted = Self.extractClaimsAndAgeValues(from: nameSpaceItems, displayNames: displayNames, mandatory: mandatory)
+            self.nameSpaces = extracted.nameSpaces
+            self.docClaims = extracted.docClaims
+            self.ageOverXX = extracted.ageOverXX
+		} else {
+            self.nameSpaces = nil
+            self.docClaims = [DocClaim]()
+            self.ageOverXX = [Int: Bool]()
+        }
 	}
-} // end extension
+
+    static func extractClaimsAndAgeValues(from nameSpaceItems: [NameSpace: [IssuerSignedItem]], displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) -> (docClaims: [DocClaim], ageOverXX: [Int: Bool], nameSpaces: [NameSpace]) {
+        var docClaimsTemp = [DocClaim]()
+        var ageOverXXtemp = [Int: Bool]()
+        extractCborClaims(nameSpaceItems, &docClaimsTemp, displayNames, mandatory)
+        extractAgeOverValues(nameSpaceItems, &ageOverXXtemp)
+        let nameSpaces = Array(nameSpaceItems.keys)
+        return (docClaimsTemp, ageOverXXtemp, nameSpaces)
+    }
+} 
+

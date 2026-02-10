@@ -18,8 +18,7 @@ limitations under the License.
 
 import Foundation
 
-public final class IsoMdlModel: GenericMdocModel {
-	public var nameSpaces: [NameSpace]?
+public final class IsoMdlModel: GenericMdocModel, @unchecked Sendable {
 	public static var isoDocType: String { "org.iso.18013.5.1.mDL" }
 	public static var isoNamespace: String { "org.iso.18013.5.1" }
 
@@ -113,7 +112,7 @@ public final class IsoMdlModel: GenericMdocModel {
 	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, credentialPolicy: CredentialPolicy, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
 
         // Initialize properties specific to IsoMdlModel
-        guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned, nameSpaces) else { return nil }
+        guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned) else { return nil }
         func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems, string: key.rawValue) }
 
         exp = getValue(key: .exp)
@@ -154,11 +153,8 @@ public final class IsoMdlModel: GenericMdocModel {
         webapiInfo = getValue(key: .webapiInfo)
         oidcInfo = getValue(key: .oidcInfo)
 
+		let extracted = Self.extractClaimsAndAgeValues(from: nameSpaceItems, displayNames: displayNames, mandatory: mandatory)
         // Call superclass initializer
-        super.init(id: id, createdAt: createdAt, docType: Self.isoDocType, displayName: displayName ?? "mdl_doctype_name", display: display, issuerDisplay: issuerDisplay, credentialIssuerIdentifier: credentialIssuerIdentifier, configurationIdentifier: configurationIdentifier, validFrom: validFrom, validUntil: validUntil, statusIdentifier: statusIdentifier, credentialsUsageCounts: credentialsUsageCounts, credentialPolicy: credentialPolicy, secureAreaName: secureAreaName, modifiedAt: nil, ageOverXX: [Int: Bool](), docClaims: [DocClaim](), docDataFormat: .cbor, hashingAlg: nil)
-
-        // Extract claims and age over values
-        Self.extractCborClaims(nameSpaceItems, &docClaims, displayNames, mandatory)
-        Self.extractAgeOverValues(nameSpaceItems, &ageOverXX)
+        super.init(id: id, createdAt: createdAt, docType: Self.isoDocType, displayName: displayName ?? "mdl_doctype_name", display: display, issuerDisplay: issuerDisplay, credentialIssuerIdentifier: credentialIssuerIdentifier, configurationIdentifier: configurationIdentifier, validFrom: validFrom, validUntil: validUntil, statusIdentifier: statusIdentifier, credentialsUsageCounts: credentialsUsageCounts, credentialPolicy: credentialPolicy, secureAreaName: secureAreaName, modifiedAt: nil, ageOverXX: extracted.ageOverXX, docClaims: extracted.docClaims, docDataFormat: .cbor, hashingAlg: nil, nameSpaces: extracted.nameSpaces)
     }
 }
