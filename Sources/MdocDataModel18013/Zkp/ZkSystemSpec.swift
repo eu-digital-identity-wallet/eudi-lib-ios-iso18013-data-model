@@ -19,17 +19,20 @@ import SwiftCBOR
 import OrderedCollections
 
 /// ZkSystemSpec
-public struct ZkSystemSpec: Sendable {
+public struct ZkSystemSpec: Sendable, Identifiable {
+    public let id: String
     public let system: ZkSystem
     public let params: ZkParams
     public let extensions: OrderedDictionary<String, CBOR>?
     
     enum Keys: String {
+        case id
         case system
         case params
     }
     
-    public init(system: ZkSystem, params: ZkParams, extensions: OrderedDictionary<String, CBOR>? = nil) {
+    public init(id: String, system: ZkSystem, params: ZkParams, extensions: OrderedDictionary<String, CBOR>? = nil) {
+        self.id = id
         self.system = system
         self.params = params
         self.extensions = extensions
@@ -41,7 +44,8 @@ extension ZkSystemSpec: CBORDecodable {
         guard case let .map(m) = cbor else { throw .invalidCbor("ZkSystemSpec") }   
         guard let systemValue = m[Keys.system] else { throw .missingField("ZkSystemSpec", Keys.system.rawValue) }
         guard case let .utf8String(sys) = systemValue else { throw .invalidCbor("ZkSystemSpec") }
-        system = sys      
+        system = sys
+        if case let .utf8String(tid) = m[Keys.id] { id = tid } else { id = "\(sys)" }
         // decode params
         guard let paramsValue = m[Keys.params] else { throw .missingField("ZkSystemSpec", Keys.params.rawValue) }
         guard case let .map(paramsMap) = paramsValue else { throw .invalidCbor("ZkSystemSpec") }
