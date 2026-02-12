@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -16,7 +16,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/niscy-eudiw/SwiftCBOR.git", from: "0.6.4"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.9.0"),
-    ] + cryptoPD
+    ]
     ,
 
     targets: [
@@ -27,17 +27,10 @@ let package = Package(
             dependencies: [
                 "SwiftCBOR",
                 .product(name: "Logging", package: "swift-log")
-                ] + cryptoTD),
+                ]
+            ),
         .testTarget(
             name: "MdocDataModel18013Tests",
             dependencies: ["MdocDataModel18013"], resources: [.process("Resources")]),
     ]
 )
-
-#if !canImport(CryptoKit)
- var cryptoPD: [Package.Dependency]{  [ Package.Dependency.package(url: "https://github.com/apple/swift-crypto.git", from: "3.9.0"), ] }
- var cryptoTD: [Target.Dependency]{  [ .product(name: "Crypto", package: "swift-crypto"), ] }
-#else
- var cryptoPD: [Package.Dependency] { [] }
- var cryptoTD: [Target.Dependency] { [] }
-#endif
