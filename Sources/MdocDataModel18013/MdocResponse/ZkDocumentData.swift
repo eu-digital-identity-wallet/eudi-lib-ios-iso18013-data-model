@@ -28,15 +28,15 @@ import OrderedCollections
 ///   - deviceSigned: Devices signed name spaces and values.
 ///   - msoX5chain: The issuers certificate chain.
 public struct ZkDocumentData: Sendable {
-    //public let zkSystemSpecId: String
+    public let zkSystemSpecId: String
     public let docType: String
     public let timestamp: Date
     public let issuerSigned: [String: [String: CBOR]]
     public let deviceSigned: [String: [String: CBOR]]
     public let msoX5chain: [[UInt8]]?
 
-    public init(docType: String, timestamp: Date, issuerSigned: [String: [String: CBOR]], deviceSigned: [String: [String: CBOR]], msoX5chain: [[UInt8]]?) {
-        //self.zkSystemSpecId = zkSystemSpecId
+    public init(zkSystemSpecId: String, docType: String, timestamp: Date, issuerSigned: [String: [String: CBOR]], deviceSigned: [String: [String: CBOR]], msoX5chain: [[UInt8]]?) {
+        self.zkSystemSpecId = zkSystemSpecId
         self.docType = docType
         self.timestamp = timestamp
         self.issuerSigned = issuerSigned
@@ -59,7 +59,7 @@ public struct ZkDocumentData: Sendable {
 extension ZkDocumentData: CBOREncodable {
     public func toCBOR(options: CBOROptions) -> CBOR {
         var map: OrderedDictionary<CBOR,CBOR> = [:]
-        //map[CBOR.utf8String("zkSystemId")] = CBOR.utf8String(zkSystemSpecId)
+        map[CBOR.utf8String("zkSystemId")] = CBOR.utf8String(zkSystemSpecId)
         map[CBOR.utf8String("docType")] = CBOR.utf8String(docType)
         // Format timestamp as ISO-8601 string with Zulu timezone
         let formatter = ISO8601DateFormatter()
@@ -129,7 +129,7 @@ extension ZkDocumentData: CBOREncodable {
 extension ZkDocumentData: CBORDecodable {
     public init(cbor: CBOR) throws(MdocValidationError) {
         guard case let .map(cborMap) = cbor else { throw .invalidCbor("ZkDocumentData") }
-        //guard case let .utf8String(zkSystemSpecId)? = cborMap[CBOR.utf8String("zkSystemId")] else { throw .missingField("ZkDocumentData", "zkSystemId") }
+        guard case let .utf8String(zkSystemSpecId)? = cborMap[CBOR.utf8String("zkSystemId")] else { throw .missingField("ZkDocumentData", "zkSystemId") }
         guard case let .utf8String(docType) = cborMap[CBOR.utf8String("docType")] else { throw .missingField("ZkDocumentData", "docType") }
         guard let taggedTimestamp = cborMap[CBOR.utf8String("timestamp")] else { throw .missingField("ZkDocumentData", "timestamp") }
         // Extract tagged timestamp (tag 0 for date-time string)
@@ -193,7 +193,7 @@ extension ZkDocumentData: CBORDecodable {
             default: throw .invalidCbor("ZkDocumentData")
             }
         }
-        self.init(docType: docType, timestamp: timestamp, issuerSigned: issuerSigned, deviceSigned: deviceSigned, msoX5chain: msoX5chain)
+        self.init(zkSystemSpecId: zkSystemSpecId, docType: docType, timestamp: timestamp, issuerSigned: issuerSigned, deviceSigned: deviceSigned, msoX5chain: msoX5chain)
     }
 }
 
