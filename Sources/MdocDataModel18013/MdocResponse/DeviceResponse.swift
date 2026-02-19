@@ -28,6 +28,7 @@ import OrderedCollections
 /// ```
 public struct DeviceResponse: Sendable {
 	public let version: String
+	public static let defaultVersion = version1
 	public static let version1 = "1.0"
 	public static let version2 = "1.1"
 	/// An array of all returned documents
@@ -47,7 +48,7 @@ public struct DeviceResponse: Sendable {
 	}
 
 	public init(version: String? = nil, documents: [Document]? = nil, zkDocuments: [ZkDocument]? = nil, documentErrors: [DocumentError]? = nil, status: UInt64? = nil) {
-		self.version = version ?? (zkDocuments != nil ? Self.version2 : Self.version1)
+		self.version = version ?? (zkDocuments != nil ? Self.version2 : Self.defaultVersion)
 		self.documents = documents
 		self.zkDocuments = zkDocuments
 		self.documentErrors = documentErrors
