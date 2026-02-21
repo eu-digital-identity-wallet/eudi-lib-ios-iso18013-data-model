@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 import Foundation
+import SwiftyJSON
 import SwiftCBOR
 import OrderedCollections
 
@@ -66,6 +67,70 @@ extension ZkSystemSpec: CBORDecodable {
             }
         }
         self.extensions = exts
+    }
+}
+
+extension ZkSystemSpec {
+    /// Initialize from a JSON dictionary (e.g. decoded from `JSONSerialization`).
+    /// The `"system"` key is **required** and maps to ``system``.
+    /// Every other key/value pair is converted to a ``ZkParam`` and stored in ``params``.
+    public init(jsonObject: JSON) throws {
+        guard let sys = jsonObject[Keys.system.rawValue].string else {
+            throw MdocValidationError.missingField("ZkSystemSpec", Keys.system.rawValue)
+        }
+        self.system = sys
+        // Use explicit "id" if present, otherwise fall back to system value
+        if let idValue = jsonObject[Keys.id.rawValue].string { self.id = idValue } 
+        else { self.id = sys }
+        // All keys except "system" and "id" become params
+        var zkParams = OrderedDictionary<String, ZkParam>()
+        for (key, value) in jsonObject {
+            guard key != Keys.system.rawValue, key != Keys.id.rawValue else { continue }
+            zkParams[key] = try Self.zkParam(from: value, key: key)
+        }
+        self.params = zkParams
+        self.extensions = nil
+    }
+
+    /// Initialize from raw JSON `Data`.
+    public init(jsonData: Data) throws {
+        guard let obj = try JSONSerialization.jsonObject(with: jsonData) as? [String: Any] else {
+            throw MdocValidationError.invalidCbor("ZkSystemSpec JSON root is not a dictionary")
+        }
+        try self.init(jsonObject: JSON(obj))
+    }
+
+    private static func zkParam(from value: JSON, key: String) throws -> ZkParam {
+        switch value.type {
+        case .number:
+            if let intVal = value.int64 {
+                return .intParam(intVal)
+            } else if let doubleVal = value.double {
+                return .doubleParam(doubleVal)
+            }
+        case .bool:
+            if let boolVal = value.bool {
+                return .boolParam(boolVal)
+            }
+        case .string:
+            if let strVal = value.string {
+                return .stringParam(strVal)
+            }
+        default: break
+        }
+        throw MdocValidationError.invalidCbor("ZkSystemSpec param '\(key)' has unsupported type")
+    }
+}
+
+extension Array where Element == ZkSystemSpec {
+    /// given a JSON object containing a "zk_system_type" array, initialize an array of `ZkSystemSpec` from it.
+    /// https://developers.google.com/wallet/identity/verify/accepting-ids-from-wallet-online#zkp
+    public init(meta: JSON) throws {
+        self = try meta["zk_system_type"].array?.map { try ZkSystemSpec(jsonObject: $0) } ?? []
+    }
+    /// Initialize an array of `ZkSystemSpec` from a JSON array.
+    public init(jsonArray: [JSON]) throws {
+        self = try jsonArray.map { try ZkSystemSpec(jsonObject: $0) }
     }
 }
 
