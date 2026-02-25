@@ -29,7 +29,7 @@ public class GenericMdocModel: DocClaimsDecodable, @unchecked Sendable {
     public let hashingAlg: String?
 	public let nameSpaces: [NameSpace]?
 
-    public init(id: String = UUID().uuidString, createdAt: Date = Date(), docType: String?, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]? = nil, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, credentialPolicy: CredentialPolicy, secureAreaName: String?, modifiedAt: Date?, ageOverXX: [Int : Bool], docClaims: [DocClaim], docDataFormat: DocDataFormat, hashingAlg: String?, nameSpaces: [NameSpace]?) {
+    public init(id: String = UUID().uuidString, createdAt: Date = Date(), docType: String?, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]? = nil, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, credentialPolicy: CredentialPolicy, secureAreaName: String?, modifiedAt: Date?, ageOverXX: [Int: Bool] = [:], docClaims: [DocClaim], docDataFormat: DocDataFormat, hashingAlg: String?, nameSpaces: [NameSpace]? = nil) {
         self.id = id
         self.createdAt = createdAt
         self.docType = docType
