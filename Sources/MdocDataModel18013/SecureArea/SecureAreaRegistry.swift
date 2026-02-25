@@ -41,32 +41,22 @@ public class SecureAreaRegistry: @unchecked Sendable {
     }
 
     public func get(name: String?) -> SecureArea {
-        lock.lock()
-        defer { lock.unlock() }
         if let name, let sa = secureAreas[name] { return sa } else { return defaultSecurityArea! }
     }
 
     public func get(deviceSecureArea: DeviceSecureArea) -> SecureArea? {
-        lock.lock()
-        defer { lock.unlock() }
         return secureAreas[deviceSecureArea.rawValue]
     }
 
     public var names: [String] {
-        lock.lock()
-        defer { lock.unlock() }
         return Array(secureAreas.keys)
     }
 
     public var values: [any SecureArea] {
-        lock.lock()
-        defer { lock.unlock() }
         return Array(secureAreas.values)
     }
 
     public var defaultSecurityArea: (any SecureArea)? {
-        lock.lock()
-        defer { lock.unlock() }
         if let sa = secureAreas[DeviceSecureArea.secureEnclave.rawValue] {
             return sa
         } else if let sa = secureAreas[DeviceSecureArea.software.rawValue] {
