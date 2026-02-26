@@ -18,9 +18,10 @@ limitations under the License.
 
 import Foundation
 
+/// SAFETY INVARIANT: Inherits @unchecked Sendable safety guarantees from GenericMdocModel.
+/// See GenericMdocModel documentation for details on thread-safety requirements.
 public final class EuPidModel: GenericMdocModel, @unchecked Sendable {
 	public static let euPidDocType: String = "eu.europa.ec.eudi.pid.1"
-	public var nameSpaces: [NameSpace]?
 
 	public let family_name: String?
 	public let given_name: String?
@@ -97,8 +98,8 @@ public final class EuPidModel: GenericMdocModel, @unchecked Sendable {
 	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, credentialPolicy: CredentialPolicy, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
 
         // Initialize properties specific to EuPidModel
-		guard let nameSpaces = Self.getCborSignedItems(issuerSigned) else { return nil }
-		func getValue<T>(key: EuPidModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaces, string: key.rawValue) }
+		guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned) else { return nil }
+		func getValue<T>(key: EuPidModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems, string: key.rawValue) }
 
         family_name = getValue(key: .family_name)
 		given_name = getValue(key: .given_name)
@@ -131,11 +132,8 @@ public final class EuPidModel: GenericMdocModel, @unchecked Sendable {
         mobile_phone_number = getValue(key: .mobile_phone_number)
         trust_anchor = getValue(key: .trust_anchor)
 
+		let extracted = Self.extractClaimsAndAgeValues(from: nameSpaceItems, displayNames: displayNames, mandatory: mandatory)
         // Call superclass initializer
-        super.init(id: id, createdAt: createdAt, docType: Self.euPidDocType, displayName: displayName ?? "eu_pid_doctype_name", display: display, issuerDisplay: issuerDisplay, credentialIssuerIdentifier: credentialIssuerIdentifier, configurationIdentifier: configurationIdentifier, validFrom: validFrom, validUntil: validUntil, statusIdentifier: statusIdentifier, credentialsUsageCounts: credentialsUsageCounts, credentialPolicy: credentialPolicy, secureAreaName: secureAreaName, modifiedAt: nil, ageOverXX: [Int: Bool](), docClaims: [DocClaim](), docDataFormat: .cbor, hashingAlg: nil)
-
-        // Extract claims and age over values
-        Self.extractCborClaims(nameSpaces, &docClaims, displayNames, mandatory)
-        Self.extractAgeOverValues(nameSpaces, &ageOverXX)
+        super.init(id: id, createdAt: createdAt, docType: Self.euPidDocType, displayName: displayName ?? "eu_pid_doctype_name", display: display, issuerDisplay: issuerDisplay, credentialIssuerIdentifier: credentialIssuerIdentifier, configurationIdentifier: configurationIdentifier, validFrom: validFrom, validUntil: validUntil, statusIdentifier: statusIdentifier, credentialsUsageCounts: credentialsUsageCounts, credentialPolicy: credentialPolicy, secureAreaName: secureAreaName, modifiedAt: nil, ageOverXX: extracted.ageOverXX, docClaims: extracted.docClaims, docDataFormat: .cbor, hashingAlg: nil, nameSpaces: extracted.nameSpaces)
 	}
 }

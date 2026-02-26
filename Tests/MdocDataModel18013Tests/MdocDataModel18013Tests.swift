@@ -223,4 +223,26 @@ struct MdocDataModel18013Tests {
 		let url = URL(string: "https://api.pp.mobiledl.us/api/Iso18013")!
 		#expect(url.host == "api.pp.mobiledl.us")
 	}
+
+	@Test func zkSystemSpecFromJSON() throws {
+		let jsonString = """
+		{
+		  "system": "longfellow-libzk-v1",
+		  "circuit_hash": "137e5a75ce72735a37c8a72da1a8a0a5df8d13365c2ae3d2c2bd6a0e7197c7c6",
+		  "version": 6,
+		  "block_enc_hash": 4096,
+		  "block_enc_sig": 2945
+		}
+		"""
+		let jsonData = jsonString.data(using: .utf8)!
+		let spec = try ZkSystemSpec(jsonData: jsonData)
+
+		#expect(spec.system == "longfellow-libzk-v1")
+		#expect(spec.id == "longfellow-libzk-v1")
+		#expect(spec.params["circuit_hash"]?.stringValue == "137e5a75ce72735a37c8a72da1a8a0a5df8d13365c2ae3d2c2bd6a0e7197c7c6")
+		#expect(spec.params["version"]?.intValue == 6)
+		#expect(spec.params["block_enc_hash"]?.intValue == 4096)
+		#expect(spec.params["block_enc_sig"]?.intValue == 2945)
+		#expect(spec.extensions == nil)
+	}
 }
