@@ -22,7 +22,7 @@ public struct DocMetadata: Sendable, Codable {
 	/// the document configuration identifier
 	public let configurationIdentifier: String
 	/// the document type
-	public let docType: String?
+	public let docType: String
 	/// get display name of the document for the given culture
 	public func getDisplayName(_ uiCulture: String?) -> String? { display?.getName(uiCulture) }
 	/// display properties for the document
@@ -33,8 +33,14 @@ public struct DocMetadata: Sendable, Codable {
 	public func getIssuerDisplayName(_ uiCulture: String?) -> String? { issuerDisplay?.getName(uiCulture) }
 	/// claims (for mso-mdoc and sd-jwt documents)
 	public let claims: [DocClaimMetadata]?
+	/// encoded access token for the document, if any
+	public let accessTokenData: Data?
+	/// encoded refresh token for the document, if any
+	public let refreshTokenData: Data?
 
-	public init(credentialIssuerIdentifier: String, configurationIdentifier: String, docType: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, claims: [DocClaimMetadata]? = nil) {
+	public init(credentialIssuerIdentifier: String, configurationIdentifier: String, docType: String, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, claims: [DocClaimMetadata]? = nil, accessTokenData: Data? = nil, refreshTokenData: Data? = nil) {
+		self.accessTokenData = accessTokenData
+		self.refreshTokenData = refreshTokenData
 		self.credentialIssuerIdentifier = credentialIssuerIdentifier
 		self.configurationIdentifier = configurationIdentifier
 		self.docType = docType

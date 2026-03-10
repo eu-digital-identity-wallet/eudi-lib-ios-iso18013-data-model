@@ -6,7 +6,7 @@ import Foundation
 /// SAFETY INVARIANT (@unchecked Sendable):
 /// This class is marked @unchecked Sendable because it contains a mutable property (credentialsUsageCounts)
 /// that may be updated after initialization. Updates to this property must be performed by external code that ensures proper synchronization.
-public class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable {
+public class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable, ObservableObject {
     public let display: [DisplayMetadata]?
     public let issuerDisplay: [DisplayMetadata]?
     public let credentialIssuerIdentifier: String?
@@ -15,7 +15,7 @@ public class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable {
     internal let _validUntil: Date?
     public var validUntil: Date? { if let uc = credentialsUsageCounts, uc.remaining <= 0 { return nil } else { return _validUntil } }
     public let statusIdentifier: StatusIdentifier?
-    public var credentialsUsageCounts: CredentialsUsageCounts?
+    @Published public var credentialsUsageCounts: CredentialsUsageCounts?
     public let credentialPolicy: CredentialPolicy
     public let secureAreaName: String?
 	public let id: String
