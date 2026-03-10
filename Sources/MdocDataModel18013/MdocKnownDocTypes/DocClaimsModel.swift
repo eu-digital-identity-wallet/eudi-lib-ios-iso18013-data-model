@@ -29,39 +29,40 @@ public class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable, Observable
     public let hashingAlg: String?
 	public let nameSpaces: [NameSpace]?
 
-    public init(id: String = UUID().uuidString, createdAt: Date = Date(), docType: String?, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]? = nil, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, credentialPolicy: CredentialPolicy, secureAreaName: String?, modifiedAt: Date?, ageOverXX: [Int: Bool] = [:], docClaims: [DocClaim], docDataFormat: DocDataFormat, hashingAlg: String?, nameSpaces: [NameSpace]? = nil) {
-        self.id = id
-        self.createdAt = createdAt
-        self.docType = docType
-        self.displayName = displayName
-        self.display = display; self.issuerDisplay = issuerDisplay
-        self.credentialIssuerIdentifier = credentialIssuerIdentifier
-        self.configurationIdentifier = configurationIdentifier
-        self.validFrom = validFrom
-        self._validUntil = validUntil
-        self.statusIdentifier = statusIdentifier
-        self.secureAreaName = secureAreaName
-        self.credentialsUsageCounts = credentialsUsageCounts
-        self.credentialPolicy = credentialPolicy
-        self.modifiedAt = modifiedAt
-        self.ageOverXX = ageOverXX
-        self.docClaims = docClaims
-        self.docDataFormat = docDataFormat
-        self.hashingAlg = hashingAlg
-        self.nameSpaces = nameSpaces
+    public init(configuration: DocClaimsModelConfiguration) {
+        self.id = configuration.id
+        self.createdAt = configuration.createdAt
+        self.docType = configuration.docType
+        self.displayName = configuration.displayName
+        self.display = configuration.display
+        self.issuerDisplay = configuration.issuerDisplay
+        self.credentialIssuerIdentifier = configuration.credentialIssuerIdentifier
+        self.configurationIdentifier = configuration.configurationIdentifier
+        self.validFrom = configuration.validFrom
+        self._validUntil = configuration.validUntil
+        self.statusIdentifier = configuration.statusIdentifier
+        self.secureAreaName = configuration.secureAreaName
+        self.credentialsUsageCounts = configuration.credentialsUsageCounts
+        self.credentialPolicy = configuration.credentialPolicy
+        self.modifiedAt = configuration.modifiedAt
+        self.ageOverXX = configuration.ageOverXX
+        self.docClaims = configuration.docClaims
+        self.docDataFormat = configuration.docDataFormat
+        self.hashingAlg = configuration.hashingAlg
+        self.nameSpaces = configuration.nameSpaces
     }
 
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, docType: String, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, credentialPolicy: CredentialPolicy, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
-        self.id = id; self.createdAt = createdAt
+	public init?(configuration: DocClaimsModelConfiguration, issuerSigned: IssuerSigned, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
+    self.id = configuration.id; self.createdAt = configuration.createdAt
         self.modifiedAt = nil
-        self.displayName = displayName
-        self.display = display; self.issuerDisplay = issuerDisplay
-        self.credentialIssuerIdentifier = credentialIssuerIdentifier
-         self.configurationIdentifier = configurationIdentifier
-        self.validFrom = validFrom; self._validUntil = validUntil; self.statusIdentifier = statusIdentifier; self.secureAreaName = secureAreaName
-        self.credentialsUsageCounts = credentialsUsageCounts
-        self.credentialPolicy = credentialPolicy
-        self.docType = docType
+    self.displayName = configuration.displayName
+    self.display = configuration.display; self.issuerDisplay = configuration.issuerDisplay
+    self.credentialIssuerIdentifier = configuration.credentialIssuerIdentifier
+     self.configurationIdentifier = configuration.configurationIdentifier
+    self.validFrom = configuration.validFrom; self._validUntil = configuration.validUntil; self.statusIdentifier = configuration.statusIdentifier; self.secureAreaName = configuration.secureAreaName
+    self.credentialsUsageCounts = configuration.credentialsUsageCounts
+    self.credentialPolicy = configuration.credentialPolicy
+    self.docType = configuration.docType
         self.docDataFormat = .cbor
         self.hashingAlg = nil
 		if let nameSpaceItems = Self.getCborSignedItems(issuerSigned) {

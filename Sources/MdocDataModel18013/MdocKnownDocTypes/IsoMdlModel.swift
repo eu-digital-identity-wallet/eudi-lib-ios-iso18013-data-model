@@ -111,7 +111,7 @@ public final class IsoMdlModel: DocClaimsModel, @unchecked Sendable {
 	}
 	public var mandatoryElementKeys: [DataElementIdentifier] { Self.isoMandatoryElementKeys }
 
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, credentialPolicy: CredentialPolicy, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
+	public override init?(configuration: DocClaimsModelConfiguration, issuerSigned: IssuerSigned, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
 
         // Initialize properties specific to IsoMdlModel
         guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned) else { return nil }
@@ -157,6 +157,29 @@ public final class IsoMdlModel: DocClaimsModel, @unchecked Sendable {
 
 		let extracted = Self.extractClaimsAndAgeValues(from: nameSpaceItems, displayNames: displayNames, mandatory: mandatory)
         // Call superclass initializer
-        super.init(id: id, createdAt: createdAt, docType: Self.isoDocType, displayName: displayName ?? "mdl_doctype_name", display: display, issuerDisplay: issuerDisplay, credentialIssuerIdentifier: credentialIssuerIdentifier, configurationIdentifier: configurationIdentifier, validFrom: validFrom, validUntil: validUntil, statusIdentifier: statusIdentifier, credentialsUsageCounts: credentialsUsageCounts, credentialPolicy: credentialPolicy, secureAreaName: secureAreaName, modifiedAt: nil, ageOverXX: extracted.ageOverXX, docClaims: extracted.docClaims, docDataFormat: .cbor, hashingAlg: nil, nameSpaces: extracted.nameSpaces)
+		super.init(
+			configuration: DocClaimsModelConfiguration(
+				id: configuration.id,
+				createdAt: configuration.createdAt,
+				docType: Self.isoDocType,
+				displayName: configuration.displayName ?? "mdl_doctype_name",
+				display: configuration.display,
+				issuerDisplay: configuration.issuerDisplay,
+				credentialIssuerIdentifier: configuration.credentialIssuerIdentifier,
+				configurationIdentifier: configuration.configurationIdentifier,
+				validFrom: configuration.validFrom,
+				validUntil: configuration.validUntil,
+				statusIdentifier: configuration.statusIdentifier,
+				credentialsUsageCounts: configuration.credentialsUsageCounts,
+				credentialPolicy: configuration.credentialPolicy,
+				secureAreaName: configuration.secureAreaName,
+				modifiedAt: nil,
+				ageOverXX: extracted.ageOverXX,
+				docClaims: extracted.docClaims,
+				docDataFormat: .cbor,
+				hashingAlg: nil,
+				nameSpaces: extracted.nameSpaces
+			)
+		)
     }
 }
