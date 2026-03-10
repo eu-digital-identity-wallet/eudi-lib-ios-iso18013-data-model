@@ -71,6 +71,6 @@ public struct SimpleAgeAttest: AgeAttesting, Sendable {
 	}
 	
 	public init(namespaces: [NameSpace: [IssuerSignedItem]]) {
-		GenericMdocModel.self.extractAgeOverValues(namespaces, &ageOverXX)
+		DocClaimsModel.self.extractAgeOverValues(namespaces, &ageOverXX)
 	}
 } // end struct
