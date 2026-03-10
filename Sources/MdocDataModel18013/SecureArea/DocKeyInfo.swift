@@ -31,12 +31,12 @@ public struct DocKeyInfo: Codable, Sendable {
 	public init?(from data: Data?) {
 		guard let data else { return nil }
 		do { self = try JSONDecoder().decode(DocKeyInfo.self, from: data) }
-		catch { return nil }
+		catch { logger.error("Cannot decode \(Self.self) from data: \(error)"); return nil }
 	}
 
 	public func toData() -> Data? {
 		do { return try JSONEncoder().encode(self) }
-		catch { return nil }
+		catch { logger.error("Cannot encode \(Self.self): \(error)"); return nil }
 	}
 }
 

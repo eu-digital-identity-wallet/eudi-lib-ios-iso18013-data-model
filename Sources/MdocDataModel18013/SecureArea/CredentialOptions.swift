@@ -17,7 +17,7 @@ limitations under the License.
 import Foundation
 
 /// Credential options
-public struct CredentialOptions: Codable,Sendable {
+public struct CredentialOptions: Codable, Sendable {
     public init(credentialPolicy: CredentialPolicy, batchSize: Int) {
         self.credentialPolicy = credentialPolicy
         self.batchSize = batchSize

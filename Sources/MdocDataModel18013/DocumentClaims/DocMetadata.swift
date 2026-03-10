@@ -35,8 +35,12 @@ public struct DocMetadata: Sendable, Codable {
 	public let claims: [DocClaimMetadata]?
 	/// encoded authorized request data for the document, if any
 	public let authorizedRequestData: Data?
+    // key options used to create the document
+    public let keyOptions: KeyOptions?
+    // credential options used to create the document
+    public let credentialOptions: CredentialOptions?
 
-	public init(credentialIssuerIdentifier: String, configurationIdentifier: String, docType: String, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, claims: [DocClaimMetadata]? = nil, authorizedRequestData: Data? = nil) {
+	public init(credentialIssuerIdentifier: String, configurationIdentifier: String, docType: String, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, claims: [DocClaimMetadata]?, authorizedRequestData: Data?, keyOptions: KeyOptions?, credentialOptions: CredentialOptions?) {
 		self.authorizedRequestData = authorizedRequestData
 		self.credentialIssuerIdentifier = credentialIssuerIdentifier
 		self.configurationIdentifier = configurationIdentifier
@@ -44,17 +48,19 @@ public struct DocMetadata: Sendable, Codable {
 		self.display = display
 		self.issuerDisplay = issuerDisplay
 		self.claims = claims
+		self.keyOptions = keyOptions
+		self.credentialOptions = credentialOptions
 	}
 
 	public init?(from data: Data?) {
 		guard let data else { return nil }
 		do { self = try JSONDecoder().decode(DocMetadata.self, from: data) }
-		catch { return nil }
+        catch { logger.error("Cannot decode \(Self.self) from data: \(error)"); return nil }
 	}
 
 	public func toData() -> Data? {
 		do { return try JSONEncoder().encode(self) }
-		catch { return nil }
+		catch { logger.error("Cannot encode \(Self.self): \(error)"); return nil }
 	}
 }
 
