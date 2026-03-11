@@ -14,7 +14,6 @@ the [EUDI Wallet Reference Implementation project description](https://github.co
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=eu-digital-identity-wallet_eudi-lib-ios-iso18013-data-model&metric=vulnerabilities&token=b00a8ef181dca9772a601a2889bf78338ac9e0e9)](https://sonarcloud.io/summary/new_code?id=eu-digital-identity-wallet_eudi-lib-ios-iso18013-data-model)
 
 Implementation of the mDoc data model according to [ISO/IEC 18013-5](https://www.iso.org/standard/69084.html) standard
-(0.9.0)
 
 ## Overview
 ### `DeviceEngagement`
