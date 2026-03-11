@@ -17,7 +17,7 @@ limitations under the License.
 import Foundation
 
 /// Key options
-public struct KeyOptions: Sendable {
+public struct KeyOptions: Codable, Sendable {
     public init(curve: CoseEcCurve = .P256, secureAreaName: String? = nil, accessProtection: KeyAccessProtection? = nil, accessControl: KeyAccessControl? = nil, keyPurposes: [KeyPurpose]? = KeyPurpose.allCases, additionalOptions: Data? = nil) {
         self.curve = curve
         self.secureAreaName = secureAreaName
@@ -53,7 +53,7 @@ public enum KeyPurpose: String, Codable, CaseIterable, Sendable {
 /// Key access protection options
 ///
 /// You control an app’s access to a keychain item relative to the state of a device by setting the item’s kSecAttrAccessible attribute when you create the item.
-public enum KeyAccessProtection: Int, CaseIterable, Sendable {
+public enum KeyAccessProtection: Int, Codable, CaseIterable, Sendable {
     /// Key data can only be accessed while the device is unlocked (default value).
     case whenUnlocked
     /// Key data can only be  accessed once the device has been unlocked after a restart.  This is  recommended for keys that need to be accesible by background applications.
@@ -79,7 +79,7 @@ public enum KeyAccessProtection: Int, CaseIterable, Sendable {
 /// Key access control settings
 ///
 /// Using these settings you can check for the presence of the authorized user at the very last minute before retrieving login credentials from the keychain. This helps secure the private key even if the user hands the device in an unlocked state to someone else.
-public struct KeyAccessControl: OptionSet, Sendable {
+public struct KeyAccessControl: OptionSet, Codable, Sendable {
     public init(rawValue: Int) {
         self.rawValue = rawValue
     }

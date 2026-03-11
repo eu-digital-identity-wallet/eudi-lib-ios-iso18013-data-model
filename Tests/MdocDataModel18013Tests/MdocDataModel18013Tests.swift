@@ -93,9 +93,61 @@ struct MdocDataModel18013Tests {
 	  	let d1 = try #require(docs.first(where: {$0.docType == EuPidModel.euPidDocType}))
 		let d2 = try #require(docs.first(where: {$0.docType == IsoMdlModel.isoDocType}))
 		//let ns1 = d1?.issuerSigned.issuerNameSpaces!.nameSpaces.first
-		let pidObj = try #require(EuPidModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d1.issuerSigned, displayName: "PID", display: nil, issuerDisplay: nil, credentialIssuerIdentifier: nil, configurationIdentifier: nil, validFrom: d1.issuerSigned.validFrom, validUntil: d1.issuerSigned.validUntil, statusIdentifier: d1.issuerSigned.issuerAuth.statusIdentifier, credentialsUsageCounts: nil, credentialPolicy: .rotateUse, secureAreaName: nil, displayNames: nil, mandatory: nil))
+		let pidObj = try #require(
+			EuPidModel(
+				configuration: DocClaimsModelConfiguration(
+					id: UUID().uuidString,
+					createdAt: Date(),
+					docType: nil,
+					displayName: "PID",
+					display: nil,
+					issuerDisplay: nil,
+					credentialIssuerIdentifier: nil,
+					configurationIdentifier: nil,
+					validFrom: d1.issuerSigned.validFrom,
+					validUntil: d1.issuerSigned.validUntil,
+					statusIdentifier: d1.issuerSigned.issuerAuth.statusIdentifier,
+					credentialsUsageCounts: nil,
+					credentialPolicy: .rotateUse,
+					secureAreaName: nil,
+					modifiedAt: nil,
+					docClaims: [],
+					docDataFormat: .cbor,
+					hashingAlg: nil
+				),
+				issuerSigned: d1.issuerSigned,
+				displayNames: nil,
+				mandatory: nil
+			)
+		)
 		#expect(pidObj.family_name == "ANDERSSON")
-		let mdlObj = try #require(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d2.issuerSigned, displayName: "mDL", display: nil, issuerDisplay: nil, credentialIssuerIdentifier: nil, configurationIdentifier: nil, validFrom: d1.issuerSigned.validFrom, validUntil: d1.issuerSigned.validUntil, statusIdentifier: d1.issuerSigned.issuerAuth.statusIdentifier, credentialsUsageCounts: nil, credentialPolicy: .rotateUse, secureAreaName: nil, displayNames: nil, mandatory: nil))
+		let mdlObj = try #require(
+			IsoMdlModel(
+				configuration: DocClaimsModelConfiguration(
+					id: UUID().uuidString,
+					createdAt: Date(),
+					docType: nil,
+					displayName: "mDL",
+					display: nil,
+					issuerDisplay: nil,
+					credentialIssuerIdentifier: nil,
+					configurationIdentifier: nil,
+					validFrom: d1.issuerSigned.validFrom,
+					validUntil: d1.issuerSigned.validUntil,
+					statusIdentifier: d1.issuerSigned.issuerAuth.statusIdentifier,
+					credentialsUsageCounts: nil,
+					credentialPolicy: .rotateUse,
+					secureAreaName: nil,
+					modifiedAt: nil,
+					docClaims: [],
+					docDataFormat: .cbor,
+					hashingAlg: nil
+				),
+				issuerSigned: d2.issuerSigned,
+				displayNames: nil,
+				mandatory: nil
+			)
+		)
 		#expect(mdlObj.familyName == "ANDERSSON")
 		printDisplayStrings(mdlObj.docClaims)
 	}
@@ -137,7 +189,33 @@ struct MdocDataModel18013Tests {
 		#expect(doc.deviceSigned.deviceAuth.coseMacOrSignature.macAlgorithm == Cose.MacAlgorithm.hmac256)
 		#expect(doc.deviceSigned.deviceAuth.coseMacOrSignature.signature.bytes.toHexString().uppercased() == "E99521A85AD7891B806A07F8B5388A332D92C189A7BF293EE1F543405AE6824D")
         let d1 = dr.documents!.first!
-		let model = try #require(IsoMdlModel(id: UUID().uuidString, createdAt: Date(), issuerSigned: d1.issuerSigned, displayName: "PID", display: nil, issuerDisplay: nil, credentialIssuerIdentifier: nil, configurationIdentifier: nil, validFrom: d1.issuerSigned.validFrom, validUntil: d1.issuerSigned.validUntil, statusIdentifier: d1.issuerSigned.issuerAuth.statusIdentifier, credentialsUsageCounts: nil, credentialPolicy: .rotateUse, secureAreaName: nil, displayNames: nil, mandatory: nil))
+		let model = try #require(
+			IsoMdlModel(
+				configuration: DocClaimsModelConfiguration(
+					id: UUID().uuidString,
+					createdAt: Date(),
+					docType: nil,
+					displayName: "PID",
+					display: nil,
+					issuerDisplay: nil,
+					credentialIssuerIdentifier: nil,
+					configurationIdentifier: nil,
+					validFrom: d1.issuerSigned.validFrom,
+					validUntil: d1.issuerSigned.validUntil,
+					statusIdentifier: d1.issuerSigned.issuerAuth.statusIdentifier,
+					credentialsUsageCounts: nil,
+					credentialPolicy: .rotateUse,
+					secureAreaName: nil,
+					modifiedAt: nil,
+					docClaims: [],
+					docDataFormat: .cbor,
+					hashingAlg: nil
+				),
+				issuerSigned: d1.issuerSigned,
+				displayNames: nil,
+				mandatory: nil
+			)
+		)
 		#expect(model.familyName == "Doe")
 	}
 

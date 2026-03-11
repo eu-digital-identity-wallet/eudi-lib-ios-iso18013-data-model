@@ -18,9 +18,9 @@ limitations under the License.
 
 import Foundation
 
-/// SAFETY INVARIANT: Inherits @unchecked Sendable safety guarantees from GenericMdocModel.
-/// See GenericMdocModel documentation for details on thread-safety requirements.
-public final class EuPidModel: GenericMdocModel, @unchecked Sendable {
+/// SAFETY INVARIANT: Inherits @unchecked Sendable safety guarantees from DocClaimsModel.
+/// See DocClaimsModel documentation for details on thread-safety requirements.
+public final class EuPidModel: DocClaimsModel, @unchecked Sendable {
 	public static let euPidDocType: String = "eu.europa.ec.eudi.pid.1"
 
 	public let family_name: String?
@@ -95,7 +95,7 @@ public final class EuPidModel: GenericMdocModel, @unchecked Sendable {
     public static var pidMandatoryElementKeys: [DataElementIdentifier] { ["age_over_18"] + mandatoryElementCodingKeys.map(\.rawValue) }
 	public var mandatoryElementKeys: [DataElementIdentifier] { Self.pidMandatoryElementKeys }
 
-	public init?(id: String, createdAt: Date, issuerSigned: IssuerSigned, displayName: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, credentialIssuerIdentifier: String?, configurationIdentifier: String?, validFrom: Date?, validUntil: Date?, statusIdentifier: StatusIdentifier?, credentialsUsageCounts: CredentialsUsageCounts?, credentialPolicy: CredentialPolicy, secureAreaName: String?, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
+	public override init?(configuration: DocClaimsModelConfiguration, issuerSigned: IssuerSigned, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
 
         // Initialize properties specific to EuPidModel
 		guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned) else { return nil }
@@ -134,6 +134,29 @@ public final class EuPidModel: GenericMdocModel, @unchecked Sendable {
 
 		let extracted = Self.extractClaimsAndAgeValues(from: nameSpaceItems, displayNames: displayNames, mandatory: mandatory)
         // Call superclass initializer
-        super.init(id: id, createdAt: createdAt, docType: Self.euPidDocType, displayName: displayName ?? "eu_pid_doctype_name", display: display, issuerDisplay: issuerDisplay, credentialIssuerIdentifier: credentialIssuerIdentifier, configurationIdentifier: configurationIdentifier, validFrom: validFrom, validUntil: validUntil, statusIdentifier: statusIdentifier, credentialsUsageCounts: credentialsUsageCounts, credentialPolicy: credentialPolicy, secureAreaName: secureAreaName, modifiedAt: nil, ageOverXX: extracted.ageOverXX, docClaims: extracted.docClaims, docDataFormat: .cbor, hashingAlg: nil, nameSpaces: extracted.nameSpaces)
+		super.init(
+			configuration: DocClaimsModelConfiguration(
+				id: configuration.id,
+				createdAt: configuration.createdAt,
+				docType: Self.euPidDocType,
+				displayName: configuration.displayName ?? "eu_pid_doctype_name",
+				display: configuration.display,
+				issuerDisplay: configuration.issuerDisplay,
+				credentialIssuerIdentifier: configuration.credentialIssuerIdentifier,
+				configurationIdentifier: configuration.configurationIdentifier,
+				validFrom: configuration.validFrom,
+				validUntil: configuration.validUntil,
+				statusIdentifier: configuration.statusIdentifier,
+				credentialsUsageCounts: configuration.credentialsUsageCounts,
+				credentialPolicy: configuration.credentialPolicy,
+				secureAreaName: configuration.secureAreaName,
+				modifiedAt: nil,
+				ageOverXX: extracted.ageOverXX,
+				docClaims: extracted.docClaims,
+				docDataFormat: .cbor,
+				hashingAlg: nil,
+				nameSpaces: extracted.nameSpaces
+			)
+		)
 	}
 }
