@@ -26,7 +26,7 @@ public struct DocClaimsModelConfiguration {
     public let nameSpaces: [NameSpace]?
 
     public init(
-        id: String = UUID().uuidString,
+        id: String,
         createdAt: Date = Date(),
         docType: String,
         displayName: String?,
