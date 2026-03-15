@@ -20,7 +20,7 @@ public class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable, Observable
     public let secureAreaName: String?
 	public let id: String
 	public let createdAt: Date 
-	public let docType: String?
+	public let docType: String
 	public let displayName: String?
 	public let modifiedAt: Date?
 	public let ageOverXX: [Int: Bool]
@@ -87,3 +87,24 @@ public class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable, Observable
     }
 } 
 
+extension DocClaimsModel {
+    public static let empty: DocClaimsModel = DocClaimsModel(
+        configuration: DocClaimsModelConfiguration(
+            docType: "",
+            displayName: nil,
+            display: nil,
+            credentialIssuerIdentifier: nil,
+            configurationIdentifier: nil,
+            validFrom: nil,
+            validUntil: nil,
+            statusIdentifier: nil,
+            credentialsUsageCounts: nil,
+            credentialPolicy: .oneTimeUse,
+            secureAreaName: nil,
+            modifiedAt: nil,
+            docClaims: [],
+            docDataFormat: .cbor,
+            hashingAlg: nil
+        )
+    )
+}

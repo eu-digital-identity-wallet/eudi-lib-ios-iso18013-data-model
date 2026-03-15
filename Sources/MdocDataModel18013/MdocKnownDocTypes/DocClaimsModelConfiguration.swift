@@ -6,7 +6,7 @@ import Foundation
 public struct DocClaimsModelConfiguration {
     public let id: String
     public let createdAt: Date
-    public let docType: String?
+    public let docType: String
     public let displayName: String?
     public let display: [DisplayMetadata]?
     public let issuerDisplay: [DisplayMetadata]?
@@ -28,7 +28,7 @@ public struct DocClaimsModelConfiguration {
     public init(
         id: String = UUID().uuidString,
         createdAt: Date = Date(),
-        docType: String?,
+        docType: String,
         displayName: String?,
         display: [DisplayMetadata]?,
         issuerDisplay: [DisplayMetadata]? = nil,
