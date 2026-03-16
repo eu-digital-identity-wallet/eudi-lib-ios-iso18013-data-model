@@ -98,7 +98,7 @@ struct MdocDataModel18013Tests {
 				configuration: DocClaimsModelConfiguration(
 					id: UUID().uuidString,
 					createdAt: Date(),
-					docType: nil,
+					docType: "",
 					displayName: "PID",
 					display: nil,
 					issuerDisplay: nil,
@@ -126,7 +126,7 @@ struct MdocDataModel18013Tests {
 				configuration: DocClaimsModelConfiguration(
 					id: UUID().uuidString,
 					createdAt: Date(),
-					docType: nil,
+					docType: "",
 					displayName: "mDL",
 					display: nil,
 					issuerDisplay: nil,
@@ -194,7 +194,7 @@ struct MdocDataModel18013Tests {
 				configuration: DocClaimsModelConfiguration(
 					id: UUID().uuidString,
 					createdAt: Date(),
-					docType: nil,
+					docType: "",
 					displayName: "PID",
 					display: nil,
 					issuerDisplay: nil,

@@ -6,7 +6,7 @@ import Foundation
 /// SAFETY INVARIANT (@unchecked Sendable):
 /// This class is marked @unchecked Sendable because it contains a mutable property (credentialsUsageCounts)
 /// that may be updated after initialization. Updates to this property must be performed by external code that ensures proper synchronization.
-public class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable, ObservableObject {
+public class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable, ObservableObject, Equatable {
     public let display: [DisplayMetadata]?
     public let issuerDisplay: [DisplayMetadata]?
     public let credentialIssuerIdentifier: String?
@@ -20,7 +20,7 @@ public class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable, Observable
     public let secureAreaName: String?
 	public let id: String
 	public let createdAt: Date 
-	public let docType: String?
+	public let docType: String
 	public let displayName: String?
 	public let modifiedAt: Date?
 	public let ageOverXX: [Int: Bool]
@@ -87,3 +87,12 @@ public class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable, Observable
     }
 } 
 
+extension DocClaimsModel {
+    public static func == (lhs: DocClaimsModel, rhs: DocClaimsModel) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    public static let empty: DocClaimsModel = DocClaimsModel(
+        configuration: DocClaimsModelConfiguration(id: "", docType: "", displayName: nil, display: nil, credentialIssuerIdentifier: nil, configurationIdentifier: nil, validFrom: nil, validUntil: nil, statusIdentifier: nil, credentialsUsageCounts: nil, credentialPolicy: .oneTimeUse, secureAreaName: nil, modifiedAt: nil, docClaims: [], docDataFormat: .cbor, hashingAlg: nil)
+    )
+}
