@@ -39,8 +39,10 @@ public struct DocMetadata: Sendable, Codable {
     public let keyOptions: KeyOptions?
     // credential options used to create the document
     public let credentialOptions: CredentialOptions?
+	/// the DPoP key identifier used for proof of possession
+	public let dpopKeyId: String?
 
-	public init(credentialIssuerIdentifier: String, configurationIdentifier: String, docType: String, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, claims: [DocClaimMetadata]?, authorizedRequestData: Data?, keyOptions: KeyOptions?, credentialOptions: CredentialOptions?) {
+	public init(credentialIssuerIdentifier: String, configurationIdentifier: String, docType: String, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, claims: [DocClaimMetadata]?, authorizedRequestData: Data?, keyOptions: KeyOptions?, credentialOptions: CredentialOptions?, dpopKeyId: String? = nil) {
 		self.authorizedRequestData = authorizedRequestData
 		self.credentialIssuerIdentifier = credentialIssuerIdentifier
 		self.configurationIdentifier = configurationIdentifier
@@ -50,6 +52,7 @@ public struct DocMetadata: Sendable, Codable {
 		self.claims = claims
 		self.keyOptions = keyOptions
 		self.credentialOptions = credentialOptions
+		self.dpopKeyId = dpopKeyId
 	}
 
 	public init?(from data: Data?) {
