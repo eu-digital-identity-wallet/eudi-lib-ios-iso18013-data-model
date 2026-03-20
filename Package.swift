@@ -15,9 +15,10 @@ let package = Package(
     ],
     dependencies: [
  	    .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
-        .package(url: "https://github.com/niscy-eudiw/SwiftCBOR.git", from: "0.6.2"),
-        .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
-    ] + cryptoPD
+        .package(url: "https://github.com/niscy-eudiw/SwiftCBOR.git", from: "0.6.4"),
+        .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "5.0.1"),
+        .package(url: "https://github.com/apple/swift-log.git", from: "1.9.0"),
+    ]
     ,
 
     targets: [
@@ -27,18 +28,12 @@ let package = Package(
 			name: "MdocDataModel18013",
             dependencies: [
                 "SwiftCBOR",
+                .product(name: "SwiftyJSON", package: "SwiftyJSON"),
                 .product(name: "Logging", package: "swift-log")
-                ] + cryptoTD),
+                ]
+            ),
         .testTarget(
             name: "MdocDataModel18013Tests",
             dependencies: ["MdocDataModel18013"], resources: [.process("Resources")]),
     ]
 )
-
-#if !canImport(CryptoKit)
- var cryptoPD: [Package.Dependency]{  [ Package.Dependency.package(url: "https://github.com/apple/swift-crypto.git", from: "3.9.0"), ] }
- var cryptoTD: [Target.Dependency]{  [ .product(name: "Crypto", package: "swift-crypto"), ] }
-#else
- var cryptoPD: [Package.Dependency] { [] }
- var cryptoTD: [Target.Dependency] { [] }
-#endif

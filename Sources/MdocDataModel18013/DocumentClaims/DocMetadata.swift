@@ -22,7 +22,7 @@ public struct DocMetadata: Sendable, Codable {
 	/// the document configuration identifier
 	public let configurationIdentifier: String
 	/// the document type
-	public let docType: String?
+	public let docType: String
 	/// get display name of the document for the given culture
 	public func getDisplayName(_ uiCulture: String?) -> String? { display?.getName(uiCulture) }
 	/// display properties for the document
@@ -33,25 +33,37 @@ public struct DocMetadata: Sendable, Codable {
 	public func getIssuerDisplayName(_ uiCulture: String?) -> String? { issuerDisplay?.getName(uiCulture) }
 	/// claims (for mso-mdoc and sd-jwt documents)
 	public let claims: [DocClaimMetadata]?
+	/// encoded authorized request data for the document, if any
+	public let authorizedRequestData: Data?
+    // key options used to create the document
+    public let keyOptions: KeyOptions?
+    // credential options used to create the document
+    public let credentialOptions: CredentialOptions?
+	/// the DPoP key identifier used for proof of possession
+	public let dpopKeyId: String?
 
-	public init(credentialIssuerIdentifier: String, configurationIdentifier: String, docType: String?, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, claims: [DocClaimMetadata]? = nil) {
+	public init(credentialIssuerIdentifier: String, configurationIdentifier: String, docType: String, display: [DisplayMetadata]?, issuerDisplay: [DisplayMetadata]?, claims: [DocClaimMetadata]?, authorizedRequestData: Data?, keyOptions: KeyOptions?, credentialOptions: CredentialOptions?, dpopKeyId: String? = nil) {
+		self.authorizedRequestData = authorizedRequestData
 		self.credentialIssuerIdentifier = credentialIssuerIdentifier
 		self.configurationIdentifier = configurationIdentifier
 		self.docType = docType
 		self.display = display
 		self.issuerDisplay = issuerDisplay
 		self.claims = claims
+		self.keyOptions = keyOptions
+		self.credentialOptions = credentialOptions
+		self.dpopKeyId = dpopKeyId
 	}
 
 	public init?(from data: Data?) {
 		guard let data else { return nil }
 		do { self = try JSONDecoder().decode(DocMetadata.self, from: data) }
-		catch { return nil }
+        catch { logger.error("Cannot decode \(Self.self) from data: \(error)"); return nil }
 	}
 
 	public func toData() -> Data? {
 		do { return try JSONEncoder().encode(self) }
-		catch { return nil }
+		catch { logger.error("Cannot encode \(Self.self): \(error)"); return nil }
 	}
 }
 

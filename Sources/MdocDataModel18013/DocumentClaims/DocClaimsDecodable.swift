@@ -22,7 +22,7 @@ import SwiftCBOR
 /// A conforming type represents claims data.
 ///
 /// Can be decoded by CBOR or SD-JWT data
-public protocol DocClaimsDecodable: Sendable, AgeAttesting {
+public protocol DocClaimsDecodable: AgeAttesting, Identifiable, Sendable {
 	/// The unique identifier of the document.
 	var id: String { get }
 	/// The date and time the document was created.
@@ -40,7 +40,7 @@ public protocol DocClaimsDecodable: Sendable, AgeAttesting {
     /// The issuer configuration identifier
     var configurationIdentifier: String? { get }
 	// The document type. For CBOR (mso_mdoc) documents is native, for SD-JWT (vc+sd-jwt) documents is the type of the document.
-	var docType: String? { get }
+	var docType: String { get }
 	// document claims in a format agnostic way
 	var docClaims: [DocClaim] { get }
     /// The format of the document data.

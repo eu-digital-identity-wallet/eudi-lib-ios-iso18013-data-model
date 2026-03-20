@@ -24,7 +24,7 @@ public struct ItemsRequest: Sendable {
 	/// Requested data elements for each NameSpace
     public let requestNameSpaces: RequestNameSpaces
 	/// May be used by the mdoc reader to provide additional information
-    let requestInfo: CBOR?
+    public let requestInfo: DocRequestInfo?
 
     enum Keys: String {
         case docType
@@ -40,7 +40,7 @@ extension ItemsRequest: CBORDecodable {
         docType = dt
         guard let cns = m[Keys.nameSpaces]  else { throw .missingField("ItemsRequest", Keys.nameSpaces.rawValue) }
         requestNameSpaces = try RequestNameSpaces(cbor: cns)
-        requestInfo = m[Keys.requestInfo]
+        requestInfo = if let reqInfoCbor = m[Keys.requestInfo] { try DocRequestInfo(cbor: reqInfoCbor) } else { nil }
     }
 }
 
@@ -49,7 +49,7 @@ extension ItemsRequest: CBOREncodable {
 		var m = OrderedDictionary<CBOR, CBOR>()
         m[.utf8String(Keys.docType.rawValue)] = .utf8String(docType)
         m[.utf8String(Keys.nameSpaces.rawValue)] = requestNameSpaces.toCBOR(options: options)
-        if let requestInfo { m[.utf8String(Keys.requestInfo.rawValue)] = requestInfo }
+        if let requestInfo { m[.utf8String(Keys.requestInfo.rawValue)] = requestInfo.toCBOR(options: options) }
 		return .map(m)
 	}
 }

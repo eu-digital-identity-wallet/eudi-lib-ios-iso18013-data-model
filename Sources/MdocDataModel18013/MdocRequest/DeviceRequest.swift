@@ -31,15 +31,23 @@ import OrderedCollections
 /// ```
 public struct DeviceRequest: Sendable {
 	/// The current version
-	static let currentVersion = "1.0"
+	static let version1 = "1.0"
+    static let version2 = "1.1"
 	/// The version requested
     public let version: String
 	/// An array of all requested documents.
     public let docRequests: [DocRequest]
+    /// Optional device request info (tag 24 encoded)
+    public let deviceRequestInfo: DeviceRequestInfo?
+    // optional reader auth all
+    public let readerAuthAll: ReaderAuth?
+    public let readerAuthAllRawCBOR: CBOR?
 
     enum Keys: String {
         case version
         case docRequests
+        case deviceRequestInfo
+        case readerAuthAll
     }
 }
 
@@ -52,6 +60,13 @@ extension DeviceRequest: CBORDecodable {
         guard case let .array(cdrs) = m[Keys.docRequests] else { throw .missingField("DeviceRequest", Keys.docRequests.rawValue) }
         do { docRequests = try cdrs.map { try DocRequest(cbor: $0) } } catch { throw .invalidCbor("device request") }
         guard docRequests.count > 0 else { throw .invalidCbor("device request") }
+        // Decode deviceRequestInfo from tag 24 (bstr .cbor DeviceRequestInfo)
+        if let deviceReqInfoValue = m[Keys.deviceRequestInfo] {
+            guard case let .tagged(.encodedCBORDataItem, .byteString(bytes)) = deviceReqInfoValue,
+                  let decoded = try? CBOR.decode(bytes) else { throw .invalidCbor("DeviceRequest") }
+            deviceRequestInfo = try DeviceRequestInfo(cbor: decoded)
+        } else { deviceRequestInfo = nil }
+        if let ra = m[Keys.readerAuthAll] { readerAuthAllRawCBOR = ra; readerAuthAll = try ReaderAuth(cbor: ra) } else { readerAuthAllRawCBOR = nil; readerAuthAll = nil }
     }
 }
 
@@ -62,6 +77,11 @@ extension DeviceRequest: CBOREncodable {
 		var m = OrderedDictionary<CBOR, CBOR>()
         m[.utf8String(Keys.version.rawValue)] = .utf8String(version)
         m[.utf8String(Keys.docRequests.rawValue)] = .array(docRequests.map { $0.toCBOR(options: options) })
+        if let deviceRequestInfo {
+            let bytes = deviceRequestInfo.toCBOR(options: options).encode(options: options)
+            m[.utf8String(Keys.deviceRequestInfo.rawValue)] = .tagged(.encodedCBORDataItem, .byteString(bytes))
+        }
+        if let readerAuthAll { m[.utf8String(Keys.readerAuthAll.rawValue)] = readerAuthAll.toCBOR(options: options) }
 		return .map(m)
 	}
 }
@@ -77,6 +97,6 @@ extension DeviceRequest {
 		for ao in agesOver { isoDataElements["age_over_\(ao)"] = intentToRetain }
 		let isoReqElements = RequestDataElements(dataElements: isoDataElements )
 		let itemsReq = ItemsRequest(docType: IsoMdlModel.isoDocType, requestNameSpaces: RequestNameSpaces(nameSpaces: [IsoMdlModel.isoNamespace: isoReqElements]), requestInfo: nil)
-		self.init(version: "1.0", docRequests: [DocRequest(itemsRequest: itemsReq, itemsRequestRawData: nil, readerAuth: nil, readerAuthRawCBOR: nil)])
+		self.init(version: Self.version1, docRequests: [DocRequest(itemsRequest: itemsReq, itemsRequestRawData: nil, readerAuth: nil, readerAuthRawCBOR: nil)], deviceRequestInfo: nil, readerAuthAll: nil, readerAuthAllRawCBOR: nil)
 	}
 }

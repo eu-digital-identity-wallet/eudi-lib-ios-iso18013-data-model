@@ -1,18 +1,18 @@
 /*
-Copyright (c) 2023 European Commission
+ Copyright (c) 2023 European Commission
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 @testable import MdocDataModel18013
 #if canImport(CryptoKit)
 import CryptoKit
@@ -44,14 +44,26 @@ public actor InMemoryP256SecureArea: SecureArea {
     public func getStorage() async -> any MdocDataModel18013.SecureKeyStorage { storage }
 
     public func createKeyBatch(id: String, credentialOptions: CredentialOptions, keyOptions: KeyOptions?) async throws -> [CoseKey] {
+        print("Creating in-memory P256 key batch for id: \(id)")
         key = if let x963Key { try P256.Signing.PrivateKey(x963Representation: x963Key) } else { P256.Signing.PrivateKey() }
         guard SecKeyCreateWithData(key.x963Representation as NSData, [kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom, kSecAttrKeyClass: kSecAttrKeyClassPrivate] as NSDictionary, nil) != nil else {  throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey : "Error creating private key"])  }
         return [CoseKey(crv: .P256, x963Representation: key.publicKey.x963Representation)]
-   }
+    }
 
-    public func deleteKeyBatch(id: String, startIndex: Int, batchSize: Int) throws { }
+    public func getPublicKey(id: String, index: Int, curve: CoseEcCurve) async throws -> CoseKey {
+        print("Getting in-memory public key for id: \(id), index: \(index), curve: \(curve)")
+        return CoseKey(crv: .P256, x963Representation: key.publicKey.x963Representation)
+    }
 
-    public func deleteKeyInfo(id: String) async throws {  }
+    public func deleteKeyBatch(id: String, startIndex: Int, batchSize: Int) throws {
+        print("Deleting in-memory key batch for id: \(id), startIndex: \(startIndex), batchSize: \(batchSize)")
+        key = nil
+    }
+
+    public func deleteKeyInfo(id: String) async throws {
+        print("Deleting in-memory key info for id: \(id)")
+        key = nil
+     }
 
     public func signature(id: String, index: Int, algorithm: MdocDataModel18013.SigningAlgorithm, dataToSign: Data, unlockData: Data?) throws -> Data {
         let signature = try key.signature(for: dataToSign)
@@ -91,13 +103,15 @@ public actor DummySecureKeyStorage: MdocDataModel18013.SecureKeyStorage {
 }
 
 extension MdocDataModel18013.CoseKeyPrivate {
-  // decode cbor string
-    public init?(p256data base64: String) {
+    // decode cbor string
+    public init?(p256data base64: String, privateKeyId: String) {
         guard let d = Data(base64Encoded: base64), let obj = try? CBOR.decode([UInt8](d)), let coseKey = try? CoseKey(cbor: obj), let cd = obj[-4], case let CBOR.byteString(rd) = cd else { return nil }
         let sampleSA = InMemoryP256SecureArea(storage: DummySecureKeyStorage())
         let keyData = NSMutableData(bytes: [0x04], length: [0x04].count)
         keyData.append(Data(coseKey.x)); keyData.append(Data(coseKey.y));  keyData.append(Data(rd))
         sampleSA.x963Key = keyData as Data
         self.init(secureArea: sampleSA)
+        self.privateKeyId = privateKeyId
+        self.index = 0
     }
 }
