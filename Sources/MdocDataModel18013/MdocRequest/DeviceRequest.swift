@@ -40,8 +40,8 @@ public struct DeviceRequest: Sendable {
     /// Optional device request info (tag 24 encoded)
     public let deviceRequestInfo: DeviceRequestInfo?
     // optional reader auth all
-    public let readerAuthAll: ReaderAuth?
-    public let readerAuthAllRawCBOR: CBOR?
+    public let readerAuthAll: [ReaderAuth]?
+    public let readerAuthAllRawCBOR: [CBOR]?
 
     enum Keys: String {
         case version
@@ -66,7 +66,11 @@ extension DeviceRequest: CBORDecodable {
                   let decoded = try? CBOR.decode(bytes) else { throw .invalidCbor("DeviceRequest") }
             deviceRequestInfo = try DeviceRequestInfo(cbor: decoded)
         } else { deviceRequestInfo = nil }
-        if let ra = m[Keys.readerAuthAll] { readerAuthAllRawCBOR = ra; readerAuthAll = try ReaderAuth(cbor: ra) } else { readerAuthAllRawCBOR = nil; readerAuthAll = nil }
+        if case let .array(ra) = m[Keys.readerAuthAll] {
+            readerAuthAllRawCBOR = ra
+            do { readerAuthAll = try ra.map { try ReaderAuth(cbor: $0) } } catch { throw .invalidCbor("readerAuthAll") }
+        }
+        else { readerAuthAllRawCBOR = nil; readerAuthAll = nil }
     }
 }
 
