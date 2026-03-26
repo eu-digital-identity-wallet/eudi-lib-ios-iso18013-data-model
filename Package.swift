@@ -16,7 +16,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/niscy-eudiw/SwiftCBOR.git", from: "0.6.4"),
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "5.0.1"),
-        .package(url: "https://github.com/apple/swift-log.git", from: "1.9.0"),
+        .package(url: "https://github.com/apple/swift-log.git", from: "1.10.1"),
     ]
     ,
 
