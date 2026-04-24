@@ -1,0 +1,99 @@
+/*
+Copyright (c) 2023 European Commission
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+import Foundation
+import Copyable
+/// Transaction log.
+@Copyable
+public struct TransactionLog: Sendable, Codable {
+	public init(timestamp: Int64, status: Status, errorMessage: String? = nil, rawRequest: Data? = nil, rawResponse: Data? = nil, relyingParty: RelyingParty? = nil, issuingParty: IssuingParty? = nil, type: TransactionLog.LogType, dataFormat: TransactionLog.DataFormat, sessionTranscript: Data? = nil, docMetadata: [Data?]? = nil, documentId: String? = nil, docType: String? = nil, displayName: String? = nil) {
+		// Initialize the properties with the provided values
+		self.timestamp = timestamp
+		self.status = status
+		self.errorMessage = errorMessage
+		self.rawRequest = rawRequest
+		self.rawResponse = rawResponse
+		self.relyingParty = relyingParty
+		self.issuingParty = issuingParty
+		self.type = type
+		self.dataFormat = dataFormat
+		self.sessionTranscript = sessionTranscript
+		self.docMetadata = docMetadata
+		self.documentId = documentId
+		self.docType = docType
+		self.displayName = displayName
+	}
+
+	public let timestamp: Int64
+	public let status: Status
+	public let errorMessage: String?
+	public let rawRequest: Data?
+	public let rawResponse: Data?
+	public let relyingParty: RelyingParty?
+	public let issuingParty: IssuingParty?
+	public let type: LogType
+	public let dataFormat: DataFormat
+	public let sessionTranscript: Data?
+	public let docMetadata: [Data?]?
+	public let documentId: String?
+	public let docType: String?
+	public let displayName: String?
+
+	public enum DataFormat: Int, Sendable, Codable {
+		case cbor
+		case json
+
+		public init(_ format: DocDataFormat) {
+			switch format {
+			case .cbor: self = .cbor
+			case .sdjwt: self = .json
+			}
+		}
+	}
+
+	public struct RelyingParty: Codable, Sendable {
+		/// The name of the relying party
+		public let name: String
+		/// Whether the relying party is verified.
+		public let isVerified: Bool
+		/// The certificate chain of the relying party.
+		public let certificateChain: [Data]
+		/// The reader authentication data. This is populated only when mdoc presentation is used.
+		public let readerAuth: Data?
+	}
+
+	public struct IssuingParty: Codable, Sendable {
+		public let name: String
+		public let identifier: String
+		public let logoUrl: String?
+	}
+
+	public enum LogType: Int, Sendable, Codable {
+		case presentation
+		case issuance
+		case signing
+		case deletion
+	}
+
+	public enum Status: Int, Sendable, Codable {
+		/// Indicates that the transaction is incomplete
+		case incomplete
+		// Indicates that the transaction was completed successfully.
+		case completed
+		// Indicates that the transaction failed.
+		case failed
+	}
+}
