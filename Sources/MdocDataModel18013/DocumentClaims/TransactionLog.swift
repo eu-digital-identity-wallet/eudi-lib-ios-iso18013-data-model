@@ -64,7 +64,14 @@ public struct TransactionLog: Sendable, Codable {
 		}
 	}
 
-	public struct RelyingParty: Codable, Sendable {
+    public struct RelyingParty: Codable, Sendable {
+        public init(name: String, isVerified: Bool, certificateChain: [Data], readerAuth: Data? = nil) {
+            self.name = name
+            self.isVerified = isVerified
+            self.certificateChain = certificateChain
+            self.readerAuth = readerAuth
+        }
+        
 		/// The name of the relying party
 		public let name: String
 		/// Whether the relying party is verified.
@@ -75,7 +82,13 @@ public struct TransactionLog: Sendable, Codable {
 		public let readerAuth: Data?
 	}
 
-	public struct IssuingParty: Codable, Sendable {
+    public struct IssuingParty: Codable, Sendable {
+        public init(name: String, identifier: String, logoUrl: String? = nil) {
+            self.name = name
+            self.identifier = identifier
+            self.logoUrl = logoUrl
+        }
+        
 		public let name: String
 		public let identifier: String
 		public let logoUrl: String?
