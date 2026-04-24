@@ -22,6 +22,7 @@ public struct DisplayMetadata: Codable, Equatable, Sendable {
     public let logo: LogoMetadata?
     public let description: String?
     public let backgroundColor: String?
+    public let backgroundImageURL: String?
     public let textColor: String?
     public var locale: Locale? { Locale(identifier: localeIdentifier ?? "en_US") }
     public let backgroundImageURL: String?
