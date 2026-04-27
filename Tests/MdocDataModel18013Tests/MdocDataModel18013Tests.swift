@@ -32,13 +32,13 @@ struct MdocDataModel18013Tests {
     @Test func decodeDE1() throws {
         let de = try DeviceEngagement(data: Self.AnnexdTestData.d31.bytes)
         #expect(de.version == "1.0")
-        #expect(de.deviceRetrievalMethods?.first == .ble(isBleServer: false, uuid: UUID(uuidString: "45EFEF74-2B2C-4837-A9A3-B0E1D05A6917")!))
+        #expect(de.deviceRetrievalMethods?.first == .ble(peripheralServerMode: false, uuid: UUID(uuidString: "45EFEF74-2B2C-4837-A9A3-B0E1D05A6917")!))
     }
 
     @Test func decodeDE2() throws {
         let de = try DeviceEngagement(data: Self.OtherTestData.deOnline.bytes)
         #expect(de.version == "1.0")
-        #expect(de.deviceRetrievalMethods?.first == .ble(isBleServer: true, uuid: UUID(uuidString: "0000D296-0000-1000-8000-00805F9B34FB")!))
+        #expect(de.deviceRetrievalMethods?.first == .ble(peripheralServerMode: true, uuid: UUID(uuidString: "0000D296-0000-1000-8000-00805F9B34FB")!))
         #expect(de.serverRetrievalOptions?.webAPI == ServerRetrievalOption(url: "https://api.pp.mobiledl.us/api/Iso18013", token: "eWqbX81BE0LaT1cumhgh"))
     }
 
@@ -149,7 +149,7 @@ struct MdocDataModel18013Tests {
 			)
 		)
 		#expect(mdlObj.familyName == "ANDERSSON")
-		printDisplayStrings(mdlObj.docClaims)
+		// printDisplayStrings(mdlObj.docClaims)
 	}
 
 	func printDisplayStrings(_ displayStrings: [DocClaim], level: Int = 0) {

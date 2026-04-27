@@ -27,7 +27,7 @@ public enum DeviceRetrievalMethod: Equatable, Sendable {
 
     case qr
     case nfc(maxLenCommand: UInt64, maxLenResponse: UInt64)
-    case ble(isBleServer: Bool, uuid: UUID)
+    case ble(peripheralServerMode: Bool, uuid: UUID, psm: UInt16? = nil) // psm is optional for future use, not used in current version
     //  case wifiaware // not supported in ios
 }
 
@@ -44,9 +44,10 @@ extension DeviceRetrievalMethod: CBOREncodable {
             Self.appendTypeAndVersion(&cborArr, type: 1)
             let options: CBOR = [0: .unsignedInt(maxLenCommand), 1: .unsignedInt(maxLenResponse)]
             cborArr.append(options)
-        case .ble(let isBleServer, let uuid):
+        case .ble(let peripheralServerMode, let uuid, let psm):
             Self.appendTypeAndVersion(&cborArr, type: 2)
-            let options: CBOR = [0: .boolean(isBleServer), 1: .boolean(!isBleServer), .unsignedInt(isBleServer ? 10 : 11): .byteString(uuid.uuidString.replacingOccurrences(of: "-", with: "").byteArray)]
+            var options: CBOR = [0: .boolean(peripheralServerMode), 1: .boolean(!peripheralServerMode), .unsignedInt(peripheralServerMode ? 10 : 11): .byteString(uuid.uuidString.replacingOccurrences(of: "-", with: "").byteArray)]
+            if let psm { options[21] = .unsignedInt(UInt64(psm)) }
             cborArr.append(options)
         }
         return .array(cborArr)
@@ -68,9 +69,11 @@ extension DeviceRetrievalMethod: CBORDecodable {
         case 2:
             guard case let .map(options) = arr[2] else { throw .invalidCbor("device retrieval method") }
             if case let .boolean(b) = options[0], b, case let .byteString(bytes) = options[10], let uuid = UUID(uuidBytes: bytes) {
-                self = .ble(isBleServer: b, uuid: uuid)
+                let psm: UInt16? = if case let .unsignedInt(p) = options[21] { UInt16(p) } else { nil }
+                self = .ble(peripheralServerMode: b, uuid: uuid, psm: psm)
             } else if case let .boolean(b) = options[1], b, case let .byteString(bytes) = options[11], let uuid = UUID(uuidBytes: bytes) {
-                self = .ble(isBleServer: !b, uuid: uuid)
+                let psm: UInt16? = if case let .unsignedInt(p) = options[21] { UInt16(p) } else { nil }
+                self = .ble(peripheralServerMode: !b, uuid: uuid, psm: psm)
             } else { throw .invalidCbor("device retrieval method") }
         default: throw .invalidCbor("device retrieval method")
         }
