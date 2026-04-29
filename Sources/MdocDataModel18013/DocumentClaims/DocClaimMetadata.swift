@@ -18,15 +18,21 @@ import Foundation
 
 @DebugDescription
 public struct DocClaimMetadata: Sendable, Codable, CustomStringConvertible, CustomDebugStringConvertible {
-    public init(display: [DisplayMetadata]?, isMandatory: Bool?, claimPath: [String]) {
+    public init(display: [DisplayMetadata]?, isMandatory: Bool?, claimPath: [String], valueType: String?) {
         self.display = display
         self.isMandatory = isMandatory
         self.claimPath = claimPath
+        self.valueType = valueType
 }
 
 	public func getDisplayName(_ uiCulture: String?) -> String? { display?.getName(uiCulture) }
+	/// The type of the claim value, e.g. "string", "uint", "bool", "jpeg" etc.
+	public let valueType: String?
+	/// Display metadata for the claim, which may include localized names, descriptions, logos, etc.
 	public let display: [DisplayMetadata]?
+	/// Indicates whether the claim is mandatory or optional.
 	public let isMandatory: Bool?
+	/// The path to the claim value in the document, represented as an array of strings.
 	public let claimPath: [String]
 	/// Description of the claim.
 	public var description: String { "\(claimPath)" }

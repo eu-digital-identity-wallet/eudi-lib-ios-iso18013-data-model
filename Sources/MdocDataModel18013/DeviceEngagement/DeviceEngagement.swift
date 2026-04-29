@@ -55,11 +55,16 @@ public struct DeviceEngagement: Sendable {
 
 	/// Generate device engagement
 	/// - Parameters
-	///    - isBleServer: true for BLE mdoc peripheral server mode, false for BLE mdoc central client mode
+	///    - supportsCentralClientMode: true if the holder supports BLE central client mode
+	///    - supportsPeripheralServerMode: true if the holder supports BLE peripheral server mode
 	///    - crv: The EC curve type used in the mdoc ephemeral private key
-    public init?(isBleServer: Bool?, rfus: [String]? = nil) {
+    public init?(supportsCentralClientMode: Bool, supportsPeripheralServerMode: Bool, rfus: [String]? = nil) {
 		self.rfus = rfus
-        if let isBleServer { deviceRetrievalMethods = [.ble(isBleServer: isBleServer, uuid: UUID())] }
+		let uuid = UUID()
+		guard supportsCentralClientMode || supportsPeripheralServerMode else { return nil }
+		deviceRetrievalMethods = []
+		if supportsCentralClientMode { deviceRetrievalMethods!.append(.ble(peripheralServerMode: false, uuid: uuid)) }
+        if supportsPeripheralServerMode { deviceRetrievalMethods!.append(.ble(peripheralServerMode: true, uuid: uuid)) }
 	}
 	/// initialize from cbor data
 	public init(data: [UInt8]) throws {
@@ -74,17 +79,25 @@ public struct DeviceEngagement: Sendable {
 		security = Security(deviceKey: generatedPrivateKey.key)
     }
 
-	public var isBleServer: Bool? {
-		guard let deviceRetrievalMethods else { return nil}
-		for case let .ble(isBleServer, _) in deviceRetrievalMethods {
-			return isBleServer
+	public var supportsCentralClientMode: Bool {
+		guard let deviceRetrievalMethods else { return false }
+		for case let .ble(peripheralServerMode, _, _) in deviceRetrievalMethods {
+			return !peripheralServerMode
 		}
-		return nil
+		return false
+	}
+
+	public var supportsPeripheralServerMode: Bool {
+		guard let deviceRetrievalMethods else { return false }
+		for case let .ble(peripheralServerMode, _, _) in deviceRetrievalMethods {
+			return peripheralServerMode
+		}
+		return false
 	}
 
 	public var ble_uuid: String? {
 		guard let deviceRetrievalMethods else { return nil}
-		for case let .ble(_, uuid) in deviceRetrievalMethods {
+		for case let .ble(_, uuid, _) in deviceRetrievalMethods {
             return uuid.uuidString
 		}
 		return nil
