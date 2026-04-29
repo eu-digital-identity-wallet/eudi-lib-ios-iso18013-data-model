@@ -35,11 +35,22 @@ struct MdocDataModel18013Tests {
         #expect(de.deviceRetrievalMethods?.first == .ble(peripheralServerMode: false, uuid: UUID(uuidString: "45EFEF74-2B2C-4837-A9A3-B0E1D05A6917")!))
     }
 
-    @Test func decodeDE2() throws {
+
+    @Test("Decode DE with online retrieval method")
+     func decodeDeviceEngagementOnline() throws {
         let de = try DeviceEngagement(data: Self.OtherTestData.deOnline.bytes)
         #expect(de.version == "1.0")
         #expect(de.deviceRetrievalMethods?.first == .ble(peripheralServerMode: true, uuid: UUID(uuidString: "0000D296-0000-1000-8000-00805F9B34FB")!))
         #expect(de.serverRetrievalOptions?.webAPI == ServerRetrievalOption(url: "https://api.pp.mobiledl.us/api/Iso18013", token: "eWqbX81BE0LaT1cumhgh"))
+    }
+
+    @Test("Decode DE with offline retrieval methods")
+     func decodeDeviceEngagementOffline() throws {
+        let de = try DeviceEngagement(data: Self.OtherTestData.deOffline.bytes)
+        #expect(de.version == "1.0")
+		let retrievalMethods = try #require(de.deviceRetrievalMethods)
+		#expect(try #require(retrievalMethods.first) == .ble(peripheralServerMode: false, uuid: UUID(uuidString: "DEAA78C8-9E6B-9D3E-7C97-F272EFCE6B57")!))
+		#expect(try #require(retrievalMethods.dropFirst().first) == .ble(peripheralServerMode: true, uuid: UUID(uuidString: "DEAA78C8-9E6B-9D3E-7C97-F272EFCE6B57")!))
     }
 
     @Test func encodeDE() throws {
