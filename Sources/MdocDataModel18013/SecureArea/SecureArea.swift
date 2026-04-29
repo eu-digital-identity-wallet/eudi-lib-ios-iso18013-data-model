@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -49,6 +49,8 @@ public protocol SecureArea: Actor {
     func signature(id: String, index: Int, algorithm: SigningAlgorithm, dataToSign: Data, unlockData: Data?) async throws -> Data
     /// make key-agreement (shared secret) with other public key (used for encryption and mac computations)
     func keyAgreement(id: String, index: Int, publicKey: CoseKey, unlockData: Data?) async throws -> SharedSecret
+    /// returns information about the key with the given id and the curve of the key
+    func getInfoAndCurve(id: String) async throws -> ([String:Data], CoseEcCurve) 
     /// returns information about the key with the given id
     func getKeyBatchInfo(id: String) async throws -> KeyBatchInfo
     /// return the storage instance
@@ -69,6 +71,13 @@ extension SecureArea {
     }
     public func defaultSigningAlgorithm(ecCurve: CoseEcCurve) -> SigningAlgorithm { ecCurve.defaultSigningAlgorithm }
 
+    public func getInfoAndCurve(id: String) async throws -> ([String:Data], CoseEcCurve) {
+        let storage = await getStorage()
+        let keyInfoDict = try await storage.readKeyInfo(id: id)
+        guard let jwkNameData = keyInfoDict[kSecAttrDescription as String], let jwkName = String(data: jwkNameData, encoding: .utf8) else { throw SecureAreaError("Key info description not found") }
+        let curve = try CoseEcCurve.fromJwkName(jwkName)
+        return (keyInfoDict, curve)
+    }
     /// returns information about the key with the given key
     public func getKeyBatchInfo(id: String) async throws -> KeyBatchInfo {
         let storage = await getStorage()

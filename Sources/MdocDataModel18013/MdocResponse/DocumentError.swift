@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,23 +31,23 @@ public struct DocumentError: Sendable {
 
 extension DocumentError: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case let .map(e) = cbor else { throw MdocValidationError.invalidCbor("document error") }
-		let dePairs = try e.map { (k: CBOR, v: CBOR) throws(MdocValidationError) -> (DocType, ErrorCode)  in
-			guard case .utf8String(let dt) = k else { throw .invalidCbor("document error") }
-			guard case .unsignedInt(let ec) = v else { throw .invalidCbor("document error") }
-			return (dt,ec)
+		guard case let .map(errorMap) = cbor else { throw MdocValidationError.invalidCbor("document error") }
+		let docErrorPairs = try errorMap.map { (key: CBOR, value: CBOR) throws(MdocValidationError) -> (DocType, ErrorCode)  in
+			guard case .utf8String(let docType) = key else { throw .invalidCbor("document error") }
+			guard case .unsignedInt(let errorCode) = value else { throw .invalidCbor("document error") }
+			return (docType, errorCode)
 		}
-		let de = Dictionary(dePairs, uniquingKeysWith: { (first, _) in first })
-		if de.count == 0 { throw .invalidCbor("document error") }
-		docErrors = de
+		let docErrorsMap = Dictionary(docErrorPairs, uniquingKeysWith: { (first, _) in first })
+		if docErrorsMap.count == 0 { throw .invalidCbor("document error") }
+		docErrors = docErrorsMap
 	}
 }
 
 extension DocumentError: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		let m = docErrors.map { (dt: DocType, ec: ErrorCode) -> (CBOR, CBOR) in
-			(.utf8String(dt), .unsignedInt(ec))
+		let entries = docErrors.map { (docType: DocType, errorCode: ErrorCode) -> (CBOR, CBOR) in
+			(.utf8String(docType), .unsignedInt(errorCode))
 		}
-		return .map(OrderedDictionary(m, uniquingKeysWith: { (d, _) in d }))
+		return .map(OrderedDictionary(entries, uniquingKeysWith: { (key, _) in key }))
 	}
 }

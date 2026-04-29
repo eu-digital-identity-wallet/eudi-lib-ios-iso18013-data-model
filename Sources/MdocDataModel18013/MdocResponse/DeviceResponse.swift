@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -58,23 +58,27 @@ public struct DeviceResponse: Sendable {
 
 extension DeviceResponse: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case .map(let cd) = cbor else { throw .invalidCbor("device response") }
-		guard case .utf8String(let v) = cd[Keys.version] else { throw .missingField("DeviceResponse", Keys.version.rawValue) }
-		version = v
-		if case let .array(ds) = cd[Keys.documents] {
-			let ds = try ds.map { d  throws(MdocValidationError) in try Document(cbor:d) }
-			if ds.count > 0 { self.documents = ds } else { self.documents = nil }
+		guard case .map(let cborMap) = cbor else { throw .invalidCbor("device response") }
+		guard case .utf8String(let versionString) = cborMap[Keys.version] else { throw .missingField("DeviceResponse", Keys.version.rawValue) }
+		try MdocVersion.validateDeviceVersion(versionString, component: "device response")
+		version = versionString
+		if case let .array(documentCbors) = cborMap[Keys.documents] {
+			guard !documentCbors.isEmpty else { throw .invalidCbor("DeviceResponse.documents empty array") }
+			let parsedDocuments = try documentCbors.map { documentCbor  throws(MdocValidationError) in try Document(cbor: documentCbor) }
+			self.documents = parsedDocuments
 		} else { documents = nil }
-		if case let .array(zkd) = cd[Keys.zkDocuments] {
-			let zk = try zkd.map { d throws(MdocValidationError) in try ZkDocument(cbor:d) }
-			if zk.count > 0 { self.zkDocuments = zk } else { self.zkDocuments = nil }
+		if case let .array(zkDocumentCbors) = cborMap[Keys.zkDocuments] {
+			guard !zkDocumentCbors.isEmpty else { throw .invalidCbor("DeviceResponse.zkDocuments empty array") }
+			let parsedZkDocuments = try zkDocumentCbors.map { zkDocumentCbor throws(MdocValidationError) in try ZkDocument(cbor: zkDocumentCbor) }
+			self.zkDocuments = parsedZkDocuments
 		} else { zkDocuments = nil }
-		if case let .array(are) = cd[Keys.documentErrors] {
-			let de = try are.map { d throws(MdocValidationError) in try DocumentError(cbor:d) }
-			if de.count > 0 { self.documentErrors = de } else { self.documentErrors = nil }
+		if case let .array(documentErrorCbors) = cborMap[Keys.documentErrors] {
+			guard !documentErrorCbors.isEmpty else { throw .invalidCbor("DeviceResponse.documentErrors empty array") }
+			let parsedDocumentErrors = try documentErrorCbors.map { documentErrorCbor throws(MdocValidationError) in try DocumentError(cbor: documentErrorCbor) }
+			self.documentErrors = parsedDocumentErrors
 		}  else { documentErrors = nil }
-		guard case .unsignedInt(let st) = cd[Keys.status] else { throw .missingField("DeviceResponse", Keys.status.rawValue) }
-		status = st
+		guard case .unsignedInt(let statusValue) = cborMap[Keys.status] else { throw .missingField("DeviceResponse", Keys.status.rawValue) }
+		status = statusValue
 	}
 }
 
@@ -82,9 +86,9 @@ extension DeviceResponse: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
 		var cbor = OrderedDictionary<CBOR, CBOR>()
 		cbor[.utf8String(Keys.version.rawValue)] = .utf8String(version)
-		if let ds = documents { cbor[.utf8String(Keys.documents.rawValue)] = ds.toCBOR(options: options) }
-		if let zk = zkDocuments { cbor[.utf8String(Keys.zkDocuments.rawValue)] = .array(zk.map {$0.toCBOR(options: options)}) }
-		if let de = documentErrors { cbor[.utf8String(Keys.documentErrors.rawValue)] = .array(de.map {$0.toCBOR(options: options)}) }
+		if let documents { cbor[.utf8String(Keys.documents.rawValue)] = documents.toCBOR(options: options) }
+		if let zkDocuments { cbor[.utf8String(Keys.zkDocuments.rawValue)] = .array(zkDocuments.map { $0.toCBOR(options: options) }) }
+		if let documentErrors { cbor[.utf8String(Keys.documentErrors.rawValue)] = .array(documentErrors.map { $0.toCBOR(options: options) }) }
 		cbor[.utf8String(Keys.status.rawValue)] = .unsignedInt(status)
 		return .map(cbor)
 	}

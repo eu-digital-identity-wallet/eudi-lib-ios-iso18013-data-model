@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -44,11 +44,11 @@ extension DocRequest: CBORDecodable {
 
 extension DocRequest: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-        var m = OrderedDictionary<CBOR, CBOR>()
-		if let itemsRequestRawData { m[.utf8String(Keys.itemsRequest.rawValue)] = itemsRequestRawData.taggedEncoded }
-        else { m[.utf8String(Keys.itemsRequest.rawValue)] = itemsRequest.toCBOR(options: options).taggedEncoded }
-        if let readerAuth { m[.utf8String(Keys.readerAuth.rawValue)] = readerAuth.toCBOR(options: options) }
-        return .map(m)
+        var map = OrderedDictionary<CBOR, CBOR>()
+		if let itemsRequestRawData { map[.utf8String(Keys.itemsRequest.rawValue)] = itemsRequestRawData.taggedEncoded }
+        else { map[.utf8String(Keys.itemsRequest.rawValue)] = itemsRequest.toCBOR(options: options).taggedEncoded }
+        if let readerAuth { map[.utf8String(Keys.readerAuth.rawValue)] = readerAuth.toCBOR(options: options) }
+        return .map(map)
     }
 }
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import OrderedCollections
 @testable import MdocDataModel18013
 
 struct MdocDataModel18013Tests {
-	static let pkb64 = "pQECIAEhWCBoHIiBQnDRMLUT4yOLqJ1l8mrfNIgrjNnFq4RyZgxSmiJYIGD/Sabu6GejaR4eTiym1JkyjnBNcJ+f59pN+lCEyhVyI1ggC6EPCKyGci++LGWUX3fXpPFW6pYO8pyyKLMKs1qF0jo="
-    static let pk = CoseKeyPrivate(p256data: pkb64, privateKeyId: "someKeyId")!
+	static let privateKeyBase64 = "pQECIAEhWCBoHIiBQnDRMLUT4yOLqJ1l8mrfNIgrjNnFq4RyZgxSmiJYIGD/Sabu6GejaR4eTiym1JkyjnBNcJ+f59pN+lCEyhVyI1ggC6EPCKyGci++LGWUX3fXpPFW6pYO8pyyKLMKs1qF0jo="
+    static let privateKey = CoseKeyPrivate(p256data: privateKeyBase64, privateKeyId: "someKeyId")!
 
     @Test func basicExample() throws {
         // Swift Testing Documentation
@@ -32,14 +32,25 @@ struct MdocDataModel18013Tests {
     @Test func decodeDE1() throws {
         let de = try DeviceEngagement(data: Self.AnnexdTestData.d31.bytes)
         #expect(de.version == "1.0")
-        #expect(de.deviceRetrievalMethods?.first == .ble(isBleServer: false, uuid: UUID(uuidString: "45EFEF74-2B2C-4837-A9A3-B0E1D05A6917")!))
+        #expect(de.deviceRetrievalMethods?.first == .ble(peripheralServerMode: false, uuid: UUID(uuidString: "45EFEF74-2B2C-4837-A9A3-B0E1D05A6917")!))
     }
 
-    @Test func decodeDE2() throws {
+
+    @Test("Decode DE with online retrieval method")
+     func decodeDeviceEngagementOnline() throws {
         let de = try DeviceEngagement(data: Self.OtherTestData.deOnline.bytes)
         #expect(de.version == "1.0")
-        #expect(de.deviceRetrievalMethods?.first == .ble(isBleServer: true, uuid: UUID(uuidString: "0000D296-0000-1000-8000-00805F9B34FB")!))
+        #expect(de.deviceRetrievalMethods?.first == .ble(peripheralServerMode: true, uuid: UUID(uuidString: "0000D296-0000-1000-8000-00805F9B34FB")!))
         #expect(de.serverRetrievalOptions?.webAPI == ServerRetrievalOption(url: "https://api.pp.mobiledl.us/api/Iso18013", token: "eWqbX81BE0LaT1cumhgh"))
+    }
+
+    @Test("Decode DE with offline retrieval methods")
+     func decodeDeviceEngagementOffline() throws {
+        let de = try DeviceEngagement(data: Self.OtherTestData.deOffline.bytes)
+        #expect(de.version == "1.0")
+		let retrievalMethods = try #require(de.deviceRetrievalMethods)
+		#expect(try #require(retrievalMethods.first) == .ble(peripheralServerMode: false, uuid: UUID(uuidString: "DEAA78C8-9E6B-9D3E-7C97-F272EFCE6B57")!))
+		#expect(try #require(retrievalMethods.dropFirst().first) == .ble(peripheralServerMode: true, uuid: UUID(uuidString: "DEAA78C8-9E6B-9D3E-7C97-F272EFCE6B57")!))
     }
 
     @Test func encodeDE() throws {
@@ -69,7 +80,7 @@ struct MdocDataModel18013Tests {
 	}
 
     // test based on D.4.1.1 mdoc request section of the ISO/IEC FDIS 18013-5 document
-	@Test func decodeDeviceRequest() throws {
+    @Test func decodeDeviceRequest() throws {
 		let dr = try DeviceRequest(data: AnnexdTestData.d411.bytes)
 		let testItems = ["family_name", "document_number", "driving_privileges", "issue_date", "expiry_date", "portrait"].sorted()
         #expect(dr.version == "1.0")
@@ -83,6 +94,28 @@ struct MdocDataModel18013Tests {
 		let isoKeys: [IsoMdlModel.CodingKeys] = [.familyName, .documentNumber, .drivingPrivileges, .issueDate, .expiryDate, .portrait]
 		let dr3 = DeviceRequest(mdl: isoKeys, agesOver: [], intentToRetain: true)
 		#expect(dr3.docRequests.first?.itemsRequest.requestNameSpaces[IsoMdlModel.isoNamespace]?.elementIdentifiers.sorted() == testItems)
+	}
+
+	@Test func decodeDeviceRequestRejectsUnsupportedVersion() throws {
+		let cbor = try unsupportedVersionCBOR(
+			from: Self.AnnexdTestData.d411.bytes,
+			key: .utf8String("version"),
+			version: "1.9"
+		)
+
+		#expect(throws: MdocValidationError.self) {
+			try DeviceRequest(cbor: cbor)
+		}
+	}
+
+	@Test func decodeDeviceRequestRejectsEmptyReaderAuthAllArray() throws {
+		let cbor = try mutatedTopLevelMapCBOR(from: Self.AnnexdTestData.d411.bytes) { map in
+			map[.utf8String("readerAuthAll")] = .array([])
+		}
+
+		#expect(throws: MdocValidationError.self) {
+			try DeviceRequest(cbor: cbor)
+		}
 	}
 
 	@Test func decodeSampleDataResponse() throws {
@@ -149,7 +182,7 @@ struct MdocDataModel18013Tests {
 			)
 		)
 		#expect(mdlObj.familyName == "ANDERSSON")
-		printDisplayStrings(mdlObj.docClaims)
+		// printDisplayStrings(mdlObj.docClaims)
 	}
 
 	func printDisplayStrings(_ displayStrings: [DocClaim], level: Int = 0) {
@@ -219,6 +252,50 @@ struct MdocDataModel18013Tests {
 		#expect(model.familyName == "Doe")
 	}
 
+	@Test func decodeDeviceResponseRejectsUnsupportedVersion() throws {
+		let cbor = try unsupportedVersionCBOR(
+			from: Self.AnnexdTestData.d412.bytes,
+			key: .utf8String("version"),
+			version: "1.9"
+		)
+
+		#expect(throws: MdocValidationError.self) {
+			try DeviceResponse(cbor: cbor)
+		}
+	}
+
+	@Test func decodeDeviceResponseRejectsEmptyDocumentsArray() throws {
+		let cbor = try mutatedTopLevelMapCBOR(from: Self.AnnexdTestData.d412.bytes) { map in
+			map[.utf8String("documents")] = .array([])
+		}
+
+		#expect(throws: MdocValidationError.self) {
+			try DeviceResponse(cbor: cbor)
+		}
+	}
+
+	@Test func decodeDeviceResponseRejectsEmptyDocumentErrorsArray() throws {
+		let cbor = try mutatedTopLevelMapCBOR(from: Self.AnnexdTestData.d412.bytes) { map in
+			map[.utf8String("documentErrors")] = .array([])
+		}
+
+		#expect(throws: MdocValidationError.self) {
+			try DeviceResponse(cbor: cbor)
+		}
+	}
+
+	@Test func decodeIssuerSignedRejectsEmptyNamespaceItemsArray() throws {
+		let cbor = try mutatedIssuerSignedCBOR(from: Self.AnnexdTestData.d412.bytes) { issuerSignedMap in
+			issuerSignedMap[.utf8String("nameSpaces")] = .map([
+				.utf8String(IsoMdlModel.isoNamespace): .array([])
+			])
+		}
+
+		#expect(throws: MdocValidationError.self) {
+			try IssuerSigned(cbor: cbor)
+		}
+	}
+
 	@Test func encodeDeviceResponse() throws {
 		let cborIn = try #require(try CBOR.decode(AnnexdTestData.d412.bytes))
 		let dr = try DeviceResponse(cbor: cborIn)
@@ -226,6 +303,31 @@ struct MdocDataModel18013Tests {
         // test if successfully encoded
         let dr2 = try DeviceResponse(cbor: cborDr)
         #expect(dr2.version == "1.0")
+	}
+
+	@Test func decodeDeviceEngagementRejectsUnsupportedVersion() throws {
+		let cbor = try unsupportedVersionCBOR(
+			from: Self.AnnexdTestData.d31.bytes,
+			key: .unsignedInt(0),
+			version: "1.9"
+		)
+
+		#expect(throws: MdocValidationError.self) {
+			try DeviceEngagement(cbor: cbor)
+		}
+	}
+
+	@Test func decodeDeviceAuthRejectsMutuallyExclusiveFields() throws {
+		let deviceSignature = Cose(type: .sign1, algorithm: Cose.VerifyAlgorithm.es256.rawValue, signature: Data([0x01]))
+		let deviceMac = Cose(type: .mac0, algorithm: Cose.MacAlgorithm.hmac256.rawValue, signature: Data([0x02]))
+		let cbor = CBOR.map([
+			.utf8String("deviceSignature"): deviceSignature.toCBOR(options: CBOROptions()),
+			.utf8String("deviceMac"): deviceMac.toCBOR(options: CBOROptions())
+		])
+
+		#expect(throws: MdocValidationError.self) {
+			try DeviceAuth(cbor: cbor)
+		}
 	}
 
   #if os(iOS)
@@ -316,11 +418,73 @@ struct MdocDataModel18013Tests {
 		let spec = try ZkSystemSpec(jsonData: jsonData)
 
 		#expect(spec.system == "longfellow-libzk-v1")
-		#expect(spec.id == "longfellow-libzk-v1")
+		#expect(spec.zkSystemId == "longfellow-libzk-v1")
 		#expect(spec.params["circuit_hash"]?.stringValue == "137e5a75ce72735a37c8a72da1a8a0a5df8d13365c2ae3d2c2bd6a0e7197c7c6")
 		#expect(spec.params["version"]?.intValue == 6)
 		#expect(spec.params["block_enc_hash"]?.intValue == 4096)
 		#expect(spec.params["block_enc_sig"]?.intValue == 2945)
 		#expect(spec.extensions == nil)
+	}
+
+	@Test func decodeUseCaseRejectsEmptyDocumentSet() throws {
+		let cbor = CBOR.map([
+			.utf8String("mandatory"): .boolean(true),
+			.utf8String("documentSets"): .array([.array([])])
+		])
+
+		#expect(throws: MdocValidationError.self) {
+			try UseCase(cbor: cbor)
+		}
+	}
+
+	@Test func decodeDeviceRequestInfoRejectsEmptyUseCasesArray() throws {
+		let cbor = CBOR.map([
+			.utf8String("useCases"): .array([])
+		])
+
+		#expect(throws: MdocValidationError.self) {
+			try DeviceRequestInfo(cbor: cbor)
+		}
+	}
+
+	private func unsupportedVersionCBOR(
+		from bytes: [UInt8],
+		key: CBOR,
+		version: String
+	) throws -> CBOR {
+		let cbor = try #require(try CBOR.decode(bytes))
+		guard case .map(var map) = cbor else {
+			throw MdocValidationError.invalidCbor("test data")
+		}
+		map[key] = .utf8String(version)
+		return .map(map)
+	}
+
+	private func mutatedTopLevelMapCBOR(
+		from bytes: [UInt8],
+		mutate: (inout OrderedDictionary<CBOR, CBOR>) throws -> Void
+	) throws -> CBOR {
+		let cbor = try #require(try CBOR.decode(bytes))
+		guard case .map(var map) = cbor else {
+			throw MdocValidationError.invalidCbor("test data")
+		}
+		try mutate(&map)
+		return .map(map)
+	}
+
+	private func mutatedIssuerSignedCBOR(
+		from responseBytes: [UInt8],
+		mutate: (inout OrderedDictionary<CBOR, CBOR>) throws -> Void
+	) throws -> CBOR {
+		let responseCbor = try #require(try CBOR.decode(responseBytes))
+		guard case .map(let responseMap) = responseCbor,
+			  case let .array(documents)? = responseMap[.utf8String("documents")],
+			  let firstDocument = documents.first,
+			  case .map(let documentMap) = firstDocument,
+			  case .map(var issuerSignedMap) = documentMap[.utf8String("issuerSigned")] else {
+			throw MdocValidationError.invalidCbor("test data")
+		}
+		try mutate(&issuerSignedMap)
+		return .map(issuerSignedMap)
 	}
 }

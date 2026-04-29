@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -84,13 +84,13 @@ extension MobileSecurityObject: CBORDecodable {
 
 extension MobileSecurityObject: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		var m = OrderedDictionary<CBOR, CBOR>()
-		m[.utf8String(Keys.version.rawValue)] = .utf8String(version)
-		m[.utf8String(Keys.digestAlgorithm.rawValue)] = .utf8String(digestAlgorithm)
-		m[.utf8String(Keys.valueDigests.rawValue)] = valueDigests.toCBOR(options: options)
-		m[.utf8String(Keys.deviceKeyInfo.rawValue)] = deviceKeyInfo.toCBOR(options: options)
-		m[.utf8String(Keys.docType.rawValue)] = .utf8String(docType)
-		m[.utf8String(Keys.validityInfo.rawValue)] = validityInfo.toCBOR(options: options)
-		return .map(m)
+		var map = OrderedDictionary<CBOR, CBOR>()
+		map[.utf8String(Keys.version.rawValue)] = .utf8String(version)
+		map[.utf8String(Keys.digestAlgorithm.rawValue)] = .utf8String(digestAlgorithm)
+		map[.utf8String(Keys.valueDigests.rawValue)] = valueDigests.toCBOR(options: options)
+		map[.utf8String(Keys.deviceKeyInfo.rawValue)] = deviceKeyInfo.toCBOR(options: options)
+		map[.utf8String(Keys.docType.rawValue)] = .utf8String(docType)
+		map[.utf8String(Keys.validityInfo.rawValue)] = validityInfo.toCBOR(options: options)
+		return .map(map)
 	}
 }

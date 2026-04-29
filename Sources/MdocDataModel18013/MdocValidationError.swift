@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ public enum MdocValidationError: LocalizedError, Sendable {
     case cborDecodingError
     case invalidCbor(String)
     case missingField(String, String)
+    case invalidDateTimeFormat(String, String)
 
     public var errorDescription: String? {
         switch self {
@@ -30,6 +31,8 @@ public enum MdocValidationError: LocalizedError, Sendable {
             return NSLocalizedString("Invalid CBOR format in \(component)", comment: "Error message for invalid CBOR format")
         case .missingField(let component, let field):
             return NSLocalizedString("Missing field in \(component): \(field)", comment: "Error message for missing field")
+        case .invalidDateTimeFormat(let component, let field):
+            return NSLocalizedString("Invalid date-time format in \(component): \(field) must not contain fractional seconds", comment: "Error message for invalid date-time format")
         }
     }
 }

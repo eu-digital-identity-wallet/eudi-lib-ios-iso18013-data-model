@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -45,23 +45,29 @@ extension ValidityInfo: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .map(v) = cbor else { throw .invalidCbor("validity info") }
 		guard case .tagged(let t, let cs) = v[Keys.signed], t == .standardDateTimeString, case let .utf8String(s) = cs else { throw .missingField("ValidityInfo", Keys.signed.rawValue) }
+		guard !s.contains(".") else { throw .invalidDateTimeFormat("ValidityInfo", Keys.signed.rawValue) }
 		signed = s
 		guard case .tagged(let t, let cvf) = v[Keys.validFrom], t == .standardDateTimeString, case let .utf8String(vf) = cvf else { throw .missingField("ValidityInfo", Keys.validFrom.rawValue) }
+		guard !vf.contains(".") else { throw .invalidDateTimeFormat("ValidityInfo", Keys.validFrom.rawValue) }
 		validFrom = vf
 		guard case .tagged(let t, let cvu) = v[Keys.validUntil], t == .standardDateTimeString, case let .utf8String(vu) = cvu else { throw .missingField("ValidityInfo", Keys.validUntil.rawValue) }
+		guard !vu.contains(".") else { throw .invalidDateTimeFormat("ValidityInfo", Keys.validUntil.rawValue) }
 		validUntil = vu
-		if case .tagged(let t, let ceu) = v[Keys.expectedUpdate], t == .standardDateTimeString, case let .utf8String(eu) = ceu { expectedUpdate = eu } else { expectedUpdate = nil }
+		if case .tagged(let t, let ceu) = v[Keys.expectedUpdate], t == .standardDateTimeString, case let .utf8String(eu) = ceu {
+			guard !eu.contains(".") else { throw .invalidDateTimeFormat("ValidityInfo", Keys.expectedUpdate.rawValue) }
+			expectedUpdate = eu
+		} else { expectedUpdate = nil }
 	}
 }
 
 extension ValidityInfo: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		var m = OrderedDictionary<CBOR, CBOR>()
-		m[.utf8String(Keys.signed.rawValue)] = .tagged(.standardDateTimeString, .utf8String(signed))
-		m[.utf8String(Keys.validFrom.rawValue)] = .tagged(.standardDateTimeString, .utf8String(validFrom))
-		m[.utf8String(Keys.validUntil.rawValue)] = .tagged(.standardDateTimeString, .utf8String(validUntil))
-		if let expectedUpdate { m[.utf8String(Keys.expectedUpdate.rawValue)] = .tagged(.standardDateTimeString, .utf8String(expectedUpdate)) }
-		return .map(m)
+		var map = OrderedDictionary<CBOR, CBOR>()
+		map[.utf8String(Keys.signed.rawValue)] = .tagged(.standardDateTimeString, .utf8String(signed))
+		map[.utf8String(Keys.validFrom.rawValue)] = .tagged(.standardDateTimeString, .utf8String(validFrom))
+		map[.utf8String(Keys.validUntil.rawValue)] = .tagged(.standardDateTimeString, .utf8String(validUntil))
+		if let expectedUpdate { map[.utf8String(Keys.expectedUpdate.rawValue)] = .tagged(.standardDateTimeString, .utf8String(expectedUpdate)) }
+		return .map(map)
 	}
 }
 

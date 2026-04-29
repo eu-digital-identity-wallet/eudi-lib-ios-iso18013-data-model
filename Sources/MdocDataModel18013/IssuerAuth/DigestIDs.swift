@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -44,10 +44,10 @@ extension DigestIDs: CBORDecodable {
 
 extension DigestIDs: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		var m = OrderedDictionary<CBOR, CBOR>()
+		var map = OrderedDictionary<CBOR, CBOR>()
 		for (k,v) in digestIDs {
-			m[.unsignedInt(k)] = .byteString(v)
+			map[.unsignedInt(k)] = .byteString(v)
 		}
-		return .map(m)
+		return .map(map)
 	}
 }

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -68,11 +68,11 @@ extension DeviceNameSpaces: CBORDecodable {
 		guard case let .map(m) = cbor else { throw .invalidCbor("device signed") }
 		let dnsPairs = try m.map { (k: CBOR, v: CBOR) throws(MdocValidationError) -> (NameSpace, DeviceSignedItems)  in
 			guard case .utf8String(let ns) = k else { throw .invalidCbor("device signed") }
-			let dsi = try DeviceSignedItems(cbor: v)
-			return (ns,dsi)
+			let deviceSignedItems = try DeviceSignedItems(cbor: v)
+			return (ns, deviceSignedItems)
 		}
-		let dns: [NameSpace : DeviceSignedItems] = Dictionary(dnsPairs, uniquingKeysWith: { (first, _) in first })
-		deviceNameSpaces = dns
+		let dsignItemsMap: [NameSpace : DeviceSignedItems] = Dictionary(dnsPairs, uniquingKeysWith: { (first, _) in first })
+		deviceNameSpaces = dsignItemsMap
 	}
 }
 
@@ -90,7 +90,7 @@ extension DeviceSignedItems: CBORDecodable {
 			return (dei,v)
 		}
 		let dsi = Dictionary(dsiPairs, uniquingKeysWith: { (first, _) in first })
-		if dsi.count == 0 { throw .invalidCbor("device signed") }
+		guard !dsi.isEmpty else { throw .invalidCbor("device signed empty array") }
 		deviceSignedItems = dsi
 	}
 }

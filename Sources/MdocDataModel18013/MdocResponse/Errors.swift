@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -32,34 +32,34 @@ public struct Errors: Sendable {
 
 extension Errors: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-        guard case let .map(e) = cbor else { throw .invalidCbor("errors") }
-        if e.count == 0 { throw .invalidCbor("errors") }
-        let pairs = try e.map { (key: CBOR, value: CBOR) throws(MdocValidationError) -> (NameSpace, ErrorItems) in
+        guard case let .map(errorMap) = cbor else { throw .invalidCbor("errors") }
+        if errorMap.count == 0 { throw .invalidCbor("errors") }
+        let namespacePairs = try errorMap.map { (key: CBOR, value: CBOR) throws(MdocValidationError) -> (NameSpace, ErrorItems) in
             guard case .utf8String(let ns) = key else { throw .invalidCbor("errors") }
-            guard case .map(let m) = value else { throw .invalidCbor("errors") }
-            let eiPairs = try m.map { (k: CBOR, v: CBOR) throws(MdocValidationError) -> (DataElementIdentifier, ErrorCode) in
-                guard case .utf8String(let dei) = k else { throw .invalidCbor("errors") }
-                guard case .unsignedInt(let ec) = v else { throw .invalidCbor("errors") }
-                return (dei, ec)
+            guard case .map(let namespaceItemMap) = value else { throw .invalidCbor("errors") }
+            let errorItemPairs = try namespaceItemMap.map { (key: CBOR, value: CBOR) throws(MdocValidationError) -> (DataElementIdentifier, ErrorCode) in
+                guard case .utf8String(let dataElementIdentifier) = key else { throw .invalidCbor("errors") }
+                guard case .unsignedInt(let errorCode) = value else { throw .invalidCbor("errors") }
+                return (dataElementIdentifier, errorCode)
             }
-            let ei = Dictionary(eiPairs, uniquingKeysWith: { (first, _) in first })
-            if ei.count == 0 { throw .invalidCbor("errors") }
-            return (ns, ei)
+            let errorItems = Dictionary(errorItemPairs, uniquingKeysWith: { (first, _) in first })
+            if errorItems.count == 0 { throw .invalidCbor("errors") }
+            return (ns, errorItems)
         }
-        errors = Dictionary(pairs, uniquingKeysWith: { (first, _) in first })
+        errors = Dictionary(namespacePairs, uniquingKeysWith: { (first, _) in first })
     }
 }
 
 extension Errors: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-        let map1 = errors.map { (ns: NameSpace, ei: ErrorItems) -> (CBOR, CBOR) in
-            let kns = CBOR.utf8String(ns)
-            let mei = ei.map { (dei: DataElementIdentifier, ec: ErrorCode) -> (CBOR, CBOR) in
-                (.utf8String(dei), .unsignedInt(ec))
+        let namespaceMapEntries = errors.map { (ns: NameSpace, errorItems: ErrorItems) -> (CBOR, CBOR) in
+            let namespaceKey = CBOR.utf8String(ns)
+            let errorItemEntries = errorItems.map { (dataElementIdentifier: DataElementIdentifier, errorCode: ErrorCode) -> (CBOR, CBOR) in
+                (.utf8String(dataElementIdentifier), .unsignedInt(errorCode))
             }
-            return (kns, .map(OrderedDictionary(mei, uniquingKeysWith: { (d, _) in d })))
+            return (namespaceKey, .map(OrderedDictionary(errorItemEntries, uniquingKeysWith: { (key, _) in key })))
         }
-        let cborMap = OrderedDictionary(map1, uniquingKeysWith: { (ns, _) in ns })
+        let cborMap = OrderedDictionary(namespaceMapEntries, uniquingKeysWith: { (key, _) in key })
         return .map(cborMap)
     }
 }

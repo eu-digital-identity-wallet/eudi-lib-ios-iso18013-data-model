@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -41,9 +41,9 @@ extension RequestNameSpaces: CBORDecodable {
 
 extension RequestNameSpaces: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		let m = nameSpaces.map { (ns: NameSpace, rde: RequestDataElements) -> (CBOR, CBOR) in
+		let map = nameSpaces.map { (ns: NameSpace, rde: RequestDataElements) -> (CBOR, CBOR) in
 			(.utf8String(ns), rde.toCBOR(options: options))
 		}
-		return .map(OrderedDictionary(m, uniquingKeysWith: { (d, _) in d }))
+		return .map(OrderedDictionary(map, uniquingKeysWith: { (d, _) in d }))
 	}
 }
