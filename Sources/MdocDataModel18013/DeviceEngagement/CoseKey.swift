@@ -43,10 +43,25 @@ public struct CoseKey: Equatable, Codable, Sendable {
 /// COSE_Key + private key
 public struct CoseKeyPrivate: Sendable {
 
-	public var key: CoseKey!
-    public var privateKeyId: String!
-    public var index: Int!
-    public var secureArea: (any SecureArea)!
+	private var cachedKey: CoseKey?
+    public var privateKeyId: String
+    public var index: Int
+    public var secureArea: (any SecureArea)
+	private var curve: CoseEcCurve
+
+	public var key: CoseKey {
+		mutating get async throws {
+			if let cachedKey {
+				return cachedKey
+			}
+			///guard let privateKeyId, let index, let curve else {
+			//	throw SecureAreaError("Cannot load public key: key reference is incomplete")
+			//}
+			let loadedKey = try await secureArea.getPublicKey(id: privateKeyId, index: index, curve: curve)
+			self.cachedKey = loadedKey
+			return loadedKey
+		}
+	}
 
 	/// Initialize with existing key in secure area
     public init(privateKeyId: String, index: Int, secureArea: any SecureArea, curve: CoseEcCurve) async throws {
@@ -54,30 +69,23 @@ public struct CoseKeyPrivate: Sendable {
 		self.privateKeyId = privateKeyId
         self.index = index
 		self.secureArea = secureArea
-		self.key = try await secureArea.getPublicKey(id: privateKeyId, index: index, curve: curve)
+		self.curve = curve
 	}
 
-    public init(secureArea: any SecureArea) {
-        self.secureArea = secureArea
-    }
-
-}
-
-extension CoseKeyPrivate {
-	// make new key
-    public mutating func makeKey(curve: CoseEcCurve) async throws {
-        let ephemeralKeyId = UUID().uuidString
+    public init(secureArea: any SecureArea, curve: CoseEcCurve)  async throws {
         index = 0
-        privateKeyId = ephemeralKeyId
+        privateKeyId = UUID().uuidString
+        self.secureArea = secureArea
+		self.curve = curve
         let createdKeys = try await secureArea.createKeyBatch(
-            id: ephemeralKeyId,
+            id: privateKeyId,
             credentialOptions: CredentialOptions(credentialPolicy: .rotateUse, batchSize: 1),
             keyOptions: KeyOptions(curve: curve)
         )
         guard let firstKey = createdKeys.first else {
             throw SecureAreaError("Secure area returned an empty key batch")
         }
-        self.key = firstKey
+		self.cachedKey = firstKey
 	}
 }
 
