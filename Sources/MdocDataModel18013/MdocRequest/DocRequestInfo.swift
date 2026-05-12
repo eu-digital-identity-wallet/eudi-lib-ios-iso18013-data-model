@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ public typealias MaximumResponseSize = UInt
 public struct ElementReference: Sendable, Equatable {
     public let nameSpace: NameSpace
     public let dataElementIdentifier: DataElementIdentifier
-    
+
     public init(nameSpace: NameSpace, dataElementIdentifier: DataElementIdentifier) {
         self.nameSpace = nameSpace
         self.dataElementIdentifier = dataElementIdentifier
@@ -65,12 +65,12 @@ public struct AlternativeDataElementsSet: Sendable {
     public let requestedElement: ElementReference
     public let alternativeElementSets: [AlternativeElementSet]
     public let extensions: OrderedDictionary<String, CBOR>?
-    
+
     enum Keys: String {
         case requestedElement
         case alternativeElementSets
     }
-    
+
     public init(requestedElement: ElementReference, alternativeElementSets: [AlternativeElementSet], extensions: OrderedDictionary<String, CBOR>? = nil) {
         self.requestedElement = requestedElement
         self.alternativeElementSets = alternativeElementSets
@@ -83,14 +83,14 @@ extension AlternativeDataElementsSet: CBORDecodable {
         guard case let .map(m) = cbor else { throw .invalidCbor("AlternativeDataElementsSet") }
         guard let reqElem = m[Keys.requestedElement] else { throw .missingField("AlternativeDataElementsSet", Keys.requestedElement.rawValue) }
         requestedElement = try ElementReference(cbor: reqElem)
-        
+
         guard let altElemSets = m[Keys.alternativeElementSets] else { throw .missingField("AlternativeDataElementsSet", Keys.alternativeElementSets.rawValue) }
         guard case let .array(arr) = altElemSets else { throw .invalidCbor("AlternativeDataElementsSet") }
         alternativeElementSets = try arr.map { cborSet throws(MdocValidationError) in
             guard case let .array(setArr) = cborSet else { throw MdocValidationError.invalidCbor("AlternativeElementSet") }
             return try setArr.map { e throws(MdocValidationError) in try ElementReference(cbor: e) }
         }
-        
+
         // Parse extensions (other keys in the map)
         var exts: OrderedDictionary<String, CBOR>? = nil
         for (key, value) in m {
@@ -105,19 +105,19 @@ extension AlternativeDataElementsSet: CBORDecodable {
 
 extension AlternativeDataElementsSet: CBOREncodable {
     public func toCBOR(options: CBOROptions) -> CBOR {
-        var m = OrderedDictionary<CBOR, CBOR>()
-        m[.utf8String(Keys.requestedElement.rawValue)] = requestedElement.toCBOR(options: options)
-        m[.utf8String(Keys.alternativeElementSets.rawValue)] = .array(
+        var map = OrderedDictionary<CBOR, CBOR>()
+        map[.utf8String(Keys.requestedElement.rawValue)] = requestedElement.toCBOR(options: options)
+        map[.utf8String(Keys.alternativeElementSets.rawValue)] = .array(
             alternativeElementSets.map { set in
                 .array(set.map { $0.toCBOR(options: options) })
             }
         )
         if let extensions {
             for (key, value) in extensions {
-                m[.utf8String(key)] = value
+                map[.utf8String(key)] = value
             }
         }
-        return .map(m)
+        return .map(map)
     }
 }
 
@@ -129,7 +129,7 @@ public struct DocRequestInfo: Sendable {
     public let maximumResponseSize: MaximumResponseSize?
     public let zkRequest: ZkRequest?
     public let extensions: OrderedDictionary<String, CBOR>?
-    
+
     enum Keys: String {
         case alternativeDataElements
         case issuerIdentifiers
@@ -137,7 +137,7 @@ public struct DocRequestInfo: Sendable {
         case maximumResponseSize
         case zkRequest
     }
-    
+
     public init(alternativeDataElements: [AlternativeDataElementsSet]? = nil, issuerIdentifiers: [IssuerIdentifier]? = nil, uniqueDocSetRequired: UniqueDocSetRequired? = nil, maximumResponseSize: MaximumResponseSize? = nil, zkRequest: ZkRequest? = nil, extensions: OrderedDictionary<String, CBOR>? = nil) {
         self.alternativeDataElements = alternativeDataElements
         self.issuerIdentifiers = issuerIdentifiers
@@ -177,7 +177,7 @@ extension DocRequestInfo: CBORDecodable {
         // parse zkRequest
         if let zkReq = m[Keys.zkRequest] {
             zkRequest = try ZkRequest(cbor: zkReq)
-        } else { zkRequest = nil }        
+        } else { zkRequest = nil }
         // Parse extensions (other keys in the map)
         var exts: OrderedDictionary<String, CBOR>? = nil
         for (key, value) in m {
@@ -197,37 +197,37 @@ extension DocRequestInfo: CBORDecodable {
 
 extension DocRequestInfo: CBOREncodable {
     public func toCBOR(options: CBOROptions) -> CBOR {
-        var m = OrderedDictionary<CBOR, CBOR>()
+        var map = OrderedDictionary<CBOR, CBOR>()
         // encode alternativeDataElements
         if let altData = alternativeDataElements {
-            m[.utf8String(Keys.alternativeDataElements.rawValue)] = .array(
+            map[.utf8String(Keys.alternativeDataElements.rawValue)] = .array(
                 altData.map { $0.toCBOR(options: options) }
             )
         }
         // encode issuerIdentifiers
         if let issuerIds = issuerIdentifiers {
-            m[.utf8String(Keys.issuerIdentifiers.rawValue)] = .array(
+            map[.utf8String(Keys.issuerIdentifiers.rawValue)] = .array(
                 issuerIds.map { .byteString($0) }
             )
         }
         // encode uniqueDocSetRequired
         if let uniqueDoc = uniqueDocSetRequired {
-            m[.utf8String(Keys.uniqueDocSetRequired.rawValue)] = .boolean(uniqueDoc)
+            map[.utf8String(Keys.uniqueDocSetRequired.rawValue)] = .boolean(uniqueDoc)
         }
         // encode maximumResponseSize
         if let maxResponse = maximumResponseSize {
-            m[.utf8String(Keys.maximumResponseSize.rawValue)] = .unsignedInt(UInt64(maxResponse))
+            map[.utf8String(Keys.maximumResponseSize.rawValue)] = .unsignedInt(UInt64(maxResponse))
         }
         // encode zkRequest
         if let zkReq = zkRequest {
-            m[.utf8String(Keys.zkRequest.rawValue)] = zkReq.toCBOR(options: options)
+            map[.utf8String(Keys.zkRequest.rawValue)] = zkReq.toCBOR(options: options)
         }
         // encode extensions
         if let extensions {
             for (key, value) in extensions {
-                m[.utf8String(key)] = value
+                map[.utf8String(key)] = value
             }
         }
-        return .map(m)
+        return .map(map)
     }
 }

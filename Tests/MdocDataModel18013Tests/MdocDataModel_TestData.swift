@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ extension MdocDataModel18013Tests {
 
     enum OtherTestData {
         static let deOnline = Data(base64Encoded: "pABjMS4wAYIB2BhYS6QBAiABIVggE1J1aXu4P9WmTmQqBjpJA3SPiRqQD2oR/kTiCvD5kKwiWCA5lKH1NUsQjsGoFJXU/HGq9gEaIgihxHBLjc1cYAd3QgKBgwIBowD1AfQKUAAA0pYAABAAgAAAgF+bNPsDoWZ3ZWJBcGmDAXgnaHR0cHM6Ly9hcGkucHAubW9iaWxlZGwudXMvYXBpL0lzbzE4MDEzdGVXcWJYODFCRTBMYVQxY3VtaGdo")!
-		
+
+        static let deOffline = Data(base64URLEncoded: "owBjMS4wAYIB2BhYS6QBAiABIVggWArCVADDTdHDi0b9Z9sbjE6aWewxX2kCWvoNnUbfsqQiWCATW-AYzpyGws5peBd3frutln0Gi6WTNpYTGemx7Hc0oAKCgwIBowD0AfULUN6qeMiea50-fJfycu_Oa1eDAgGjAPUB9ApQ3qp4yJ5rnT58l_Jy785rVw")!
     }
 }

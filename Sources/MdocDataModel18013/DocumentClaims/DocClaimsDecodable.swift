@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -91,9 +91,9 @@ extension DocClaimsDecodable {
 	public static func extractAgeOverValues(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ ageOverXX: inout [Int: Bool]) {
 		for (_, items) in nameSpaces {
 			for item in items {
-				let k = item.elementIdentifier
-				if !k.hasPrefix("age_over_") { continue }
-				if let age = Int(k.suffix(k.count - 9)) {
+				let elementIdentifier = item.elementIdentifier
+				if !elementIdentifier.hasPrefix("age_over_") { continue }
+				if let age = Int(elementIdentifier.suffix(elementIdentifier.count - 9)) {
 					let b: Bool? = item.getTypedValue()
 					if let b { ageOverXX[age] = b }
 				}

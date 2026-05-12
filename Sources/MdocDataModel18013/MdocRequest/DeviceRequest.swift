@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -40,8 +40,8 @@ public struct DeviceRequest: Sendable {
     /// Optional device request info (tag 24 encoded)
     public let deviceRequestInfo: DeviceRequestInfo?
     // optional reader auth all
-    public let readerAuthAll: ReaderAuth?
-    public let readerAuthAllRawCBOR: CBOR?
+    public let readerAuthAll: [ReaderAuth]?
+    public let readerAuthAllRawCBOR: [CBOR]?
 
     enum Keys: String {
         case version
@@ -55,8 +55,8 @@ extension DeviceRequest: CBORDecodable {
     public init(cbor: CBOR) throws(MdocValidationError) {
         guard case let .map(m) = cbor else { throw .invalidCbor("device request") }
         guard case let .utf8String(v) = m[Keys.version] else { throw .missingField("DeviceRequest", Keys.version.rawValue) }
+        try MdocVersion.validateDeviceVersion(v, component: "device request")
         version = v
-		if v.count == 0 || v.prefix(1) != "1" { throw .invalidCbor("device request") }
         guard case let .array(cdrs) = m[Keys.docRequests] else { throw .missingField("DeviceRequest", Keys.docRequests.rawValue) }
         do { docRequests = try cdrs.map { try DocRequest(cbor: $0) } } catch { throw .invalidCbor("device request") }
         guard docRequests.count > 0 else { throw .invalidCbor("device request") }
@@ -66,7 +66,12 @@ extension DeviceRequest: CBORDecodable {
                   let decoded = try? CBOR.decode(bytes) else { throw .invalidCbor("DeviceRequest") }
             deviceRequestInfo = try DeviceRequestInfo(cbor: decoded)
         } else { deviceRequestInfo = nil }
-        if let ra = m[Keys.readerAuthAll] { readerAuthAllRawCBOR = ra; readerAuthAll = try ReaderAuth(cbor: ra) } else { readerAuthAllRawCBOR = nil; readerAuthAll = nil }
+        if case let .array(ra) = m[Keys.readerAuthAll] {
+            guard !ra.isEmpty else { throw .invalidCbor("readerAuthAll array is empty") }
+            readerAuthAllRawCBOR = ra
+            do { readerAuthAll = try ra.map { try ReaderAuth(cbor: $0) } } catch { throw .invalidCbor("readerAuthAll") }
+        }
+        else { readerAuthAllRawCBOR = nil; readerAuthAll = nil }
     }
 }
 
@@ -74,15 +79,15 @@ extension DeviceRequest: CBOREncodable {
     public func encode(options: CBOROptions) -> [UInt8] { toCBOR(options: options).encode(options: options) }
 
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		var m = OrderedDictionary<CBOR, CBOR>()
-        m[.utf8String(Keys.version.rawValue)] = .utf8String(version)
-        m[.utf8String(Keys.docRequests.rawValue)] = .array(docRequests.map { $0.toCBOR(options: options) })
+		var map = OrderedDictionary<CBOR, CBOR>()
+        map[.utf8String(Keys.version.rawValue)] = .utf8String(version)
+        map[.utf8String(Keys.docRequests.rawValue)] = .array(docRequests.map { $0.toCBOR(options: options) })
         if let deviceRequestInfo {
             let bytes = deviceRequestInfo.toCBOR(options: options).encode(options: options)
-            m[.utf8String(Keys.deviceRequestInfo.rawValue)] = .tagged(.encodedCBORDataItem, .byteString(bytes))
+            map[.utf8String(Keys.deviceRequestInfo.rawValue)] = .tagged(.encodedCBORDataItem, .byteString(bytes))
         }
-        if let readerAuthAll { m[.utf8String(Keys.readerAuthAll.rawValue)] = readerAuthAll.toCBOR(options: options) }
-		return .map(m)
+        if let readerAuthAll { map[.utf8String(Keys.readerAuthAll.rawValue)] = readerAuthAll.toCBOR(options: options) }
+		return .map(map)
 	}
 }
 

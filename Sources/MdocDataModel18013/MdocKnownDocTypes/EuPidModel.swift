@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ public final class EuPidModel: DocClaimsModel, @unchecked Sendable {
         case trust_anchor
 	}
 	static var mandatoryElementCodingKeys: [CodingKeys] {
-		[.family_name, .given_name, .birth_date]
+		[.family_name, .given_name, .birth_date, .birth_place, .nationality]
 	}
     public static var pidMandatoryElementKeys: [DataElementIdentifier] { ["age_over_18"] + mandatoryElementCodingKeys.map(\.rawValue) }
 	public var mandatoryElementKeys: [DataElementIdentifier] { Self.pidMandatoryElementKeys }

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,12 +17,6 @@ limitations under the License.
 import Foundation
 
 extension Data {
-
-/// init from local file
-    public init?(name: String, ext: String = "json", from bundle:Bundle = Bundle.main) {
-        guard let url = bundle.url(forResource: name, withExtension: ext) else { return nil }
-        try? self.init(contentsOf: url, options: .mappedIfSafe)
-    }
 
 		public func decodeJSON<T: Decodable>(type: T.Type = T.self) -> T? {
         let decoder = JSONDecoder()

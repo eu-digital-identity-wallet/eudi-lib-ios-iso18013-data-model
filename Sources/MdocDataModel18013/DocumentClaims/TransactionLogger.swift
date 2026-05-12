@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-	http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,12 @@ limitations under the License.
 */
 
 import Foundation
-import Logging
-// abstract logger. By default writes to console
-let logger = Logger(label: "MdocDataModel18013")
+
+/// A logger for transactions.
+///
+/// Implementations of this protocol should log transactions to some persistent storage.
+/// The storage can be a file, a database, or any other storage medium.
+public protocol TransactionLogger: Actor {
+    ///  Logs a transaction.
+    func log(transaction: TransactionLog) async throws
+}

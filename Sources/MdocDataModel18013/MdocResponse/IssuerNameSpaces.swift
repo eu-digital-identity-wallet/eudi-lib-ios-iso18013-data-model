@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ extension IssuerNameSpaces: CBORDecodable {
 		var temp = [NameSpace: [IssuerSignedItem]]()
 		for (k,v) in m {
 			guard case let .utf8String(ns) = k, case let .array(ar) = v else { continue }
+			guard !ar.isEmpty else { throw .invalidCbor("issuer namespace '\(ns)' empty array") }
 			let items = try ar.map { c throws(MdocValidationError) -> IssuerSignedItem in
 				guard case let .tagged(tg, cbs) = c, tg == .encodedCBORDataItem, case let .byteString(bs) = cbs else {
                     throw .invalidCbor("issuer signed item '\(k)'")

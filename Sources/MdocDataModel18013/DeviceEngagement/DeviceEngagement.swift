@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ import Crypto
 /// ```
 public struct DeviceEngagement: Sendable {
 	static let versionImpl: String = "1.0"
+	static let version2 = "1.1"
 	var version: String = Self.versionImpl
 	var security: Security!
 	public var originInfos: [OriginInfoWebsite]? = nil
@@ -54,11 +55,16 @@ public struct DeviceEngagement: Sendable {
 
 	/// Generate device engagement
 	/// - Parameters
-	///    - isBleServer: true for BLE mdoc peripheral server mode, false for BLE mdoc central client mode
+	///    - supportsCentralClientMode: true if the holder supports BLE central client mode
+	///    - supportsPeripheralServerMode: true if the holder supports BLE peripheral server mode
 	///    - crv: The EC curve type used in the mdoc ephemeral private key
-    public init?(isBleServer: Bool?, rfus: [String]? = nil) {
+    public init?(supportsCentralClientMode: Bool, supportsPeripheralServerMode: Bool, rfus: [String]? = nil) {
 		self.rfus = rfus
-        if let isBleServer { deviceRetrievalMethods = [.ble(isBleServer: isBleServer, uuid: UUID())] }
+		let uuid = UUID()
+		guard supportsCentralClientMode || supportsPeripheralServerMode else { return nil }
+		deviceRetrievalMethods = []
+		if supportsCentralClientMode { deviceRetrievalMethods!.append(.ble(peripheralServerMode: false, uuid: uuid)) }
+        if supportsPeripheralServerMode { deviceRetrievalMethods!.append(.ble(peripheralServerMode: true, uuid: uuid)) }
 	}
 	/// initialize from cbor data
 	public init(data: [UInt8]) throws {
@@ -67,23 +73,29 @@ public struct DeviceEngagement: Sendable {
 	}
 
     public mutating func makePrivateKey(crv: CoseEcCurve, secureArea: any SecureArea) async throws {
-        var pk = CoseKeyPrivate(secureArea: secureArea)
-        try await pk.makeKey(curve: crv)
-        privateKey = pk
-        security = Security(deviceKey: pk.key)
+        privateKey = try await CoseKeyPrivate(secureArea: secureArea, curve: crv)
+		security = Security(deviceKey: try await privateKey!.key)
     }
 
-	public var isBleServer: Bool? {
-		guard let deviceRetrievalMethods else { return nil}
-		for case let .ble(isBleServer, _) in deviceRetrievalMethods {
-			return isBleServer
+	public var supportsCentralClientMode: Bool {
+		guard let deviceRetrievalMethods else { return false }
+		for case let .ble(peripheralServerMode, _, _) in deviceRetrievalMethods {
+			return !peripheralServerMode
 		}
-		return nil
+		return false
+	}
+
+	public var supportsPeripheralServerMode: Bool {
+		guard let deviceRetrievalMethods else { return false }
+		for case let .ble(peripheralServerMode, _, _) in deviceRetrievalMethods {
+			return peripheralServerMode
+		}
+		return false
 	}
 
 	public var ble_uuid: String? {
 		guard let deviceRetrievalMethods else { return nil}
-		for case let .ble(_, uuid) in deviceRetrievalMethods {
+		for case let .ble(_, uuid, _) in deviceRetrievalMethods {
             return uuid.uuidString
 		}
 		return nil
@@ -105,7 +117,8 @@ extension DeviceEngagement: CBOREncodable {
 extension DeviceEngagement: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .map(map) = cbor else { throw .invalidCbor("device engagement") }
-		guard let cv = map[0], case let .utf8String(v) = cv, v.prefix(2) == "1." else { throw .invalidCbor("device engagement") }
+		guard let cv = map[0], case let .utf8String(v) = cv else { throw .invalidCbor("device engagement") }
+		try MdocVersion.validateDeviceVersion(v, component: "device engagement")
 		guard let cs = map[1] else { throw .invalidCbor("device engagement") }
         security = try Security(cbor: cs)
 		if let cdrms = map[2], case let .array(drms) = cdrms, drms.count > 0 { deviceRetrievalMethods = try drms.map(DeviceRetrievalMethod.init(cbor:)) }

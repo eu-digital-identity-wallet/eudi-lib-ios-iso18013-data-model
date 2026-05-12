@@ -105,7 +105,7 @@ The released software is a initial development release version:
 
 ### License details
 
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

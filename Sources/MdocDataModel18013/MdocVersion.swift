@@ -15,6 +15,16 @@ limitations under the License.
 */
 
 import Foundation
-import Logging
-// abstract logger. By default writes to console
-let logger = Logger(label: "MdocDataModel18013")
+
+enum MdocVersion {
+	static let supportedDeviceVersions: Set<String> = [
+		"1.0",
+		"1.1",
+	]
+
+	static func validateDeviceVersion(_ version: String, component: String) throws(MdocValidationError) {
+		guard supportedDeviceVersions.contains(version) else {
+			throw .invalidCbor(component)
+		}
+	}
+}

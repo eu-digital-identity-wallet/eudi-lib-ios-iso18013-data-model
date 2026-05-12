@@ -17,7 +17,8 @@ let package = Package(
  	    .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
         .package(url: "https://github.com/niscy-eudiw/SwiftCBOR.git", from: "0.6.4"),
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "5.0.1"),
-        .package(url: "https://github.com/apple/swift-log.git", from: "1.9.0"),
+        .package(url: "https://github.com/apple/swift-log.git", from: "1.10.1"),
+		.package(url: "https://github.com/eu-digital-identity-wallet/SwiftCopyableMacro.git", from: "0.0.3")
     ]
     ,
 
@@ -29,7 +30,8 @@ let package = Package(
             dependencies: [
                 "SwiftCBOR",
                 .product(name: "SwiftyJSON", package: "SwiftyJSON"),
-                .product(name: "Logging", package: "swift-log")
+                .product(name: "Logging", package: "swift-log"),
+				.product(name: "Copyable", package: "SwiftCopyableMacro"),
                 ]
             ),
         .testTarget(

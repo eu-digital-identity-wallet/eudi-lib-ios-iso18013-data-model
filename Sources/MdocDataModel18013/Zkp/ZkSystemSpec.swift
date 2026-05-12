@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,19 +21,21 @@ import OrderedCollections
 
 /// ZkSystemSpec
 public struct ZkSystemSpec: Sendable, Identifiable {
-    public let id: String
+    public let zkSystemId: String
     public let system: ZkSystem
     public let params: ZkParams
     public let extensions: OrderedDictionary<String, CBOR>?
-    
+
+    public var id: String { zkSystemId }
+
     enum Keys: String {
-        case id
+        case zkSystemId
         case system
         case params
     }
-    
-    public init(id: String, system: ZkSystem, params: ZkParams, extensions: OrderedDictionary<String, CBOR>? = nil) {
-        self.id = id
+
+    public init(zkSystemId: String, system: ZkSystem, params: ZkParams, extensions: OrderedDictionary<String, CBOR>? = nil) {
+        self.zkSystemId = zkSystemId
         self.system = system
         self.params = params
         self.extensions = extensions
@@ -42,11 +44,11 @@ public struct ZkSystemSpec: Sendable, Identifiable {
 
 extension ZkSystemSpec: CBORDecodable {
     public init(cbor: CBOR) throws(MdocValidationError) {
-        guard case let .map(m) = cbor else { throw .invalidCbor("ZkSystemSpec") }   
+        guard case let .map(m) = cbor else { throw .invalidCbor("ZkSystemSpec") }
         guard let systemValue = m[Keys.system] else { throw .missingField("ZkSystemSpec", Keys.system.rawValue) }
         guard case let .utf8String(sys) = systemValue else { throw .invalidCbor("ZkSystemSpec") }
         system = sys
-        if case let .utf8String(tid) = m[Keys.id] { id = tid } else { id = "\(sys)" }
+        if case let .utf8String(tid) = m[Keys.zkSystemId] { zkSystemId = tid } else { zkSystemId = sys }
         // decode params
         guard let paramsValue = m[Keys.params] else { throw .missingField("ZkSystemSpec", Keys.params.rawValue) }
         guard case let .map(paramsMap) = paramsValue else { throw .invalidCbor("ZkSystemSpec") }
@@ -79,13 +81,13 @@ extension ZkSystemSpec {
             throw MdocValidationError.missingField("ZkSystemSpec", Keys.system.rawValue)
         }
         self.system = sys
-        // Use explicit "id" if present, otherwise fall back to system value
-        if let idValue = jsonObject[Keys.id.rawValue].string { self.id = idValue } 
-        else { self.id = sys }
-        // All keys except "system" and "id" become params
+        // Use explicit "zkSystemId" if present, otherwise fall back to system value
+        if let idValue = jsonObject[Keys.zkSystemId.rawValue].string { self.zkSystemId = idValue }
+        else { self.zkSystemId = sys }
+        // All keys except "system" and "zkSystemId" become params
         var zkParams = OrderedDictionary<String, ZkParam>()
         for (key, value) in jsonObject {
-            guard key != Keys.system.rawValue, key != Keys.id.rawValue else { continue }
+            guard key != Keys.system.rawValue, key != Keys.zkSystemId.rawValue else { continue }
             zkParams[key] = try Self.zkParam(from: value, key: key)
         }
         self.params = zkParams
@@ -136,21 +138,21 @@ extension Array where Element == ZkSystemSpec {
 
 extension ZkSystemSpec: CBOREncodable {
     public func toCBOR(options: CBOROptions) -> CBOR {
-        var m = OrderedDictionary<CBOR, CBOR>()
-        m[.utf8String(Keys.system.rawValue)] = .utf8String(system)
+        var map = OrderedDictionary<CBOR, CBOR>()
+        map[.utf8String(Keys.system.rawValue)] = .utf8String(system)
         // encode params
         var paramsMap = OrderedDictionary<CBOR, CBOR>()
         for (key, value) in params {
             paramsMap[.utf8String(key)] = value.toCBOR(options: options)
         }
-        m[.utf8String(Keys.params.rawValue)] = .map(paramsMap)
+        map[.utf8String(Keys.params.rawValue)] = .map(paramsMap)
         // encode extensions
         if let extensions {
             for (key, value) in extensions {
-                m[.utf8String(key)] = value
+                map[.utf8String(key)] = value
             }
         }
-        
-        return .map(m)
+
+        return .map(map)
     }
 }

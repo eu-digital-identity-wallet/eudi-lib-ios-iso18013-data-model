@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2023 European Commission
+Copyright (c) 2026 European Commission
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,13 +24,15 @@ public struct DisplayMetadata: Codable, Equatable, Sendable {
     public let backgroundColor: String?
     public let textColor: String?
     public var locale: Locale? { Locale(identifier: localeIdentifier ?? "en_US") }
+    public let backgroundImageURL: String?
     
-    public init(name: String? = nil, localeIdentifier: String? = nil, logo: LogoMetadata? = nil, description: String? = nil, backgroundColor: String? = nil, textColor: String? = nil) {
+    public init(name: String? = nil, localeIdentifier: String? = nil, logo: LogoMetadata? = nil, description: String? = nil, backgroundColor: String? = nil, textColor: String? = nil, backgroundImageURL: String? = nil) {
         self.name = name
         self.localeIdentifier = localeIdentifier
         self.logo = logo
         self.description = description
         self.backgroundColor = backgroundColor
         self.textColor = textColor
+        self.backgroundImageURL = backgroundImageURL
     }
 }

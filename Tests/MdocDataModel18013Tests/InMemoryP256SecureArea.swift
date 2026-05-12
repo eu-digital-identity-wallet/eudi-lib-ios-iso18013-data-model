@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2023 European Commission
+ Copyright (c) 2026 European Commission
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -110,8 +110,6 @@ extension MdocDataModel18013.CoseKeyPrivate {
         let keyData = NSMutableData(bytes: [0x04], length: [0x04].count)
         keyData.append(Data(coseKey.x)); keyData.append(Data(coseKey.y));  keyData.append(Data(rd))
         sampleSA.x963Key = keyData as Data
-        self.init(secureArea: sampleSA)
-        self.privateKeyId = privateKeyId
-        self.index = 0
+        self.init(privateKeyId: privateKeyId, index: 0, secureArea: sampleSA, curve: .P256)
     }
 }
