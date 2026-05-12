@@ -64,7 +64,7 @@ public struct CoseKeyPrivate: Sendable {
 	}
 
 	/// Initialize with existing key in secure area
-    public init(privateKeyId: String, index: Int, secureArea: any SecureArea, curve: CoseEcCurve) async throws {
+    public init(privateKeyId: String, index: Int, secureArea: any SecureArea, curve: CoseEcCurve) {
         logger.info("Loading cose key private with id: \(privateKeyId)")
 		self.privateKeyId = privateKeyId
         self.index = index
