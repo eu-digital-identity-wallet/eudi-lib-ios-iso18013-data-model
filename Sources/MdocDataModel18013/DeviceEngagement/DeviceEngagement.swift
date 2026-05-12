@@ -73,10 +73,8 @@ public struct DeviceEngagement: Sendable {
 	}
 
     public mutating func makePrivateKey(crv: CoseEcCurve, secureArea: any SecureArea) async throws {
-		var generatedPrivateKey = CoseKeyPrivate(secureArea: secureArea)
-		try await generatedPrivateKey.makeKey(curve: crv)
-		privateKey = generatedPrivateKey
-		security = Security(deviceKey: generatedPrivateKey.key)
+        privateKey = try await CoseKeyPrivate(secureArea: secureArea, curve: crv)
+		security = Security(deviceKey: try await privateKey!.key)
     }
 
 	public var supportsCentralClientMode: Bool {
