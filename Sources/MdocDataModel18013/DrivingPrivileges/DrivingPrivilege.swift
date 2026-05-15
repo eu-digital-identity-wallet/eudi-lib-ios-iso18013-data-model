@@ -41,11 +41,16 @@ public struct DrivingPrivilege: Codable, Sendable {
 
 extension DrivingPrivilege: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-        guard case let .utf8String(v) = cbor[.utf8String(CodingKeys.vehicleCategoryCode.rawValue)] else { throw .invalidCbor("driving privilege") }
-        vehicleCategoryCode = v
+        let vehicleCategoryCodeKey = CBOR.utf8String(CodingKeys.vehicleCategoryCode.rawValue)
+        guard case let .utf8String(vehicleCategory) = cbor[vehicleCategoryCodeKey] else { throw .invalidCbor("driving privilege") }
+        vehicleCategoryCode = vehicleCategory
         if let id = cbor[.utf8String(CodingKeys.issueDate.rawValue)]?.decodeFullDate() { issueDate = id} else { issueDate = nil }
         if let ed = cbor[.utf8String(CodingKeys.expiryDate.rawValue)]?.decodeFullDate() { expiryDate = ed} else { expiryDate = nil }
-        if case let .array(ac) = cbor[.utf8String(CodingKeys.codes.rawValue)] { codes = try ac.map(DrivingPrivilegeCode.init(cbor:)) } else { codes = nil }
+        if case let .array(codeArray) = cbor[.utf8String(CodingKeys.codes.rawValue)] {
+            codes = try codeArray.map(DrivingPrivilegeCode.init(cbor:))
+        } else {
+            codes = nil
+        }
     }
 }
 
@@ -55,7 +60,10 @@ extension DrivingPrivilege: CBOREncodable {
         cborMap[.utf8String(CodingKeys.vehicleCategoryCode.rawValue)] = .utf8String(vehicleCategoryCode)
         if let issueDate { cborMap[.utf8String(CodingKeys.issueDate.rawValue)] = issueDate.fullDateEncoded }
         if let expiryDate { cborMap[.utf8String(CodingKeys.expiryDate.rawValue)] = expiryDate.fullDateEncoded }
-        if let codes { cborMap[.utf8String(CodingKeys.codes.rawValue)] = .array(codes.map { $0.toCBOR(options: options) }) }
+        if let codes {
+            let encodedCodes = codes.map { $0.toCBOR(options: options) }
+            cborMap[.utf8String(CodingKeys.codes.rawValue)] = .array(encodedCodes)
+        }
         return .map(cborMap)
     }
 }

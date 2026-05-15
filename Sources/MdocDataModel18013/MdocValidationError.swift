@@ -28,11 +28,14 @@ public enum MdocValidationError: LocalizedError, Sendable {
         case .cborDecodingError:
             return NSLocalizedString("Failed to decode CBOR data", comment: "Error message for CBOR decoding failure")
         case .invalidCbor(let component):
-            return NSLocalizedString("Invalid CBOR format in \(component)", comment: "Error message for invalid CBOR format")
+            let message = "Invalid CBOR format in \(component)"
+            return NSLocalizedString(message, comment: "Error message for invalid CBOR format")
         case .missingField(let component, let field):
-            return NSLocalizedString("Missing field in \(component): \(field)", comment: "Error message for missing field")
+            let message = "Missing field in \(component): \(field)"
+            return NSLocalizedString(message, comment: "Error message for missing field")
         case .invalidDateTimeFormat(let component, let field):
-            return NSLocalizedString("Invalid date-time format in \(component): \(field) must not contain fractional seconds", comment: "Error message for invalid date-time format")
+            let message = "Invalid date-time format in \(component): \(field) must not contain fractional seconds"
+            return NSLocalizedString(message, comment: "Error message for invalid date-time format")
         }
     }
 }

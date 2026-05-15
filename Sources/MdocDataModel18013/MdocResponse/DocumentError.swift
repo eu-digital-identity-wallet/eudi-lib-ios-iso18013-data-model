@@ -32,7 +32,7 @@ public struct DocumentError: Sendable {
 extension DocumentError: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .map(errorMap) = cbor else { throw MdocValidationError.invalidCbor("document error") }
-		let docErrorPairs = try errorMap.map { (key: CBOR, value: CBOR) throws(MdocValidationError) -> (DocType, ErrorCode)  in
+		let docErrorPairs = try errorMap.map { (key: CBOR, value: CBOR) throws(MdocValidationError) -> (DocType, ErrorCode) in
 			guard case .utf8String(let docType) = key else { throw .invalidCbor("document error") }
 			guard case .unsignedInt(let errorCode) = value else { throw .invalidCbor("document error") }
 			return (docType, errorCode)

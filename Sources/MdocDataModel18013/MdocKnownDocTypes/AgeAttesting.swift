@@ -30,9 +30,15 @@ extension AgeAttesting {
 /// - Parameter age: The age to compare against.
 /// - Returns: A tuple containing the key as the input age and a boolean value indicating whether the age is over the specified value.
   public func isOver(age: Int) -> (key: Int, value: Bool)? {
-	if let overTrue = ageOverXX.filter({ (key, value) in value == true && key >= age}).sorted(by: { $0.key < $1.key}).first
+	let sortedMatchingTrueValues = ageOverXX
+		.filter({ (key, value) in value == true && key >= age })
+		.sorted(by: { $0.key < $1.key })
+	if let overTrue = sortedMatchingTrueValues.first
 	{ return overTrue}
-	if let overFalse = ageOverXX.filter({ (key, value) in value == false && key <= age}).sorted(by: { $0.key > $1.key}).first
+	let sortedMatchingFalseValues = ageOverXX
+		.filter({ (key, value) in value == false && key <= age })
+		.sorted(by: { $0.key > $1.key })
+	if let overFalse = sortedMatchingFalseValues.first
 	{ return overFalse}
 	return nil
   }

@@ -81,11 +81,11 @@ public struct AlternativeDataElementsSet: Sendable {
 extension AlternativeDataElementsSet: CBORDecodable {
     public init(cbor: CBOR) throws(MdocValidationError) {
         guard case let .map(m) = cbor else { throw .invalidCbor("AlternativeDataElementsSet") }
-        guard let reqElem = m[Keys.requestedElement] else { throw .missingField("AlternativeDataElementsSet", Keys.requestedElement.rawValue) }
-        requestedElement = try ElementReference(cbor: reqElem)
+        guard let requestedElementCbor = m[Keys.requestedElement] else { throw .missingField("AlternativeDataElementsSet", Keys.requestedElement.rawValue) }
+        requestedElement = try ElementReference(cbor: requestedElementCbor)
 
-        guard let altElemSets = m[Keys.alternativeElementSets] else { throw .missingField("AlternativeDataElementsSet", Keys.alternativeElementSets.rawValue) }
-        guard case let .array(arr) = altElemSets else { throw .invalidCbor("AlternativeDataElementsSet") }
+        guard let alternativeElementSetsCbor = m[Keys.alternativeElementSets] else { throw .missingField("AlternativeDataElementsSet", Keys.alternativeElementSets.rawValue) }
+        guard case let .array(arr) = alternativeElementSetsCbor else { throw .invalidCbor("AlternativeDataElementsSet") }
         alternativeElementSets = try arr.map { cborSet throws(MdocValidationError) in
             guard case let .array(setArr) = cborSet else { throw MdocValidationError.invalidCbor("AlternativeElementSet") }
             return try setArr.map { e throws(MdocValidationError) in try ElementReference(cbor: e) }
@@ -154,7 +154,9 @@ extension DocRequestInfo: CBORDecodable {
         // parse alternativeDataElements
         if let altData = m[Keys.alternativeDataElements] {
             guard case let .array(arr) = altData else { throw .invalidCbor("DocRequestInfo") }
-            alternativeDataElements = try arr.map { ae throws(MdocValidationError) in try AlternativeDataElementsSet(cbor: ae) }
+            alternativeDataElements = try arr.map { alternativeDataElementCbor throws(MdocValidationError) in
+                try AlternativeDataElementsSet(cbor: alternativeDataElementCbor)
+            }
         } else { alternativeDataElements = nil}
         // parse issuerIdentifiers
         if let issuerIds = m[Keys.issuerIdentifiers] {

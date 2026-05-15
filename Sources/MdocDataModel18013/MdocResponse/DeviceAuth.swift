@@ -38,9 +38,17 @@ extension DeviceAuth: CBORDecodable {
 		let deviceMac = m[Keys.deviceMac]
 		switch (deviceSignature, deviceMac) {
 		case let (coseDs?, nil):
-			if let dsign = Cose(type: .sign1, cbor: coseDs) { coseMacOrSignature = dsign } else { throw .invalidCbor("Device authentication invalid DeviceSignature") }
+			if let deviceSignatureCose = Cose(type: .sign1, cbor: coseDs) {
+				coseMacOrSignature = deviceSignatureCose
+			} else {
+				throw .invalidCbor("Device authentication invalid DeviceSignature")
+			}
 		case let (nil, coseDm?):
-			if let dmac = Cose(type: .mac0, cbor: coseDm) { coseMacOrSignature = dmac } else { throw .invalidCbor("Device authentication invalid DeviceMac") }
+			if let deviceMacCose = Cose(type: .mac0, cbor: coseDm) {
+				coseMacOrSignature = deviceMacCose
+			} else {
+				throw .invalidCbor("Device authentication invalid DeviceMac")
+			}
 		case (.some, .some):
 			throw .invalidCbor("DeviceMac and DeviceSignature cannot both be present")
 		case (nil, nil):

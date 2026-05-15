@@ -37,8 +37,10 @@ extension ServerRetrievalOption: CBOREncodable {
 extension ServerRetrievalOption: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
         guard case let .array(arr) = cbor, arr.count > 2 else { throw .invalidCbor("device key info") }
-        guard case let .unsignedInt(v) = arr[0], v == Self.versionImpl else { throw .invalidCbor("device key info") }
-        guard case let .utf8String(u) = arr[1], case let .utf8String(t) = arr[2] else { throw .invalidCbor("device key info") }
-        version = v; url = u; token = t
+        guard case let .unsignedInt(versionValue) = arr[0], versionValue == Self.versionImpl else { throw .invalidCbor("device key info") }
+        guard case let .utf8String(urlValue) = arr[1], case let .utf8String(tokenValue) = arr[2] else { throw .invalidCbor("device key info") }
+        version = versionValue
+        url = urlValue
+        token = tokenValue
     }
 }
