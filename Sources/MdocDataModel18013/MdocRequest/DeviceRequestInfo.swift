@@ -60,15 +60,15 @@ extension UseCase: CBORDecodable {
         guard let mandatoryValue = m[Keys.mandatory] else { throw .missingField("UseCase", Keys.mandatory.rawValue) }
         guard case let .boolean(b) = mandatoryValue else { throw .invalidCbor("UseCase") }
         mandatory = b
-        guard let docSetsValue = m[Keys.documentSets] else { throw .missingField("UseCase", Keys.documentSets.rawValue) }
-        guard case let .array(arr) = docSetsValue else { throw .invalidCbor("UseCase") }
+        guard let documentSetsValue = m[Keys.documentSets] else { throw .missingField("UseCase", Keys.documentSets.rawValue) }
+        guard case let .array(arr) = documentSetsValue else { throw .invalidCbor("UseCase") }
         guard !arr.isEmpty else { throw .invalidCbor("UseCase.documentSets empty array") }
         documentSets = try arr.map { cbor  throws(MdocValidationError) in
             guard case let .array(docArray) = cbor else { throw MdocValidationError.invalidCbor("DocumentSet") }
             guard !docArray.isEmpty else { throw MdocValidationError.invalidCbor("DocumentSet") }
             return try docArray.map { cborItem  throws(MdocValidationError) in
-                guard case let .unsignedInt(id) = cborItem else { throw MdocValidationError.invalidCbor("DocRequestID") }
-                return UInt(id)
+                guard case let .unsignedInt(documentRequestIdentifier) = cborItem else { throw MdocValidationError.invalidCbor("DocRequestID") }
+                return UInt(documentRequestIdentifier)
             }
         }
         if let purposeHintsValue = m[Keys.purposeHints] {
@@ -116,7 +116,8 @@ extension UseCase: CBOREncodable {
         if let purposeHints {
             var hintsMap = OrderedDictionary<CBOR, CBOR>()
             for (controllerId, code) in purposeHints {
-                hintsMap[.utf8String(controllerId)] = code >= 0 ? .unsignedInt(UInt64(code)) : .negativeInt(UInt64(-code - 1))
+                let encodedCode: CBOR = code >= 0 ? .unsignedInt(UInt64(code)) : .negativeInt(UInt64(-code - 1))
+                hintsMap[.utf8String(controllerId)] = encodedCode
             }
             map[.utf8String(Keys.purposeHints.rawValue)] = .map(hintsMap)
         }

@@ -29,10 +29,22 @@ public struct StatusIdentifier: Codable, Sendable {
 extension StatusIdentifier {
     public init?(data msoRawData: [UInt8]) {
 		guard let obj = try? CBOR.decode(msoRawData) else { return nil }
-		guard case let CBOR.tagged(tag, cborEncoded) = obj, tag == .encodedCBORDataItem, case let .byteString(bytes) = cborEncoded else { return nil }
-		guard let cbor = try? CBOR.decode(bytes), case let .map(m) = cbor, case let .map(status) = m[.utf8String("status")] else { return nil }
-		if case let .map(status_list) = status[.utf8String("status_list")], case let .unsignedInt(idx) = status_list[.utf8String("idx")], case let .utf8String(uri) = status_list[.utf8String("uri")] {
-			self.idx = Int(idx); uriString = uri
+        guard case let CBOR.tagged(tag, encodedCbor) = obj,
+              tag == .encodedCBORDataItem,
+              case let .byteString(encodedBytes) = encodedCbor
+        else { return nil }
+
+        guard let cbor = try? CBOR.decode(encodedBytes),
+              case let .map(msoMap) = cbor,
+              case let .map(statusMap) = msoMap[.utf8String("status")]
+        else { return nil }
+
+        if case let .map(statusListMap) = statusMap[.utf8String("status_list")],
+           case let .unsignedInt(statusIndex) = statusListMap[.utf8String("idx")],
+           case let .utf8String(statusUri) = statusListMap[.utf8String("uri")]
+        {
+            self.idx = Int(statusIndex)
+            uriString = statusUri
         } else { return nil }
     }
 }

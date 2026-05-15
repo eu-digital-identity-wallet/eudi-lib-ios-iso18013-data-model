@@ -1,5 +1,5 @@
 {
-  "originHash" : "34a85f35ad8be12e1a1212dc2407b49b87749a8e69ecbbdade838fe310db0247",
+  "originHash" : "fdf233abd3a4449777663b976061081ff25c2af97c399424fc0e08cf83c4624e",
   "pins" : [
     {
       "identity" : "swift-collections",
@@ -8,6 +8,24 @@
       "state" : {
         "revision" : "671108c96644956dddcd89dd59c203dcdb36cec7",
         "version" : "1.1.4"
+      }
+    },
+    {
+      "identity" : "swift-docc-plugin",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-docc-plugin",
+      "state" : {
+        "revision" : "647c708be89f834fa6a6d4945442793a77ddf5b6",
+        "version" : "1.5.0"
+      }
+    },
+    {
+      "identity" : "swift-docc-symbolkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-docc-symbolkit",
+      "state" : {
+        "revision" : "b45d1f2ed151d057b54504d653e0da5552844e34",
+        "version" : "1.0.0"
       }
     },
     {
@@ -24,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/swiftlang/swift-syntax.git",
       "state" : {
-        "revision" : "64889f0c732f210a935a0ad7cda38f77f876262d",
-        "version" : "509.1.1"
+        "revision" : "4799286537280063c85a32f09884cfbca301b1a1",
+        "version" : "602.0.0"
       }
     },
     {
@@ -42,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/eu-digital-identity-wallet/SwiftCopyableMacro.git",
       "state" : {
-        "revision" : "d535b0836be52c846d87605adad1205445e4dc35",
-        "version" : "0.0.4"
+        "revision" : "ba0d1318b825b69d8c0bd5ae65746300c95aa972",
+        "version" : "0.0.5"
       }
     },
     {

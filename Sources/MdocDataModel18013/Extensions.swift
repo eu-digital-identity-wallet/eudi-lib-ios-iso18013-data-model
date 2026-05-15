@@ -159,17 +159,26 @@ extension CBORDecodable {
 
 extension CBOR {
 	public func decodeTaggedBytes() -> [UInt8]? {
-		guard case let CBOR.tagged(tag, cborEncoded) = self, tag == .encodedCBORDataItem, case let .byteString(bytes) = cborEncoded else {  return nil }
+		guard case let CBOR.tagged(tag, encodedCbor) = self,
+			  tag == .encodedCBORDataItem,
+			  case let .byteString(bytes) = encodedCbor
+		else { return nil }
 		return bytes
 	}
 	public func decodeTagged<T: CBORDecodable>(_ t: T.Type = T.self) throws -> T {
-		guard case let CBOR.tagged(tag, cborEncoded) = self, tag == .encodedCBORDataItem, case let .byteString(bytes) = cborEncoded else {  throw MdocValidationError.cborDecodingError }
+		guard case let CBOR.tagged(tag, encodedCbor) = self,
+			  tag == .encodedCBORDataItem,
+			  case let .byteString(bytes) = encodedCbor
+		else { throw MdocValidationError.cborDecodingError }
 		return try T.init(data: bytes)
 	}
 
 	public func decodeFullDate() -> String? {
-		guard case let CBOR.tagged(tag, cborEncoded) = self, tag.rawValue == 1004, case let .utf8String(s) = cborEncoded else { return nil }
-		return s
+		guard case let CBOR.tagged(tag, encodedCbor) = self,
+			  tag.rawValue == 1004,
+			  case let .utf8String(fullDateString) = encodedCbor
+		else { return nil }
+		return fullDateString
 	}
 }
 
@@ -409,11 +418,15 @@ extension Array where Element == DocClaim {
 extension Array where Element == DisplayMetadata {
 	// get the first name with the given locale or the first element if not found
     public func getName(_ uiCulture: String?) -> String? {
-		(first(where: { $0.locale?.language.languageCode?.identifier == uiCulture ?? Locale.current.language.languageCode?.identifier }) ?? first)?.name
+		let languageIdentifier = uiCulture ?? Locale.current.language.languageCode?.identifier
+		let matchedMetadata = first(where: { $0.locale?.language.languageCode?.identifier == languageIdentifier })
+		return (matchedMetadata ?? first)?.name
 	}
     // get the first logo with the given locale or the first element if not found
     public func getLogo(_ uiCulture: String?) -> LogoMetadata? {
-		(first(where: { $0.locale?.language.languageCode?.identifier == uiCulture ?? Locale.current.language.languageCode?.identifier }) ?? first)?.logo
+		let languageIdentifier = uiCulture ?? Locale.current.language.languageCode?.identifier
+		let matchedMetadata = first(where: { $0.locale?.language.languageCode?.identifier == languageIdentifier })
+		return (matchedMetadata ?? first)?.logo
 	}
 }
 

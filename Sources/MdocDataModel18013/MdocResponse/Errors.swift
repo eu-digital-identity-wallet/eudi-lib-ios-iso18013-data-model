@@ -57,7 +57,8 @@ extension Errors: CBOREncodable {
             let errorItemEntries = errorItems.map { (dataElementIdentifier: DataElementIdentifier, errorCode: ErrorCode) -> (CBOR, CBOR) in
                 (.utf8String(dataElementIdentifier), .unsignedInt(errorCode))
             }
-            return (namespaceKey, .map(OrderedDictionary(errorItemEntries, uniquingKeysWith: { (key, _) in key })))
+            let namespaceItemsMap = OrderedDictionary(errorItemEntries, uniquingKeysWith: { (key, _) in key })
+            return (namespaceKey, .map(namespaceItemsMap))
         }
         let cborMap = OrderedDictionary(namespaceMapEntries, uniquingKeysWith: { (key, _) in key })
         return .map(cborMap)

@@ -73,14 +73,18 @@ public enum CoseEcCurve: UInt64, Codable, Sendable {
 
     public static func fromInt(_ coseCurveIdentifier: UInt64) throws -> CoseEcCurve {
         guard let curve = CoseEcCurve(rawValue: coseCurveIdentifier) else {
-            throw NSError(domain: "EcCurve", code: -1, userInfo: [NSLocalizedDescriptionKey: "No curve with COSE identifier \(coseCurveIdentifier)"])
+            let errorDescription = "No curve with COSE identifier \(coseCurveIdentifier)"
+            let errorInfo = [NSLocalizedDescriptionKey: errorDescription]
+            throw NSError(domain: "EcCurve", code: -1, userInfo: errorInfo)
         }
         return curve
     }
 
     public static func fromJwkName(_ jwkName: String) throws -> CoseEcCurve {
         guard let curve = jwkToCose[jwkName] else {
-            throw NSError(domain: "EcCurve", code: -1, userInfo: [NSLocalizedDescriptionKey: "No EcCurve value for \(jwkName)"])
+            let errorDescription = "No EcCurve value for \(jwkName)"
+            let errorInfo = [NSLocalizedDescriptionKey: errorDescription]
+            throw NSError(domain: "EcCurve", code: -1, userInfo: errorInfo)
         }
         return curve
     }

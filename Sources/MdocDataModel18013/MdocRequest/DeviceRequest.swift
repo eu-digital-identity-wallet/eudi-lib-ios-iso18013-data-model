@@ -54,9 +54,9 @@ public struct DeviceRequest: Sendable {
 extension DeviceRequest: CBORDecodable {
     public init(cbor: CBOR) throws(MdocValidationError) {
         guard case let .map(m) = cbor else { throw .invalidCbor("device request") }
-        guard case let .utf8String(v) = m[Keys.version] else { throw .missingField("DeviceRequest", Keys.version.rawValue) }
-        try MdocVersion.validateDeviceVersion(v, component: "device request")
-        version = v
+        guard case let .utf8String(versionString) = m[Keys.version] else { throw .missingField("DeviceRequest", Keys.version.rawValue) }
+        try MdocVersion.validateDeviceVersion(versionString, component: "device request")
+        version = versionString
         guard case let .array(cdrs) = m[Keys.docRequests] else { throw .missingField("DeviceRequest", Keys.docRequests.rawValue) }
         do { docRequests = try cdrs.map { try DocRequest(cbor: $0) } } catch { throw .invalidCbor("device request") }
         guard docRequests.count > 0 else { throw .invalidCbor("device request") }
@@ -98,10 +98,18 @@ extension DeviceRequest {
     ///   - agesOver: Ages to request if equal or above
     ///   - intentToRetain: Specify intent to retain (after retrieval)
 	public init(mdl items: [IsoMdlModel.CodingKeys], agesOver: [Int], intentToRetain: IntentToRetain = true) {
-		var isoDataElements: [DataElementIdentifier: IntentToRetain] = Dictionary(grouping: items, by: {$0.rawValue}).mapValues {_ in intentToRetain}
+        var isoDataElements: [DataElementIdentifier: IntentToRetain] = Dictionary(grouping: items, by: { $0.rawValue }).mapValues { _ in intentToRetain }
 		for ao in agesOver { isoDataElements["age_over_\(ao)"] = intentToRetain }
 		let isoReqElements = RequestDataElements(dataElements: isoDataElements )
-		let itemsReq = ItemsRequest(docType: IsoMdlModel.isoDocType, requestNameSpaces: RequestNameSpaces(nameSpaces: [IsoMdlModel.isoNamespace: isoReqElements]), requestInfo: nil)
-		self.init(version: Self.version1, docRequests: [DocRequest(itemsRequest: itemsReq, itemsRequestRawData: nil, readerAuth: nil, readerAuthRawCBOR: nil)], deviceRequestInfo: nil, readerAuthAll: nil, readerAuthAllRawCBOR: nil)
+        let requestNameSpaces = RequestNameSpaces(nameSpaces: [IsoMdlModel.isoNamespace: isoReqElements])
+        let itemsReq = ItemsRequest(docType: IsoMdlModel.isoDocType, requestNameSpaces: requestNameSpaces, requestInfo: nil)
+        let docRequest = DocRequest(itemsRequest: itemsReq, itemsRequestRawData: nil, readerAuth: nil, readerAuthRawCBOR: nil)
+        self.init(
+            version: Self.version1,
+            docRequests: [docRequest],
+            deviceRequestInfo: nil,
+            readerAuthAll: nil,
+            readerAuthAllRawCBOR: nil
+        )
 	}
 }

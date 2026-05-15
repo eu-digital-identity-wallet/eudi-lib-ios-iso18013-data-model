@@ -46,7 +46,11 @@ extension DeviceKeyInfo: CBORDecodable {
 		guard case let .map(cborMap) = cbor else { throw MdocValidationError.invalidCbor("device key info") }
 		guard let cborDeviceKey = cborMap[Keys.deviceKey] else { throw MdocValidationError.missingField("DeviceKeyInfo", "deviceKey") }
 		deviceKey = try CoseKey(cbor: cborDeviceKey)
-		if let cborKeyAuthorizations = cborMap[Keys.keyAuthorizations] { keyAuthorizations = try KeyAuthorizations(cbor: cborKeyAuthorizations) } else { keyAuthorizations = nil }
+		if let cborKeyAuthorizations = cborMap[Keys.keyAuthorizations] {
+			keyAuthorizations = try KeyAuthorizations(cbor: cborKeyAuthorizations)
+		} else {
+			keyAuthorizations = nil
+		}
 		keyInfo = cborMap[Keys.keyInfo]
 	}
 }
@@ -77,7 +81,12 @@ extension KeyAuthorizations: CBORDecodable {
 		guard case let .map(cborMap) = cbor else { throw MdocValidationError.invalidCbor("key authorizations") }
 		var authorizedNameSpaces: AuthorizedNameSpaces? = nil
 		if case let .array(nameSpaceValues) = cborMap[Keys.nameSpaces] {
-			authorizedNameSpaces = nameSpaceValues.compactMap { if case let .utf8String(value) = $0 { return value } else { return nil } }
+			authorizedNameSpaces = nameSpaceValues.compactMap { nameSpaceValue in
+				if case let .utf8String(value) = nameSpaceValue {
+					return value
+				}
+				return nil
+			}
 			if authorizedNameSpaces?.count == 0 { authorizedNameSpaces = nil }
 		}
 		nameSpaces = authorizedNameSpaces
@@ -85,7 +94,12 @@ extension KeyAuthorizations: CBORDecodable {
 		if case let .map(dataElementsMap) = cborMap[Keys.dataElements] {
 			for (nameSpaceKey, nameSpaceValue) in dataElementsMap  {
 				guard case let .utf8String(nameSpace) = nameSpaceKey, case let .array(dataElementValues) = nameSpaceValue else { continue }
-				let dataElementIdentifiers = dataElementValues.compactMap { if case let .utf8String(value) = $0 { return value } else { return nil } }
+				let dataElementIdentifiers = dataElementValues.compactMap { dataElementValue in
+					if case let .utf8String(value) = dataElementValue {
+						return value
+					}
+					return nil
+				}
 				guard dataElementIdentifiers.count > 0 else { continue }
 				authorizedDataElements[nameSpace] = dataElementIdentifiers
 			}

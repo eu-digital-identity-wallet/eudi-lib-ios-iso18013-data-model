@@ -53,13 +53,18 @@ open class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable, ObservableOb
     }
 
 	public init?(configuration: DocClaimsModelConfiguration, issuerSigned: IssuerSigned, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
-    self.id = configuration.id; self.createdAt = configuration.createdAt
+    self.id = configuration.id
+    self.createdAt = configuration.createdAt
         self.modifiedAt = nil
     self.displayName = configuration.displayName
-    self.display = configuration.display; self.issuerDisplay = configuration.issuerDisplay
+    self.display = configuration.display
+    self.issuerDisplay = configuration.issuerDisplay
     self.credentialIssuerIdentifier = configuration.credentialIssuerIdentifier
-     self.configurationIdentifier = configuration.configurationIdentifier
-    self.validFrom = configuration.validFrom; self._validUntil = configuration.validUntil; self.statusIdentifier = configuration.statusIdentifier; self.secureAreaName = configuration.secureAreaName
+    self.configurationIdentifier = configuration.configurationIdentifier
+    self.validFrom = configuration.validFrom
+    self._validUntil = configuration.validUntil
+    self.statusIdentifier = configuration.statusIdentifier
+    self.secureAreaName = configuration.secureAreaName
     self.credentialsUsageCounts = configuration.credentialsUsageCounts
     self.credentialPolicy = configuration.credentialPolicy
     self.docType = configuration.docType
@@ -93,6 +98,23 @@ extension DocClaimsModel {
     }
 
     public static let empty: DocClaimsModel = DocClaimsModel(
-        configuration: DocClaimsModelConfiguration(id: "", docType: "", displayName: nil, display: nil, credentialIssuerIdentifier: nil, configurationIdentifier: nil, validFrom: nil, validUntil: nil, statusIdentifier: nil, credentialsUsageCounts: nil, credentialPolicy: .oneTimeUse, secureAreaName: nil, modifiedAt: nil, docClaims: [], docDataFormat: .cbor, hashingAlg: nil)
+        configuration: DocClaimsModelConfiguration(
+            id: "",
+            docType: "",
+            displayName: nil,
+            display: nil,
+            credentialIssuerIdentifier: nil,
+            configurationIdentifier: nil,
+            validFrom: nil,
+            validUntil: nil,
+            statusIdentifier: nil,
+            credentialsUsageCounts: nil,
+            credentialPolicy: .oneTimeUse,
+            secureAreaName: nil,
+            modifiedAt: nil,
+            docClaims: [],
+            docDataFormat: .cbor,
+            hashingAlg: nil
+        )
     )
 }

@@ -113,8 +113,15 @@ public struct Cose: Sendable {
 	public let payload : CBOR
 	public let signature : Data
 
-	public var verifyAlgorithm: VerifyAlgorithm? { guard type == .sign1, let alg = protectedHeader.algorithm else { return nil }; return VerifyAlgorithm(rawValue: alg) }
-	public var macAlgorithm: MacAlgorithm? { guard type == .mac0, let alg = protectedHeader.algorithm else { return nil }; return MacAlgorithm(rawValue: alg) }
+	public var verifyAlgorithm: VerifyAlgorithm? {
+		guard type == .sign1, let algorithm = protectedHeader.algorithm else { return nil }
+		return VerifyAlgorithm(rawValue: algorithm)
+	}
+
+	public var macAlgorithm: MacAlgorithm? {
+		guard type == .mac0, let algorithm = protectedHeader.algorithm else { return nil }
+		return MacAlgorithm(rawValue: algorithm)
+	}
 
 	var keyId : Data? {
 		var keyData : Data?
@@ -170,7 +177,11 @@ extension Cose {
 	///initializer to create a payload cose message
 	public init(type: CoseType, algorithm: UInt64, payloadData: Data, unprotectedHeaderCbor: CBOR? = nil, signature: Data? = nil) {
 		self.protectedHeader = CoseHeader(alg: algorithm, isNegativeAlg: type == .sign1, keyId: nil)!
-		self.unprotectedHeader = unprotectedHeaderCbor != nil ? CoseHeader(alg: nil, isNegativeAlg: nil, keyId: nil, rawHeader: unprotectedHeaderCbor!) : nil
+		if let unprotectedHeaderCbor {
+			self.unprotectedHeader = CoseHeader(alg: nil, isNegativeAlg: nil, keyId: nil, rawHeader: unprotectedHeaderCbor)
+		} else {
+			self.unprotectedHeader = nil
+		}
 		self.payload = .byteString(payloadData.bytes)
 		self.signature = signature ?? Data()
 		self.type = type
@@ -190,6 +201,9 @@ extension Cose {
 
 extension Cose: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-        .array([protectedHeader.rawHeader ?? .map([:]), unprotectedHeader?.rawHeader ?? .map([:]), payload, .byteString(signature.bytes)])
+		let protectedHeaderValue = protectedHeader.rawHeader ?? .map([:])
+		let unprotectedHeaderValue = unprotectedHeader?.rawHeader ?? .map([:])
+		let signatureValue = CBOR.byteString(signature.bytes)
+		return .array([protectedHeaderValue, unprotectedHeaderValue, payload, signatureValue])
     }
 }

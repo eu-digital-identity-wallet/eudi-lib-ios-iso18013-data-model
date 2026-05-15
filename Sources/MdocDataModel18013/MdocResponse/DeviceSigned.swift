@@ -39,7 +39,12 @@ public struct DeviceSigned: Sendable {
 extension DeviceSigned: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .map(m) = cbor else { throw .invalidCbor("device signed") }
-		guard case let .tagged(t, cdns) = m[Keys.nameSpaces], t == .encodedCBORDataItem, case let .byteString(bs) = cdns else { throw .missingField("DeviceSigned", Keys.nameSpaces.rawValue) }
+		guard case let .tagged(nameSpacesTag, nameSpacesCbor) = m[Keys.nameSpaces],
+			  nameSpacesTag == .encodedCBORDataItem,
+			  case let .byteString(nameSpacesBytes) = nameSpacesCbor
+		else { throw .missingField("DeviceSigned", Keys.nameSpaces.rawValue) }
+
+		let bs = nameSpacesBytes
 		guard let obj = try? CBOR.decode(bs) else { throw MdocValidationError.cborDecodingError }
         nameSpaces = try DeviceNameSpaces(cbor: obj)
 		guard let cdu = m[Keys.deviceAuth] else { throw .missingField("DeviceSigned", Keys.deviceAuth.rawValue) }
@@ -85,7 +90,7 @@ public struct DeviceSignedItems: Sendable {
 extension DeviceSignedItems: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .map(m) = cbor else { throw .invalidCbor("device signed") }
-		let dsiPairs = try m.map { (k: CBOR, v: CBOR) throws(MdocValidationError) -> (DataElementIdentifier, DataElementValue)  in
+		let dsiPairs = try m.map { (k: CBOR, v: CBOR) throws(MdocValidationError) -> (DataElementIdentifier, DataElementValue) in
 			guard case .utf8String(let dei) = k else { throw .invalidCbor("device signed") }
 			return (dei,v)
 		}

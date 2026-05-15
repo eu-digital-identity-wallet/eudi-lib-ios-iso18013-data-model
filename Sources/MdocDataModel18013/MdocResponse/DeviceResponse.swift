@@ -64,17 +64,23 @@ extension DeviceResponse: CBORDecodable {
 		version = versionString
 		if case let .array(documentCbors) = cborMap[Keys.documents] {
 			guard !documentCbors.isEmpty else { throw .invalidCbor("DeviceResponse.documents empty array") }
-			let parsedDocuments = try documentCbors.map { documentCbor  throws(MdocValidationError) in try Document(cbor: documentCbor) }
+			let parsedDocuments = try documentCbors.map { documentCbor throws(MdocValidationError) in
+				try Document(cbor: documentCbor)
+			}
 			self.documents = parsedDocuments
 		} else { documents = nil }
 		if case let .array(zkDocumentCbors) = cborMap[Keys.zkDocuments] {
 			guard !zkDocumentCbors.isEmpty else { throw .invalidCbor("DeviceResponse.zkDocuments empty array") }
-			let parsedZkDocuments = try zkDocumentCbors.map { zkDocumentCbor throws(MdocValidationError) in try ZkDocument(cbor: zkDocumentCbor) }
+			let parsedZkDocuments = try zkDocumentCbors.map { zkDocumentCbor throws(MdocValidationError) in
+				try ZkDocument(cbor: zkDocumentCbor)
+			}
 			self.zkDocuments = parsedZkDocuments
 		} else { zkDocuments = nil }
 		if case let .array(documentErrorCbors) = cborMap[Keys.documentErrors] {
 			guard !documentErrorCbors.isEmpty else { throw .invalidCbor("DeviceResponse.documentErrors empty array") }
-			let parsedDocumentErrors = try documentErrorCbors.map { documentErrorCbor throws(MdocValidationError) in try DocumentError(cbor: documentErrorCbor) }
+			let parsedDocumentErrors = try documentErrorCbors.map { documentErrorCbor throws(MdocValidationError) in
+				try DocumentError(cbor: documentErrorCbor)
+			}
 			self.documentErrors = parsedDocumentErrors
 		}  else { documentErrors = nil }
 		guard case .unsignedInt(let statusValue) = cborMap[Keys.status] else { throw .missingField("DeviceResponse", Keys.status.rawValue) }
@@ -87,8 +93,14 @@ extension DeviceResponse: CBOREncodable {
 		var cbor = OrderedDictionary<CBOR, CBOR>()
 		cbor[.utf8String(Keys.version.rawValue)] = .utf8String(version)
 		if let documents { cbor[.utf8String(Keys.documents.rawValue)] = documents.toCBOR(options: options) }
-		if let zkDocuments { cbor[.utf8String(Keys.zkDocuments.rawValue)] = .array(zkDocuments.map { $0.toCBOR(options: options) }) }
-		if let documentErrors { cbor[.utf8String(Keys.documentErrors.rawValue)] = .array(documentErrors.map { $0.toCBOR(options: options) }) }
+		if let zkDocuments {
+			let encodedZkDocuments = zkDocuments.map { $0.toCBOR(options: options) }
+			cbor[.utf8String(Keys.zkDocuments.rawValue)] = .array(encodedZkDocuments)
+		}
+		if let documentErrors {
+			let encodedDocumentErrors = documentErrors.map { $0.toCBOR(options: options) }
+			cbor[.utf8String(Keys.documentErrors.rawValue)] = .array(encodedDocumentErrors)
+		}
 		cbor[.utf8String(Keys.status.rawValue)] = .unsignedInt(status)
 		return .map(cbor)
 	}

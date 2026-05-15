@@ -48,7 +48,8 @@ extension ZkDocument: CBOREncodable {
         // Encode documentData to CBOR bytes and wrap in tagged CBOR
         let documentDataCBOR = documentData.toCBOR(options: options)
         let encodedDocumentData = documentDataCBOR.encode()
-        map[CBOR.utf8String("documentData")] = CBOR.tagged(.encodedCBORDataItem, CBOR.byteString([UInt8](encodedDocumentData)))
+		let taggedDocumentData = CBOR.tagged(.encodedCBORDataItem, CBOR.byteString([UInt8](encodedDocumentData)))
+		map[CBOR.utf8String("documentData")] = taggedDocumentData
         return CBOR.map(map)
     }
 }
@@ -66,10 +67,14 @@ extension ZkDocument: CBOREncodable {
 extension ZkDocument: CBORDecodable {
     public init(cbor: CBOR) throws(MdocValidationError) {
         guard case let .map(cborMap) = cbor else { throw .invalidCbor("ZkDocument") }
-        guard case let .byteString(proofBytes)? = cborMap[CBOR.utf8String("proof")] else { throw .missingField("ZkDocument", "proof") }
-        guard let documentDataCBOR = cborMap[CBOR.utf8String("documentData")] else { throw .missingField("ZkDocument", "documentData") }
+        let proofKey = CBOR.utf8String("proof")
+        let documentDataKey = CBOR.utf8String("documentData")
+        guard case let .byteString(proofBytes)? = cborMap[proofKey] else { throw .missingField("ZkDocument", "proof") }
+        guard let documentDataCBOR = cborMap[documentDataKey] else { throw .missingField("ZkDocument", "documentData") }
         // Extract tagged byte string (tag 24 for encoded CBOR)
-        guard case let .tagged(tag, .byteString(encodedBytes)) = documentDataCBOR, tag == .encodedCBORDataItem else { throw .invalidCbor("ZkDocument") }
+        guard case let .tagged(tag, .byteString(encodedBytes)) = documentDataCBOR, tag == .encodedCBORDataItem else {
+            throw .invalidCbor("ZkDocument")
+        }
         // Decode the nested CBOR
         guard let decodedCBOR = try? CBOR.decode([UInt8](encodedBytes)) else { throw .invalidCbor("ZkDocument") }
         let documentData = try ZkDocumentData(cbor: decodedCBOR)

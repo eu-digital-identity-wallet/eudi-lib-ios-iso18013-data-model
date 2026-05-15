@@ -113,14 +113,14 @@ extension IssuerSignedItem: CBORDecodable {
 
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case .map(let cd) = cbor else { throw .invalidCbor("issuer signed item") }
-        guard case .unsignedInt(let did) = cd[Keys.digestID] else { throw .missingField("IssuerSignedItem", Keys.digestID.rawValue) }
-        digestID = did
-        guard case .byteString(let r) = cd[Keys.random] else { throw .missingField("IssuerSignedItem", Keys.random.rawValue) }
-        random = r
-        guard case .utf8String(let ei) = cd[Keys.elementIdentifier] else { throw .missingField("IssuerSignedItem", Keys.elementIdentifier.rawValue) }
-        elementIdentifier = ei
-        guard let ev = cd[Keys.elementValue] else { throw .missingField("IssuerSignedItem", Keys.elementValue.rawValue) }
-        elementValue = ev
+		guard case .unsignedInt(let digestIdentifier) = cd[Keys.digestID] else { throw .missingField("IssuerSignedItem", Keys.digestID.rawValue) }
+		digestID = digestIdentifier
+		guard case .byteString(let randomBytes) = cd[Keys.random] else { throw .missingField("IssuerSignedItem", Keys.random.rawValue) }
+		random = randomBytes
+		guard case .utf8String(let claimIdentifier) = cd[Keys.elementIdentifier] else { throw .missingField("IssuerSignedItem", Keys.elementIdentifier.rawValue) }
+		elementIdentifier = claimIdentifier
+		guard let claimValue = cd[Keys.elementValue] else { throw .missingField("IssuerSignedItem", Keys.elementValue.rawValue) }
+		elementValue = claimValue
     }
 }
 

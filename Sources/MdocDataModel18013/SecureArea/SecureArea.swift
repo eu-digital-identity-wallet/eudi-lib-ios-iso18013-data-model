@@ -74,7 +74,10 @@ extension SecureArea {
     public func getInfoAndCurve(id: String) async throws -> ([String:Data], CoseEcCurve) {
         let storage = await getStorage()
         let keyInfoDict = try await storage.readKeyInfo(id: id)
-        guard let jwkNameData = keyInfoDict[kSecAttrDescription as String], let jwkName = String(data: jwkNameData, encoding: .utf8) else { throw SecureAreaError("Key info description not found") }
+		let keyDescriptionKey = kSecAttrDescription as String
+		guard let jwkNameData = keyInfoDict[keyDescriptionKey],
+			  let jwkName = String(data: jwkNameData, encoding: .utf8)
+		else { throw SecureAreaError("Key info description not found") }
         let curve = try CoseEcCurve.fromJwkName(jwkName)
         return (keyInfoDict, curve)
     }
@@ -82,7 +85,8 @@ extension SecureArea {
     public func getKeyBatchInfo(id: String) async throws -> KeyBatchInfo {
         let storage = await getStorage()
         let keyInfoDict = try await storage.readKeyInfo(id: id)
-        guard let keyInfoData = keyInfoDict[kSecValueData as String] else { throw SecureAreaError("Key info not found") }
+		let keyInfoDataKey = kSecValueData as String
+		guard let keyInfoData = keyInfoDict[keyInfoDataKey] else { throw SecureAreaError("Key info not found") }
         guard let keyInfo = KeyBatchInfo(from: keyInfoData) else { throw SecureAreaError("Key info wrong format") }
         return keyInfo
     }
@@ -90,11 +94,18 @@ extension SecureArea {
     public func updateKeyBatchInfo(id: String, keyIndex: Int) async throws -> KeyBatchInfo {
         let storage = await getStorage()
         let keyInfoDict = try await storage.readKeyInfo(id: id)
-        guard let keyInfoData = keyInfoDict[kSecValueData as String] else { throw SecureAreaError("Key info not found") }
+        let keyInfoDataKey = kSecValueData as String
+        let keyDescriptionKey = kSecAttrDescription as String
+        guard let keyInfoData = keyInfoDict[keyInfoDataKey] else { throw SecureAreaError("Key info not found") }
         guard let kbi = KeyBatchInfo(from: keyInfoData) else { throw SecureAreaError("Key info wrong format") }
         let newKbi = KeyBatchInfo(previous: kbi, keyIndex: keyIndex)
-        let descrOld = keyInfoDict[kSecAttrDescription as String] ?? Data()
-        try await storage.writeKeyInfo(id: id, dict: [kSecValueData as String: newKbi.toData() ?? Data(), kSecAttrDescription as String: descrOld])
+        let previousDescriptionData = keyInfoDict[keyDescriptionKey] ?? Data()
+        let updatedKeyInfoData = newKbi.toData() ?? Data()
+        let updatedKeyInfoDictionary = [
+            keyInfoDataKey: updatedKeyInfoData,
+            keyDescriptionKey: previousDescriptionData,
+        ]
+        try await storage.writeKeyInfo(id: id, dict: updatedKeyInfoDictionary)
         return newKbi
     }
 }

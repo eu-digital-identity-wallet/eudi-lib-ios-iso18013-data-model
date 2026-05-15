@@ -59,25 +59,28 @@ extension MobileSecurityObject: CBORDecodable {
 	public init(data: [UInt8]) throws(MdocValidationError) {
 		// MobileSecurityObjectBytes = #6.24(bstr .cbor MobileSecurityObject)
 		guard let obj = try? CBOR.decode(data) else { throw .invalidCbor("mobile security object") }
-		guard case let CBOR.tagged(tag, cborEncoded) = obj, tag == .encodedCBORDataItem, case let .byteString(bytes) = cborEncoded else { throw .invalidCbor("mobile security object") }
-		guard let cbor = try? CBOR.decode(bytes) else { throw .invalidCbor("mobile security object") }
+		guard case let CBOR.tagged(tag, encodedCbor) = obj,
+			  tag == .encodedCBORDataItem,
+			  case let .byteString(encodedBytes) = encodedCbor
+		else { throw .invalidCbor("mobile security object") }
+		guard let cbor = try? CBOR.decode(encodedBytes) else { throw .invalidCbor("mobile security object") }
 		try self.init(cbor: cbor)
 	}
 
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case let .map(v) = cbor else { throw .invalidCbor("mobile security object") }
-		guard case let .utf8String(s) = v[Keys.version] else { throw .missingField("MobileSecurityObject", Keys.version.rawValue) }
-		version = s
-		guard case let .utf8String(da) = v[Keys.digestAlgorithm] else { throw .missingField("MobileSecurityObject", Keys.digestAlgorithm.rawValue) }
-		digestAlgorithm = da
-		guard let cvd = v[Keys.valueDigests] else { throw .missingField("MobileSecurityObject", Keys.valueDigests.rawValue) }
-		valueDigests = try ValueDigests(cbor: cvd)
-		guard let cdki = v[Keys.deviceKeyInfo] else { throw .missingField("MobileSecurityObject", Keys.deviceKeyInfo.rawValue) }
-		deviceKeyInfo = try DeviceKeyInfo(cbor: cdki)
-		guard case let .utf8String(dt) = v[Keys.docType] else { throw .missingField("MobileSecurityObject", Keys.docType.rawValue) }
-		docType = dt
-		guard let cvi = v[Keys.validityInfo] else { throw .missingField("MobileSecurityObject", Keys.validityInfo.rawValue) }
-		validityInfo = try ValidityInfo(cbor: cvi)
+		guard case let .map(msoMap) = cbor else { throw .invalidCbor("mobile security object") }
+		guard case let .utf8String(versionString) = msoMap[Keys.version] else { throw .missingField("MobileSecurityObject", Keys.version.rawValue) }
+		version = versionString
+		guard case let .utf8String(digestAlgorithmName) = msoMap[Keys.digestAlgorithm] else { throw .missingField("MobileSecurityObject", Keys.digestAlgorithm.rawValue) }
+		digestAlgorithm = digestAlgorithmName
+		guard let valueDigestsCbor = msoMap[Keys.valueDigests] else { throw .missingField("MobileSecurityObject", Keys.valueDigests.rawValue) }
+		valueDigests = try ValueDigests(cbor: valueDigestsCbor)
+		guard let deviceKeyInfoCbor = msoMap[Keys.deviceKeyInfo] else { throw .missingField("MobileSecurityObject", Keys.deviceKeyInfo.rawValue) }
+		deviceKeyInfo = try DeviceKeyInfo(cbor: deviceKeyInfoCbor)
+		guard case let .utf8String(documentType) = msoMap[Keys.docType] else { throw .missingField("MobileSecurityObject", Keys.docType.rawValue) }
+		docType = documentType
+		guard let validityInfoCbor = msoMap[Keys.validityInfo] else { throw .missingField("MobileSecurityObject", Keys.validityInfo.rawValue) }
+		validityInfo = try ValidityInfo(cbor: validityInfoCbor)
 	}
 }
 

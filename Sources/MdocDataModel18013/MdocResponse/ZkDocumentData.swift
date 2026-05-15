@@ -129,11 +129,16 @@ extension ZkDocumentData: CBOREncodable {
 extension ZkDocumentData: CBORDecodable {
     public init(cbor: CBOR) throws(MdocValidationError) {
         guard case let .map(cborMap) = cbor else { throw .invalidCbor("ZkDocumentData") }
-        guard case let .utf8String(zkSystemSpecId)? = cborMap[CBOR.utf8String("zkSystemId")] else { throw .missingField("ZkDocumentData", "zkSystemId") }
-        guard case let .utf8String(docType) = cborMap[CBOR.utf8String("docType")] else { throw .missingField("ZkDocumentData", "docType") }
-        guard let taggedTimestamp = cborMap[CBOR.utf8String("timestamp")] else { throw .missingField("ZkDocumentData", "timestamp") }
+        let zkSystemIdKey = CBOR.utf8String("zkSystemId")
+        let docTypeKey = CBOR.utf8String("docType")
+        let timestampKey = CBOR.utf8String("timestamp")
+        guard case let .utf8String(zkSystemSpecId)? = cborMap[zkSystemIdKey] else { throw .missingField("ZkDocumentData", "zkSystemId") }
+        guard case let .utf8String(docType) = cborMap[docTypeKey] else { throw .missingField("ZkDocumentData", "docType") }
+        guard let taggedTimestamp = cborMap[timestampKey] else { throw .missingField("ZkDocumentData", "timestamp") }
         // Extract tagged timestamp (tag 0 for date-time string)
-        guard case let .tagged(tag, .utf8String(timestampStr)) = taggedTimestamp, tag.rawValue == 0 else { throw .invalidCbor("ZkDocumentData") }
+        guard case let .tagged(tag, .utf8String(timestampStr)) = taggedTimestamp, tag.rawValue == 0 else {
+            throw .invalidCbor("ZkDocumentData")
+        }
         // Parse ISO-8601 timestamp
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -193,7 +198,20 @@ extension ZkDocumentData: CBORDecodable {
             default: throw .invalidCbor("ZkDocumentData")
             }
         }
-        self.init(zkSystemSpecId: zkSystemSpecId, docType: docType, timestamp: timestamp, issuerSigned: issuerSigned, deviceSigned: deviceSigned, msoX5chain: msoX5chain)
+        let parsedZkSystemSpecId = zkSystemSpecId
+        let parsedDocType = docType
+        let parsedTimestamp = timestamp
+        let parsedIssuerSigned = issuerSigned
+        let parsedDeviceSigned = deviceSigned
+        let parsedMsoX5chain = msoX5chain
+        self.init(
+            zkSystemSpecId: parsedZkSystemSpecId,
+            docType: parsedDocType,
+            timestamp: parsedTimestamp,
+            issuerSigned: parsedIssuerSigned,
+            deviceSigned: parsedDeviceSigned,
+            msoX5chain: parsedMsoX5chain
+        )
     }
 }
 
