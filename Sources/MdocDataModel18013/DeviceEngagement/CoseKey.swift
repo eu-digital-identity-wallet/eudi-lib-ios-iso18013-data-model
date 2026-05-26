@@ -72,15 +72,15 @@ public struct CoseKeyPrivate: Sendable {
 		self.curve = curve
 	}
 
-    public init(secureArea: any SecureArea, curve: CoseEcCurve)  async throws {
+    public init(secureArea: any SecureArea, keyOptions: KeyOptions)  async throws {
         index = 0
         privateKeyId = UUID().uuidString
         self.secureArea = secureArea
-		self.curve = curve
+        self.curve = keyOptions.curve
         let createdKeys = try await secureArea.createKeyBatch(
             id: privateKeyId,
             credentialOptions: CredentialOptions(credentialPolicy: .rotateUse, batchSize: 1),
-            keyOptions: KeyOptions(curve: curve)
+            keyOptions: keyOptions
         )
         guard let firstKey = createdKeys.first else {
             throw SecureAreaError("Secure area returned an empty key batch")
