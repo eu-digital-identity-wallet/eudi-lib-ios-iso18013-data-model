@@ -21,7 +21,6 @@ import OrderedCollections
 /// Contains the mdoc authentication structure and the data elements protected by mdoc authentication
 public struct DeviceSigned: Sendable {
 	let nameSpaces: DeviceNameSpaces
-	let nameSpacesRawData: [UInt8]
 	let deviceAuth: DeviceAuth
 	//DeviceNameSpacesBytes = #6.24(bstr .cbor DeviceNameSpaces)
 	enum Keys: String {
@@ -29,9 +28,8 @@ public struct DeviceSigned: Sendable {
 		case deviceAuth
 	}
 
-	public init(deviceAuth: DeviceAuth) {
-		nameSpaces = DeviceNameSpaces(deviceNameSpaces: [:])
-		nameSpacesRawData = CBOR.map([:]).encode()
+    public init(deviceAuth: DeviceAuth, deviceNameSpaces: DeviceNameSpaces? = nil ) {
+		nameSpaces = deviceNameSpaces ?? DeviceNameSpaces(deviceNameSpaces: [:])
 		self.deviceAuth = deviceAuth
 	}
 }
@@ -49,14 +47,13 @@ extension DeviceSigned: CBORDecodable {
         nameSpaces = try DeviceNameSpaces(cbor: obj)
 		guard let cdu = m[Keys.deviceAuth] else { throw .missingField("DeviceSigned", Keys.deviceAuth.rawValue) }
 		deviceAuth = try DeviceAuth(cbor: cdu)
-		nameSpacesRawData = bs
 	}
 }
 
 extension DeviceSigned: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
 		var cbor = OrderedDictionary<CBOR, CBOR>()
-		cbor[.utf8String(Keys.nameSpaces.rawValue)] = nameSpacesRawData.taggedEncoded
+        cbor[.utf8String(Keys.nameSpaces.rawValue)] = nameSpaces.toCBOR(options: options).taggedEncoded
 		cbor[.utf8String(Keys.deviceAuth.rawValue)] = deviceAuth.toCBOR(options: options)
 		return .map(cbor)
 	}
@@ -81,6 +78,16 @@ extension DeviceNameSpaces: CBORDecodable {
 	}
 }
 
+extension DeviceNameSpaces: CBOREncodable {
+    public func toCBOR(options: CBOROptions) -> CBOR {
+        var cbor = OrderedDictionary<CBOR, CBOR>()
+        for (n, items) in deviceNameSpaces {
+            cbor[.utf8String(n)] = items.toCBOR(options: options)
+        }
+        return .map(cbor)
+    }
+}
+
 /// Contains the data element identifiers and values for a namespace
 public struct DeviceSignedItems: Sendable {
 	public let deviceSignedItems: [DataElementIdentifier: DataElementValue]
@@ -98,6 +105,16 @@ extension DeviceSignedItems: CBORDecodable {
 		guard !dsi.isEmpty else { throw .invalidCbor("device signed empty array") }
 		deviceSignedItems = dsi
 	}
+}
+
+extension DeviceSignedItems: CBOREncodable {
+    public func toCBOR(options: CBOROptions) -> CBOR {
+        var cbor = OrderedDictionary<CBOR, CBOR>()
+        for (key, value) in deviceSignedItems {
+            cbor[.utf8String(key)] = value
+        }
+        return .map(cbor)
+    }
 }
 
 

@@ -27,8 +27,8 @@ typealias AuthorizedDataElements = [NameSpace: DataElementsArray]
 /// mdoc authentication public key and information related to this key.
 public struct DeviceKeyInfo:Sendable {
 	public let deviceKey: CoseKey
-	let keyAuthorizations: KeyAuthorizations?
-	let keyInfo: CBOR?
+	public let keyAuthorizations: KeyAuthorizations?
+	public let keyInfo: CBOR?
 
 	enum Keys: String {
 		case deviceKey
@@ -36,8 +36,10 @@ public struct DeviceKeyInfo:Sendable {
 		case keyInfo
 	}
 
-	public init(deviceKey: CoseKey) {
-		self.deviceKey = deviceKey; self.keyAuthorizations = nil; self.keyInfo = nil
+    public init(deviceKey: CoseKey, keyAuthorizations: KeyAuthorizations? = nil, keyInfo: CBOR? = nil) {
+		self.deviceKey = deviceKey;
+        self.keyAuthorizations = keyAuthorizations;
+        self.keyInfo = keyInfo
 	}
 }
 
@@ -66,7 +68,7 @@ extension DeviceKeyInfo: CBOREncodable {
 }
 
 /// Contains the elements the key may sign or MAC
-struct KeyAuthorizations: Sendable {
+public struct KeyAuthorizations: Sendable {
 	let nameSpaces: AuthorizedNameSpaces?
 	let dataElements: AuthorizedDataElements?
 
@@ -77,7 +79,7 @@ struct KeyAuthorizations: Sendable {
 }
 
 extension KeyAuthorizations: CBORDecodable {
-	init(cbor: CBOR) throws(MdocValidationError) {
+	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .map(cborMap) = cbor else { throw MdocValidationError.invalidCbor("key authorizations") }
 		var authorizedNameSpaces: AuthorizedNameSpaces? = nil
 		if case let .array(nameSpaceValues) = cborMap[Keys.nameSpaces] {
