@@ -78,8 +78,8 @@ public struct DeviceEngagement: Sendable {
 		try self.init(cbor: obj)
 	}
 
-    public mutating func makePrivateKey(crv: CoseEcCurve, secureArea: any SecureArea) async throws {
-        privateKey = try await CoseKeyPrivate(secureArea: secureArea, curve: crv)
+    public mutating func makePrivateKey(secureArea: any SecureArea, keyOptions: KeyOptions) async throws {
+        privateKey = try await CoseKeyPrivate(secureArea: secureArea, keyOptions: keyOptions)
 		security = Security(deviceKey: try await privateKey!.key)
     }
 
