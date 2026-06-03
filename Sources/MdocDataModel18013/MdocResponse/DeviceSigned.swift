@@ -61,59 +61,54 @@ extension DeviceSigned: CBOREncodable {
 
 /// Device data elements per namespac
 public struct DeviceNameSpaces: Sendable {
-	public let deviceNameSpaces: [NameSpace: DeviceSignedItems]
+	public let deviceNameSpaces: OrderedDictionary<NameSpace, DeviceSignedItems>
 	public subscript(ns: NameSpace) -> DeviceSignedItems? { deviceNameSpaces[ns] }
 }
 
 extension DeviceNameSpaces: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .map(m) = cbor else { throw .invalidCbor("device signed") }
-		let dnsPairs = try m.map { (k: CBOR, v: CBOR) throws(MdocValidationError) -> (NameSpace, DeviceSignedItems)  in
-			guard case .utf8String(let ns) = k else { throw .invalidCbor("device signed") }
-			let deviceSignedItems = try DeviceSignedItems(cbor: v)
-			return (ns, deviceSignedItems)
+		var orderedDeviceSignedNamespaces = OrderedDictionary<NameSpace, DeviceSignedItems>()
+		for (k, v) in m {
+			guard case .utf8String(let ns) = k else { throw .invalidCbor("Invalid device signed namespace") }
+			orderedDeviceSignedNamespaces[ns] = try DeviceSignedItems(cbor: v)
 		}
-		let dsignItemsMap: [NameSpace : DeviceSignedItems] = Dictionary(dnsPairs, uniquingKeysWith: { (first, _) in first })
-		deviceNameSpaces = dsignItemsMap
+		deviceNameSpaces = orderedDeviceSignedNamespaces
 	}
 }
 
 extension DeviceNameSpaces: CBOREncodable {
     public func toCBOR(options: CBOROptions) -> CBOR {
-        var cbor = OrderedDictionary<CBOR, CBOR>()
-        for (n, items) in deviceNameSpaces {
-            cbor[.utf8String(n)] = items.toCBOR(options: options)
-        }
-        return .map(cbor)
+        .map(deviceNameSpaces.reduce(into: OrderedDictionary<CBOR, CBOR>()) { cbor, pair in
+            cbor[.utf8String(pair.key)] = pair.value.toCBOR(options: options)
+        })
     }
 }
 
 /// Contains the data element identifiers and values for a namespace
 public struct DeviceSignedItems: Sendable {
-	public let deviceSignedItems: [DataElementIdentifier: DataElementValue]
+	public let deviceSignedItems: OrderedDictionary<DataElementIdentifier, DataElementValue>
 	public subscript(ei: DataElementIdentifier) -> DataElementValue? { deviceSignedItems[ei] }
 }
 
 extension DeviceSignedItems: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .map(m) = cbor else { throw .invalidCbor("device signed") }
-		let dsiPairs = try m.map { (k: CBOR, v: CBOR) throws(MdocValidationError) -> (DataElementIdentifier, DataElementValue) in
-			guard case .utf8String(let dei) = k else { throw .invalidCbor("device signed") }
-			return (dei,v)
+		var orderedDataElements = OrderedDictionary<DataElementIdentifier, DataElementValue>()
+		for (k, v) in m {
+			guard case .utf8String(let dei) = k else { throw .invalidCbor("Invalid device signed item") }
+			orderedDataElements[dei] = v
 		}
-		let dsi = Dictionary(dsiPairs, uniquingKeysWith: { (first, _) in first })
-		guard !dsi.isEmpty else { throw .invalidCbor("device signed empty array") }
-		deviceSignedItems = dsi
+		guard !orderedDataElements.isEmpty else { throw .invalidCbor("device signed empty array") }
+		deviceSignedItems = orderedDataElements
 	}
 }
 
 extension DeviceSignedItems: CBOREncodable {
     public func toCBOR(options: CBOROptions) -> CBOR {
-        var cbor = OrderedDictionary<CBOR, CBOR>()
-        for (key, value) in deviceSignedItems {
-            cbor[.utf8String(key)] = value
-        }
-        return .map(cbor)
+        .map(deviceSignedItems.reduce(into: OrderedDictionary<CBOR, CBOR>()) { cbor, pair in
+            cbor[.utf8String(pair.key)] = pair.value
+        })
     }
 }
 
