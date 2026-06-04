@@ -20,9 +20,9 @@ import Foundation
 import SwiftCBOR
 import OrderedCollections
 
-typealias AuthorizedNameSpaces = [NameSpace]
-typealias DataElementsArray = [DataElementIdentifier]
-typealias AuthorizedDataElements = [NameSpace: DataElementsArray]
+public typealias AuthorizedNameSpaces = [NameSpace]
+public typealias DataElementsArray = [DataElementIdentifier]
+public typealias AuthorizedDataElements = [NameSpace: DataElementsArray]
 
 /// mdoc authentication public key and information related to this key.
 public struct DeviceKeyInfo:Sendable {
@@ -69,13 +69,18 @@ extension DeviceKeyInfo: CBOREncodable {
 
 /// Contains the elements the key may sign or MAC
 public struct KeyAuthorizations: Sendable {
-	let nameSpaces: AuthorizedNameSpaces?
-	let dataElements: AuthorizedDataElements?
+	public let nameSpaces: AuthorizedNameSpaces?
+	public let dataElements: AuthorizedDataElements?
 
 	enum Keys: String {
 		case nameSpaces
 		case dataElements
 	}
+    
+    public init(nameSpaces: AuthorizedNameSpaces? = nil, dataElements: AuthorizedDataElements? = nil) {
+        self.nameSpaces = nameSpaces;
+        self.dataElements = dataElements;
+    }
 }
 
 extension KeyAuthorizations: CBORDecodable {
