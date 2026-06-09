@@ -63,6 +63,10 @@ extension DeviceSigned: CBOREncodable {
 public struct DeviceNameSpaces: Sendable {
 	public let deviceNameSpaces: OrderedDictionary<NameSpace, DeviceSignedItems>
 	public subscript(ns: NameSpace) -> DeviceSignedItems? { deviceNameSpaces[ns] }
+    
+    public init(deviceNameSpaces: OrderedDictionary<NameSpace, DeviceSignedItems>) {
+        self.deviceNameSpaces = deviceNameSpaces
+    }
 }
 
 extension DeviceNameSpaces: CBORDecodable {
@@ -89,6 +93,10 @@ extension DeviceNameSpaces: CBOREncodable {
 public struct DeviceSignedItems: Sendable {
 	public let deviceSignedItems: OrderedDictionary<DataElementIdentifier, DataElementValue>
 	public subscript(ei: DataElementIdentifier) -> DataElementValue? { deviceSignedItems[ei] }
+    
+    public init(deviceSignedItems: OrderedDictionary<DataElementIdentifier, DataElementValue>) {
+        self.deviceSignedItems = deviceSignedItems
+    }
 }
 
 extension DeviceSignedItems: CBORDecodable {
