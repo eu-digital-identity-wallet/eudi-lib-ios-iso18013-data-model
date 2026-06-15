@@ -18,7 +18,8 @@ let package = Package(
         .package(url: "https://github.com/niscy-eudiw/SwiftCBOR.git", from: "0.6.4"),
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "5.0.1"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.10.1"),
-		.package(url: "https://github.com/eu-digital-identity-wallet/SwiftCopyableMacro.git", from: "0.0.3")
+		.package(url: "https://github.com/eu-digital-identity-wallet/SwiftCopyableMacro.git", from: "0.0.5"),
+		.package(url: "https://github.com/apple/swift-docc-plugin", from: "1.5.0"),
     ]
     ,
 

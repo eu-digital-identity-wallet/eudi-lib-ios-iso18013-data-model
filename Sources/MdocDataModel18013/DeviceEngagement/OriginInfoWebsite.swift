@@ -34,15 +34,23 @@ public struct OriginInfoWebsite: Sendable {
 
 extension OriginInfoWebsite: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		.map(["cat": .unsignedInt(mCat), "type": .unsignedInt(Self.TYPE), "Details": .map(["baseUrl": .utf8String(mBaseUrl)])])
+		let detailsMap: CBOR = .map(["baseUrl": .utf8String(mBaseUrl)])
+		let originInfoMap: CBOR = .map([
+			"cat": .unsignedInt(mCat),
+			"type": .unsignedInt(Self.TYPE),
+			"Details": detailsMap,
+		])
+		return originInfoMap
 	}
 }
 
 extension OriginInfoWebsite: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case let .map(tS) = cbor else { throw .invalidCbor("origin info website") }
-		guard case let .unsignedInt(nsCat) = tS["cat"] else { throw .missingField("OriginInfoWebsite", "cat") }
-		guard case let .map(nsDetails) = tS["Details"], case let .utf8String(nsUrl) = nsDetails["baseUrl"] else { throw .missingField("OriginInfoWebsite", "baseUrl") }
-		self.init(baseUrl: nsUrl, cat: nsCat)
+		guard case let .map(originInfoMap) = cbor else { throw .invalidCbor("origin info website") }
+		guard case let .unsignedInt(category) = originInfoMap["cat"] else { throw .missingField("OriginInfoWebsite", "cat") }
+		guard case let .map(detailsMap) = originInfoMap["Details"], case let .utf8String(baseUrl) = detailsMap["baseUrl"] else {
+			throw .missingField("OriginInfoWebsite", "baseUrl")
+		}
+		self.init(baseUrl: baseUrl, cat: category)
 	}
 }

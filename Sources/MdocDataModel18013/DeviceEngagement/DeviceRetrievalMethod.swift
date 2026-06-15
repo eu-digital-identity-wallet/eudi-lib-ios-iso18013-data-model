@@ -43,7 +43,14 @@ extension DeviceRetrievalMethod: CBOREncodable {
             cborArr.append(options)
         case .ble(let peripheralServerMode, let uuid, let psm):
             Self.appendTypeAndVersion(&cborArr, type: 2)
-            var options: CBOR = [0: .boolean(peripheralServerMode), 1: .boolean(!peripheralServerMode), .unsignedInt(peripheralServerMode ? 10 : 11): .byteString(uuid.uuidString.replacingOccurrences(of: "-", with: "").byteArray)]
+            let modeSpecificOptionKey: CBOR = .unsignedInt(peripheralServerMode ? 10 : 11)
+            let compactUuidString = uuid.uuidString.replacingOccurrences(of: "-", with: "")
+            let compactUuidBytes = compactUuidString.byteArray
+            var options: CBOR = [
+                0: .boolean(peripheralServerMode),
+                1: .boolean(!peripheralServerMode),
+                modeSpecificOptionKey: .byteString(compactUuidBytes),
+            ]
             if let psm { options[21] = .unsignedInt(UInt64(psm)) }
             cborArr.append(options)
         }
@@ -55,20 +62,25 @@ extension DeviceRetrievalMethod: CBORDecodable {
     public init(cbor: CBOR) throws(MdocValidationError) {
         guard case let .array(arr) = cbor, arr.count >= 2 else { throw .invalidCbor("device retrieval method") }
         guard case let .unsignedInt(type) = arr[0] else { throw .invalidCbor("device retrieval method") }
-        guard case let .unsignedInt(v) = arr[1], v == Self.version else { throw .invalidCbor("device retrieval method") }
+		guard case let .unsignedInt(methodVersion) = arr[1], methodVersion == Self.version else { throw .invalidCbor("device retrieval method") }
         switch type {
         case 1:
             guard case let .map(options) = arr[2] else { throw .invalidCbor("device retrieval method") }
-            guard case let .unsignedInt(mlc) = options[0], case let .unsignedInt(mlr) = options[1]  else { throw .invalidCbor("device retrieval method") }
-            self = .nfc(maxLenCommand: mlc, maxLenResponse: mlr)
+			guard case let .unsignedInt(maxLenCommand) = options[0], case let .unsignedInt(maxLenResponse) = options[1]  else { throw .invalidCbor("device retrieval method") }
+			self = .nfc(maxLenCommand: maxLenCommand, maxLenResponse: maxLenResponse)
         case 2:
             guard case let .map(options) = arr[2] else { throw .invalidCbor("device retrieval method") }
-            if case let .boolean(b) = options[0], b, case let .byteString(bytes) = options[10], let uuid = UUID(uuidBytes: bytes) {
-                let psm: UInt16? = if case let .unsignedInt(p) = options[21] { UInt16(p) } else { nil }
-                self = .ble(peripheralServerMode: b, uuid: uuid, psm: psm)
-            } else if case let .boolean(b) = options[1], b, case let .byteString(bytes) = options[11], let uuid = UUID(uuidBytes: bytes) {
-                let psm: UInt16? = if case let .unsignedInt(p) = options[21] { UInt16(p) } else { nil }
-                self = .ble(peripheralServerMode: !b, uuid: uuid, psm: psm)
+            let psm: UInt16? = if case let .unsignedInt(rawPsm) = options[21] { UInt16(rawPsm) } else { nil }
+            if case let .boolean(isPeripheralServerMode) = options[0], isPeripheralServerMode,
+               case let .byteString(uuidBytes) = options[10],
+               let uuid = UUID(uuidBytes: uuidBytes)
+            {
+                self = .ble(peripheralServerMode: isPeripheralServerMode, uuid: uuid, psm: psm)
+            } else if case let .boolean(isCentralClientMode) = options[1], isCentralClientMode,
+                      case let .byteString(uuidBytes) = options[11],
+                      let uuid = UUID(uuidBytes: uuidBytes)
+            {
+				self = .ble(peripheralServerMode: !isCentralClientMode, uuid: uuid, psm: psm)
             } else { throw .invalidCbor("device retrieval method") }
         default: throw .invalidCbor("device retrieval method")
         }

@@ -16,15 +16,29 @@ limitations under the License.
 
 import Foundation
 
-/// Credential options
+/// Credential options that can be used when creating credentials in the secure area. These options allow for fine-tuning the behavior of credential issuance and management.
+/// If ARF Annex II policy is specified, any values passed will be overridden to comply with the policy requirements.
 public struct CredentialOptions: Codable, Sendable {
-    public init(credentialPolicy: CredentialPolicy, batchSize: Int) {
+    public init(
+        credentialPolicy: CredentialPolicy,
+        batchSize: Int,
+        reissueTriggerUnused: Int? = nil,
+        reissueTriggerLifetimeLeft: Int? = nil
+    ) {
         self.credentialPolicy = credentialPolicy
         self.batchSize = batchSize
+        self.reissueTriggerUnused = reissueTriggerUnused
+        self.reissueTriggerLifetimeLeft = reissueTriggerLifetimeLeft
     }
     /// Allow reuse (use more than once)
     public var credentialPolicy: CredentialPolicy
 
-    /// key batch size
+    /// Key batch size
     public var batchSize: Int
+
+    /// Reissue trigger threshold based on unused credentials in the batch.
+    public var reissueTriggerUnused: Int?
+
+    /// Reissue trigger threshold based on remaining credential lifetime.
+    public var reissueTriggerLifetimeLeft: Int?
 }

@@ -63,8 +63,14 @@ public struct DeviceEngagement: Sendable {
 		let uuid = UUID()
 		guard supportsCentralClientMode || supportsPeripheralServerMode else { return nil }
 		deviceRetrievalMethods = []
-		if supportsCentralClientMode { deviceRetrievalMethods!.append(.ble(peripheralServerMode: false, uuid: uuid)) }
-        if supportsPeripheralServerMode { deviceRetrievalMethods!.append(.ble(peripheralServerMode: true, uuid: uuid)) }
+		if supportsCentralClientMode {
+			let centralClientMethod = DeviceRetrievalMethod.ble(peripheralServerMode: false, uuid: uuid)
+			deviceRetrievalMethods!.append(centralClientMethod)
+		}
+        if supportsPeripheralServerMode {
+			let peripheralServerMethod = DeviceRetrievalMethod.ble(peripheralServerMode: true, uuid: uuid)
+			deviceRetrievalMethods!.append(peripheralServerMethod)
+		}
 	}
 	/// initialize from cbor data
 	public init(data: [UInt8]) throws {
@@ -72,8 +78,8 @@ public struct DeviceEngagement: Sendable {
 		try self.init(cbor: obj)
 	}
 
-    public mutating func makePrivateKey(crv: CoseEcCurve, secureArea: any SecureArea) async throws {
-        privateKey = try await CoseKeyPrivate(secureArea: secureArea, curve: crv)
+    public mutating func makePrivateKey(secureArea: any SecureArea, keyOptions: KeyOptions) async throws {
+        privateKey = try await CoseKeyPrivate(secureArea: secureArea, keyOptions: keyOptions)
 		security = Security(deviceKey: try await privateKey!.key)
     }
 
@@ -121,8 +127,17 @@ extension DeviceEngagement: CBORDecodable {
 		try MdocVersion.validateDeviceVersion(v, component: "device engagement")
 		guard let cs = map[1] else { throw .invalidCbor("device engagement") }
         security = try Security(cbor: cs)
-		if let cdrms = map[2], case let .array(drms) = cdrms, drms.count > 0 { deviceRetrievalMethods = try drms.map(DeviceRetrievalMethod.init(cbor:)) }
-		if let csro = map[3] { serverRetrievalOptions = try ServerRetrievalOptions.init(cbor: csro) } else { serverRetrievalOptions = nil }
+		if let deviceRetrievalMethodsCbor = map[2],
+		   case let .array(retrievalMethodItems) = deviceRetrievalMethodsCbor,
+		   retrievalMethodItems.count > 0
+		{
+			deviceRetrievalMethods = try retrievalMethodItems.map(DeviceRetrievalMethod.init(cbor:))
+		}
+		if let serverRetrievalOptionsCbor = map[3] {
+			serverRetrievalOptions = try ServerRetrievalOptions.init(cbor: serverRetrievalOptionsCbor)
+		} else {
+			serverRetrievalOptions = nil
+		}
 		if case let .array(obj5) = map[5] { originInfos = try obj5.map(OriginInfoWebsite.init(cbor:)) }
 		version = v
 	}

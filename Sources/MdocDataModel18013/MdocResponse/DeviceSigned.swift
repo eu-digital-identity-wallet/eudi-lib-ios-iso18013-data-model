@@ -21,7 +21,6 @@ import OrderedCollections
 /// Contains the mdoc authentication structure and the data elements protected by mdoc authentication
 public struct DeviceSigned: Sendable {
 	let nameSpaces: DeviceNameSpaces
-	let nameSpacesRawData: [UInt8]
 	let deviceAuth: DeviceAuth
 	//DeviceNameSpacesBytes = #6.24(bstr .cbor DeviceNameSpaces)
 	enum Keys: String {
@@ -29,9 +28,8 @@ public struct DeviceSigned: Sendable {
 		case deviceAuth
 	}
 
-	public init(deviceAuth: DeviceAuth) {
-		nameSpaces = DeviceNameSpaces(deviceNameSpaces: [:])
-		nameSpacesRawData = CBOR.map([:]).encode()
+    public init(deviceAuth: DeviceAuth, deviceNameSpaces: DeviceNameSpaces? = nil ) {
+		nameSpaces = deviceNameSpaces ?? DeviceNameSpaces(deviceNameSpaces: [:])
 		self.deviceAuth = deviceAuth
 	}
 }
@@ -39,19 +37,23 @@ public struct DeviceSigned: Sendable {
 extension DeviceSigned: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .map(m) = cbor else { throw .invalidCbor("device signed") }
-		guard case let .tagged(t, cdns) = m[Keys.nameSpaces], t == .encodedCBORDataItem, case let .byteString(bs) = cdns else { throw .missingField("DeviceSigned", Keys.nameSpaces.rawValue) }
+		guard case let .tagged(nameSpacesTag, nameSpacesCbor) = m[Keys.nameSpaces],
+			  nameSpacesTag == .encodedCBORDataItem,
+			  case let .byteString(nameSpacesBytes) = nameSpacesCbor
+		else { throw .missingField("DeviceSigned", Keys.nameSpaces.rawValue) }
+
+		let bs = nameSpacesBytes
 		guard let obj = try? CBOR.decode(bs) else { throw MdocValidationError.cborDecodingError }
         nameSpaces = try DeviceNameSpaces(cbor: obj)
 		guard let cdu = m[Keys.deviceAuth] else { throw .missingField("DeviceSigned", Keys.deviceAuth.rawValue) }
 		deviceAuth = try DeviceAuth(cbor: cdu)
-		nameSpacesRawData = bs
 	}
 }
 
 extension DeviceSigned: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
 		var cbor = OrderedDictionary<CBOR, CBOR>()
-		cbor[.utf8String(Keys.nameSpaces.rawValue)] = nameSpacesRawData.taggedEncoded
+        cbor[.utf8String(Keys.nameSpaces.rawValue)] = nameSpaces.toCBOR(options: options).taggedEncoded
 		cbor[.utf8String(Keys.deviceAuth.rawValue)] = deviceAuth.toCBOR(options: options)
 		return .map(cbor)
 	}
@@ -59,40 +61,63 @@ extension DeviceSigned: CBOREncodable {
 
 /// Device data elements per namespac
 public struct DeviceNameSpaces: Sendable {
-	public let deviceNameSpaces: [NameSpace: DeviceSignedItems]
+	public let deviceNameSpaces: OrderedDictionary<NameSpace, DeviceSignedItems>
 	public subscript(ns: NameSpace) -> DeviceSignedItems? { deviceNameSpaces[ns] }
+    
+    public init(deviceNameSpaces: OrderedDictionary<NameSpace, DeviceSignedItems>) {
+        self.deviceNameSpaces = deviceNameSpaces
+    }
 }
 
 extension DeviceNameSpaces: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .map(m) = cbor else { throw .invalidCbor("device signed") }
-		let dnsPairs = try m.map { (k: CBOR, v: CBOR) throws(MdocValidationError) -> (NameSpace, DeviceSignedItems)  in
-			guard case .utf8String(let ns) = k else { throw .invalidCbor("device signed") }
-			let deviceSignedItems = try DeviceSignedItems(cbor: v)
-			return (ns, deviceSignedItems)
+		var orderedDeviceSignedNamespaces = OrderedDictionary<NameSpace, DeviceSignedItems>()
+		for (k, v) in m {
+			guard case .utf8String(let ns) = k else { throw .invalidCbor("Invalid device signed namespace") }
+			orderedDeviceSignedNamespaces[ns] = try DeviceSignedItems(cbor: v)
 		}
-		let dsignItemsMap: [NameSpace : DeviceSignedItems] = Dictionary(dnsPairs, uniquingKeysWith: { (first, _) in first })
-		deviceNameSpaces = dsignItemsMap
+		deviceNameSpaces = orderedDeviceSignedNamespaces
 	}
+}
+
+extension DeviceNameSpaces: CBOREncodable {
+    public func toCBOR(options: CBOROptions) -> CBOR {
+        .map(deviceNameSpaces.reduce(into: OrderedDictionary<CBOR, CBOR>()) { cbor, pair in
+            cbor[.utf8String(pair.key)] = pair.value.toCBOR(options: options)
+        })
+    }
 }
 
 /// Contains the data element identifiers and values for a namespace
 public struct DeviceSignedItems: Sendable {
-	public let deviceSignedItems: [DataElementIdentifier: DataElementValue]
+	public let deviceSignedItems: OrderedDictionary<DataElementIdentifier, DataElementValue>
 	public subscript(ei: DataElementIdentifier) -> DataElementValue? { deviceSignedItems[ei] }
+    
+    public init(deviceSignedItems: OrderedDictionary<DataElementIdentifier, DataElementValue>) {
+        self.deviceSignedItems = deviceSignedItems
+    }
 }
 
 extension DeviceSignedItems: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .map(m) = cbor else { throw .invalidCbor("device signed") }
-		let dsiPairs = try m.map { (k: CBOR, v: CBOR) throws(MdocValidationError) -> (DataElementIdentifier, DataElementValue)  in
-			guard case .utf8String(let dei) = k else { throw .invalidCbor("device signed") }
-			return (dei,v)
+		var orderedDataElements = OrderedDictionary<DataElementIdentifier, DataElementValue>()
+		for (k, v) in m {
+			guard case .utf8String(let dei) = k else { throw .invalidCbor("Invalid device signed item") }
+			orderedDataElements[dei] = v
 		}
-		let dsi = Dictionary(dsiPairs, uniquingKeysWith: { (first, _) in first })
-		guard !dsi.isEmpty else { throw .invalidCbor("device signed empty array") }
-		deviceSignedItems = dsi
+		guard !orderedDataElements.isEmpty else { throw .invalidCbor("device signed empty array") }
+		deviceSignedItems = orderedDataElements
 	}
+}
+
+extension DeviceSignedItems: CBOREncodable {
+    public func toCBOR(options: CBOROptions) -> CBOR {
+        .map(deviceSignedItems.reduce(into: OrderedDictionary<CBOR, CBOR>()) { cbor, pair in
+            cbor[.utf8String(pair.key)] = pair.value
+        })
+    }
 }
 
 

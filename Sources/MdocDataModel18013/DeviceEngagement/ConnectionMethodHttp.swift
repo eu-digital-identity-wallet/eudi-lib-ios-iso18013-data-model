@@ -26,18 +26,25 @@ public struct ConnectionMethodHttp: Sendable  {
 extension ConnectionMethodHttp: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
 		guard case let .array(arr) = cbor, arr.count == 3 else { throw .invalidCbor("Connection method is not an array of 3 items") }
-		guard case let .unsignedInt(type) = arr[0], case let .unsignedInt(version) = arr[1] else { throw .invalidCbor("Connection method: First two items are not numbers") }
+		guard case let .unsignedInt(methodType) = arr[0], case let .unsignedInt(optionsVersion) = arr[1] else { throw .invalidCbor("Connection method: First two items are not numbers") }
 		guard case let .map(options) = arr[2] else { throw .invalidCbor("Connection method: Third item is not a map") }
-		guard type == Constants.METHOD_TYPE else { throw .invalidCbor("Connection method: Unexpected method type \(type)") }
-		guard version <= Constants.METHOD_MAX_VERSION else { throw .invalidCbor("Connection method: Unsupported options version \(version)") }
-		guard case let .utf8String(url) = options[.unsignedInt(Constants.OPTION_KEY_URI_WEBSITE)] else { throw .invalidCbor("Connection method: Options does not contain uri of website") }
+		guard methodType == Constants.METHOD_TYPE else { throw .invalidCbor("Connection method: Unexpected method type \(methodType)") }
+		guard optionsVersion <= Constants.METHOD_MAX_VERSION else { throw .invalidCbor("Connection method: Unsupported options version \(optionsVersion)") }
+		let websiteKey = CBOR.unsignedInt(Constants.OPTION_KEY_URI_WEBSITE)
+		guard case let .utf8String(url) = options[websiteKey] else { throw .invalidCbor("Connection method: Options does not contain uri of website") }
 		self.init(url)
 	}
 }
 
 extension ConnectionMethodHttp: CBOREncodable {
 	public func toCBOR(options: CBOROptions) -> CBOR {
-		.array([.unsignedInt(Constants.METHOD_TYPE), .unsignedInt(Constants.METHOD_MAX_VERSION), .map([.unsignedInt(Constants.OPTION_KEY_URI_WEBSITE): .utf8String(uriWebsite)])])
+		let websiteOptionKey = CBOR.unsignedInt(Constants.OPTION_KEY_URI_WEBSITE)
+		let optionsMap: CBOR = .map([websiteOptionKey: .utf8String(uriWebsite)])
+		return .array([
+			.unsignedInt(Constants.METHOD_TYPE),
+			.unsignedInt(Constants.METHOD_MAX_VERSION),
+			optionsMap,
+		])
 	}
 }
 

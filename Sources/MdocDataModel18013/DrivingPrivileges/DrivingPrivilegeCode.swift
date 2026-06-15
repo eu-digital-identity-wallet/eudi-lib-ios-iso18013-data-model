@@ -35,8 +35,9 @@ public struct DrivingPrivilegeCode: Codable, Sendable {
 
 extension DrivingPrivilegeCode: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-        guard case let .utf8String(c) = cbor[.utf8String(CodingKeys.code.rawValue)] else { throw .invalidCbor("driving privilege code") }
-        code = c
+        let codeKey = CBOR.utf8String(CodingKeys.code.rawValue)
+        guard case let .utf8String(codeValue) = cbor[codeKey] else { throw .invalidCbor("driving privilege code") }
+        code = codeValue
         if case let .utf8String(s) = cbor[.utf8String(CodingKeys.sign.rawValue)] { sign = s} else { sign = nil }
         if case let .utf8String(v) = cbor[.utf8String(CodingKeys.value.rawValue)] { value = v} else { value = nil }
     }

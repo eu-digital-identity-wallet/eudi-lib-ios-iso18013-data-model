@@ -72,15 +72,15 @@ public struct CoseKeyPrivate: Sendable {
 		self.curve = curve
 	}
 
-    public init(secureArea: any SecureArea, curve: CoseEcCurve)  async throws {
+    public init(secureArea: any SecureArea, keyOptions: KeyOptions)  async throws {
         index = 0
         privateKeyId = UUID().uuidString
         self.secureArea = secureArea
-		self.curve = curve
+        self.curve = keyOptions.curve
         let createdKeys = try await secureArea.createKeyBatch(
             id: privateKeyId,
             credentialOptions: CredentialOptions(credentialPolicy: .rotateUse, batchSize: 1),
-            keyOptions: KeyOptions(curve: curve)
+            keyOptions: keyOptions
         )
         guard let firstKey = createdKeys.first else {
             throw SecureAreaError("Secure area returned an empty key batch")
@@ -101,10 +101,12 @@ extension CoseKey: CBOREncodable {
 
 extension CoseKey: CBORDecodable {
 	public init(cbor obj: CBOR) throws(MdocValidationError) {
-		guard let calg = obj[-1], case let CBOR.unsignedInt(ralg) = calg, let alg = CoseEcCurve(rawValue: ralg) else { throw .invalidCbor("COSE key") }
-		crv = alg
-		guard let ckty = obj[1], case let CBOR.unsignedInt(rkty) = ckty else { throw .missingField("CoseKey", Keys.kty.rawValue) }
-		kty = rkty
+		guard let curveCbor = obj[-1], case let CBOR.unsignedInt(rawCurveIdentifier) = curveCbor, let curve = CoseEcCurve(rawValue: rawCurveIdentifier) else {
+			throw .invalidCbor("COSE key")
+		}
+		crv = curve
+		guard let keyTypeCbor = obj[1], case let CBOR.unsignedInt(rawKeyType) = keyTypeCbor else { throw .missingField("CoseKey", Keys.kty.rawValue) }
+		kty = rawKeyType
 		guard let cx = obj[-2], case let CBOR.byteString(rx) = cx else { throw .missingField("CoseKey", Keys.x.rawValue) }
 		x = rx
 		guard let cy = obj[-3], case let CBOR.byteString(ry) = cy else { throw .missingField("CoseKey", Keys.y.rawValue) }
@@ -125,7 +127,7 @@ extension CoseKey {
 		self.y = y
 	}
 	/// An ANSI x9.63 representation of the public key.
-	public func getx963Representation() -> Data {
+    public var x963Representation: Data {
 		let keyData = NSMutableData(bytes: [0x04], length: [0x04].count)
 		keyData.append(Data(x))
 		keyData.append(Data(y))
@@ -134,7 +136,11 @@ extension CoseKey {
 
     public func toSecKey() throws -> SecKey {
         var error: Unmanaged<CFError>?
-        guard let publicKey = SecKeyCreateWithData(getx963Representation() as NSData, [kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom, kSecAttrKeyClass: kSecAttrKeyClassPublic] as NSDictionary, &error) else {
+		let secKeyAttributes: NSDictionary = [
+			kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom,
+			kSecAttrKeyClass: kSecAttrKeyClassPublic,
+		]
+		guard let publicKey = SecKeyCreateWithData(x963Representation as NSData, secKeyAttributes, &error) else {
             throw error!.takeRetainedValue() as Error
         }
         return publicKey

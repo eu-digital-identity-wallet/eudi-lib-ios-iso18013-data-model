@@ -218,7 +218,9 @@ struct MdocDataModel18013Tests {
 		#expect(valueDigests1[0]!.toHexString().localizedUppercase == "75167333B47B6C2BFB86ECCC1F438CF57AF055371AC55E1E359E20F254ADCEBF")
 		#expect(valueDigests2.digestIDs.count == 4)
 		#expect(isoNS.count > 0)
-		#expect(doc.deviceSigned.nameSpacesRawData.count == 1); #expect(doc.deviceSigned.nameSpacesRawData[0] == 160) // {} A0 empty dic
+        #expect(doc.deviceSigned.nameSpaces.deviceNameSpaces.isEmpty);
+        let rawDeviceNameSpaces = doc.deviceSigned.nameSpaces.encode(options: CBOROptions())
+        #expect(rawDeviceNameSpaces.count == 1); #expect(rawDeviceNameSpaces[0] == 160)
 		#expect(doc.deviceSigned.deviceAuth.coseMacOrSignature.macAlgorithm == Cose.MacAlgorithm.hmac256)
 		#expect(doc.deviceSigned.deviceAuth.coseMacOrSignature.signature.bytes.toHexString().uppercased() == "E99521A85AD7891B806A07F8B5388A332D92C189A7BF293EE1F543405AE6824D")
         let d1 = dr.documents!.first!
@@ -332,16 +334,23 @@ struct MdocDataModel18013Tests {
 
   #if os(iOS)
     @Test func generateBLEengageQRCodeImage() async throws {
-        var de = try #require(DeviceEngagement(isBleServer: true))
-        try await de.makePrivateKey(crv: .P256, secureArea: InMemoryP256SecureArea(storage: DummySecureKeyStorage()))
+        var de = try #require(DeviceEngagement(supportsCentralClientMode: true, supportsPeripheralServerMode: true))
+        try await de
+            .makePrivateKey(
+                secureArea: InMemoryP256SecureArea(storage: DummySecureKeyStorage()),
+                keyOptions: KeyOptions(curve: .P256)
+            )
         #expect(de.getQrCodePayload().count > 0)
         let strQR = de.qrCode
 		#expect(DeviceEngagement.getQrCodeImage(qrCode: strQR, inputCorrectionLevel: .m) != nil)
     }
 
     @Test func generateBLEengageQRCodePayload() async throws {
-        var de = try #require(DeviceEngagement(isBleServer: true))
-        try await de.makePrivateKey(crv: .P256, secureArea: InMemoryP256SecureArea(storage: DummySecureKeyStorage()))
+        var de = try #require(DeviceEngagement(supportsCentralClientMode: true, supportsPeripheralServerMode: true))
+        try await de.makePrivateKey(
+            secureArea: InMemoryP256SecureArea(storage: DummySecureKeyStorage()),
+            keyOptions: KeyOptions(curve: .P256)
+        )
         #expect(de.getQrCodePayload().count > 0)
     }
   #endif

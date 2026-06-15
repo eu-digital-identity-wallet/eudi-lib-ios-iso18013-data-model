@@ -71,7 +71,7 @@ public actor InMemoryP256SecureArea: SecureArea {
     }
 
     public func keyAgreement(id: String, index: Int, publicKey: MdocDataModel18013.CoseKey, unlockData: Data?) throws -> SharedSecret {
-        let puk256 = try P256.KeyAgreement.PublicKey(x963Representation: publicKey.getx963Representation())
+        let puk256 = try P256.KeyAgreement.PublicKey(x963Representation: publicKey.x963Representation)
         let prk256 = try P256.KeyAgreement.PrivateKey(x963Representation: key.x963Representation)
         let sharedSecret = try prk256.sharedSecretFromKeyAgreement(with: puk256)
         return sharedSecret

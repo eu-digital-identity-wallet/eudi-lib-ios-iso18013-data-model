@@ -43,19 +43,35 @@ public struct ValidityInfo: Sendable {
 
 extension ValidityInfo: CBORDecodable {
 	public init(cbor: CBOR) throws(MdocValidationError) {
-		guard case let .map(v) = cbor else { throw .invalidCbor("validity info") }
-		guard case .tagged(let t, let cs) = v[Keys.signed], t == .standardDateTimeString, case let .utf8String(s) = cs else { throw .missingField("ValidityInfo", Keys.signed.rawValue) }
-		guard !s.contains(".") else { throw .invalidDateTimeFormat("ValidityInfo", Keys.signed.rawValue) }
-		signed = s
-		guard case .tagged(let t, let cvf) = v[Keys.validFrom], t == .standardDateTimeString, case let .utf8String(vf) = cvf else { throw .missingField("ValidityInfo", Keys.validFrom.rawValue) }
-		guard !vf.contains(".") else { throw .invalidDateTimeFormat("ValidityInfo", Keys.validFrom.rawValue) }
-		validFrom = vf
-		guard case .tagged(let t, let cvu) = v[Keys.validUntil], t == .standardDateTimeString, case let .utf8String(vu) = cvu else { throw .missingField("ValidityInfo", Keys.validUntil.rawValue) }
-		guard !vu.contains(".") else { throw .invalidDateTimeFormat("ValidityInfo", Keys.validUntil.rawValue) }
-		validUntil = vu
-		if case .tagged(let t, let ceu) = v[Keys.expectedUpdate], t == .standardDateTimeString, case let .utf8String(eu) = ceu {
-			guard !eu.contains(".") else { throw .invalidDateTimeFormat("ValidityInfo", Keys.expectedUpdate.rawValue) }
-			expectedUpdate = eu
+		guard case let .map(validityInfoMap) = cbor else { throw .invalidCbor("validity info") }
+
+		guard case .tagged(let signedTag, let signedCbor) = validityInfoMap[Keys.signed],
+			  signedTag == .standardDateTimeString,
+			  case let .utf8String(signedValue) = signedCbor
+		else { throw .missingField("ValidityInfo", Keys.signed.rawValue) }
+		guard !signedValue.contains(".") else { throw .invalidDateTimeFormat("ValidityInfo", Keys.signed.rawValue) }
+		signed = signedValue
+
+		guard case .tagged(let validFromTag, let validFromCbor) = validityInfoMap[Keys.validFrom],
+			  validFromTag == .standardDateTimeString,
+			  case let .utf8String(validFromValue) = validFromCbor
+		else { throw .missingField("ValidityInfo", Keys.validFrom.rawValue) }
+		guard !validFromValue.contains(".") else { throw .invalidDateTimeFormat("ValidityInfo", Keys.validFrom.rawValue) }
+		validFrom = validFromValue
+
+		guard case .tagged(let validUntilTag, let validUntilCbor) = validityInfoMap[Keys.validUntil],
+			  validUntilTag == .standardDateTimeString,
+			  case let .utf8String(validUntilValue) = validUntilCbor
+		else { throw .missingField("ValidityInfo", Keys.validUntil.rawValue) }
+		guard !validUntilValue.contains(".") else { throw .invalidDateTimeFormat("ValidityInfo", Keys.validUntil.rawValue) }
+		validUntil = validUntilValue
+
+		if case .tagged(let expectedUpdateTag, let expectedUpdateCbor) = validityInfoMap[Keys.expectedUpdate],
+		   expectedUpdateTag == .standardDateTimeString,
+		   case let .utf8String(expectedUpdateValue) = expectedUpdateCbor
+		{
+			guard !expectedUpdateValue.contains(".") else { throw .invalidDateTimeFormat("ValidityInfo", Keys.expectedUpdate.rawValue) }
+			expectedUpdate = expectedUpdateValue
 		} else { expectedUpdate = nil }
 	}
 }
@@ -66,7 +82,10 @@ extension ValidityInfo: CBOREncodable {
 		map[.utf8String(Keys.signed.rawValue)] = .tagged(.standardDateTimeString, .utf8String(signed))
 		map[.utf8String(Keys.validFrom.rawValue)] = .tagged(.standardDateTimeString, .utf8String(validFrom))
 		map[.utf8String(Keys.validUntil.rawValue)] = .tagged(.standardDateTimeString, .utf8String(validUntil))
-		if let expectedUpdate { map[.utf8String(Keys.expectedUpdate.rawValue)] = .tagged(.standardDateTimeString, .utf8String(expectedUpdate)) }
+		if let expectedUpdate {
+			let expectedUpdateTag = CBOR.tagged(.standardDateTimeString, .utf8String(expectedUpdate))
+			map[.utf8String(Keys.expectedUpdate.rawValue)] = expectedUpdateTag
+		}
 		return .map(map)
 	}
 }

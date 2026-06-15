@@ -46,8 +46,19 @@ public struct SignUpResponse: Codable, Sendable {
 	/// - Parameter data: Data from file or memory
 	/// - Returns:  separate ``MdocDataModel18013.DeviceResponse`` objects for each doc.type
 	public static func decomposeCBORDeviceResponse(data: Data) -> [(docType: String, dr: DeviceResponse, iss: IssuerSigned)]? {
-		guard let sr = data.decodeJSON(type: SignUpResponse.self), let dr = sr.deviceResponse, let docs = dr.documents else { return nil }
-		return docs.map { (docType: $0.docType, dr: DeviceResponse(version: dr.version, documents: [$0], status: dr.status), iss: $0.issuerSigned) }
+		guard let signupResponse = data.decodeJSON(type: SignUpResponse.self),
+			  let deviceResponse = signupResponse.deviceResponse,
+			  let documents = deviceResponse.documents
+		else { return nil }
+
+		return documents.map { document in
+			let singleDocumentResponse = DeviceResponse(
+				version: deviceResponse.version,
+				documents: [document],
+				status: deviceResponse.status
+			)
+			return (docType: document.docType, dr: singleDocumentResponse, iss: document.issuerSigned)
+		}
 	}
 
 }
