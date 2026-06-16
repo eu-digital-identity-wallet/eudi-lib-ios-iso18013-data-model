@@ -34,9 +34,8 @@ let package = Package(
 				.product(name: "Copyable", package: "SwiftCopyableMacro"),
                 ],
              swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency"), 
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"), 
-                .enableUpcomingFeature("InferIsolatedConformances") 
+                .enableUpcomingFeature("InferIsolatedConformances"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
             ),
         .testTarget(
