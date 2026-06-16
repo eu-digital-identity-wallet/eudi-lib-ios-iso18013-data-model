@@ -4,7 +4,8 @@
 import Foundation
 import os
 
-/// This class is marked @unchecked Sendable because it contains a mutable property (credentialsUsageCounts)
+/// Encapsulates the claims of a document as defined in ISO 18013-5, along with associated metadata and state management for credential usage. 
+/// It serves as a base model for specific document types, providing common properties and functionality for handling claims, validity, and credential policies.
 open class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable, ObservableObject, Equatable {
     public let display: [DisplayMetadata]?
     public let issuerDisplay: [DisplayMetadata]?

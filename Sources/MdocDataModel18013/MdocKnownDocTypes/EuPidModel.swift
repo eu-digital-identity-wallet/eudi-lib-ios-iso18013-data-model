@@ -18,8 +18,7 @@ limitations under the License.
 
 import Foundation
 
-/// SAFETY INVARIANT: Inherits @unchecked Sendable safety guarantees from DocClaimsModel.
-/// See DocClaimsModel documentation for details on thread-safety requirements.
+/// A model representing the claims of a European Personal Identification (EuPid) document, conforming to the ISO 18013-5 standard. 
 public final class EuPidModel: DocClaimsModel, @unchecked Sendable {
 	public static let euPidDocType: String = "eu.europa.ec.eudi.pid.1"
 
