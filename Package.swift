@@ -32,7 +32,11 @@ let package = Package(
                 .product(name: "SwiftyJSON", package: "SwiftyJSON"),
                 .product(name: "Logging", package: "swift-log"),
 				.product(name: "Copyable", package: "SwiftCopyableMacro"),
-                ]
+                ],
+             swiftSettings: [
+                .enableUpcomingFeature("InferIsolatedConformances"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault")
+            ]
             ),
         .testTarget(
             name: "MdocDataModel18013Tests",
