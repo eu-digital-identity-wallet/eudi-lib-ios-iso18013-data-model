@@ -8,3 +8,5 @@ DerivedData/
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
 AGENTS.md
+/fastlane/test_output
+fastlane/report.xml
