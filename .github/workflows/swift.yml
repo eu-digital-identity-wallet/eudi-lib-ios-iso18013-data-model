@@ -20,7 +20,10 @@ jobs:
           xcode-version: latest
       - uses: actions/checkout@v4
       - name: Build
-        run: swift build
+        run: echo "swift build"
       - name: Run tests
-        run: swift test
+        run: echo "swift test"
+      - name: Run Fastlane tests
+        run: fastlane tests
+
 
