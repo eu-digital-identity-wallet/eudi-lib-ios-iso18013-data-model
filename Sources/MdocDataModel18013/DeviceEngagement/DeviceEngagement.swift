@@ -106,6 +106,17 @@ public struct DeviceEngagement: Sendable {
 		}
 		return nil
 	}
+
+	    /// Updates the PSM value on BLE peripheral server mode device retrieval methods.
+    public mutating func updatePsm(_ psm: UInt16) {
+        guard let methods = deviceRetrievalMethods else { return }
+        deviceRetrievalMethods = methods.map { method in
+            if case let .ble(peripheralServerMode, uuid, _) = method, peripheralServerMode == true{
+                return .ble(peripheralServerMode: peripheralServerMode, uuid: uuid, psm: psm)
+            }
+            return method
+        }
+    }
 }
 
 extension DeviceEngagement: CBOREncodable {
