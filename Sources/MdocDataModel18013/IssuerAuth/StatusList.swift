@@ -16,17 +16,28 @@ limitations under the License.
 import Foundation
 import SwiftCBOR
 
-/// A struct representing a status identifier, which includes an index and a URI string.
-public struct StatusIdentifier: Codable, Sendable {
-    public init(idx: Int, uriString: String) {
+public struct Status: Decodable, Sendable {
+	public let statusList: StatusList
+
+	enum CodingKeys: String, CodingKey {
+		case statusList = "status_list"
+	}
+}
+/// A struct representing a status list, which includes an index and a URI string.
+public struct StatusList: Codable, Sendable {
+    public init(idx: Int, uri: String) {
         self.idx = idx
-        self.uriString = uriString
+        self.uri = uri
     }
+    enum CodingKeys: String, CodingKey {
+		case idx = "idx"
+		case uri = "uri"
+	}
     public let idx: Int
-    public let uriString: String
+    public let uri: String
 }
 
-extension StatusIdentifier {
+extension StatusList {
     public init?(data msoRawData: [UInt8]) {
 		guard let obj = try? CBOR.decode(msoRawData) else { return nil }
         guard case let CBOR.tagged(tag, encodedCbor) = obj,
@@ -43,8 +54,8 @@ extension StatusIdentifier {
            case let .unsignedInt(statusIndex) = statusListMap[.utf8String("idx")],
            case let .utf8String(statusUri) = statusListMap[.utf8String("uri")]
         {
-            self.idx = Int(statusIndex)
-            uriString = statusUri
+            idx = Int(statusIndex)
+            uri = statusUri
         } else { return nil }
     }
 }

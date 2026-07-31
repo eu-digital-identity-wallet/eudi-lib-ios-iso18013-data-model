@@ -50,7 +50,7 @@ public protocol DocClaimsDecodable: AgeAttesting, Identifiable, Sendable {
     /// Valid until date
     var validUntil: Date? { get }
     /// This identifier is used to check the status of the document.
-    var statusIdentifier: StatusIdentifier? { get }
+    var statusList: StatusList? { get }
     /// Secure area name for the saved credentials
     var secureAreaName: String? { get }
     /// Remaining credentials to be used for presentation. If nil, the credentials do not expire.

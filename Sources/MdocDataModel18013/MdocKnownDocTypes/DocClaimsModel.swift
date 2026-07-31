@@ -2,10 +2,10 @@
 //  DocClaimsModel.swift
 
 import Foundation
+import os
 
-/// SAFETY INVARIANT (@unchecked Sendable):
-/// This class is marked @unchecked Sendable because it contains a mutable property (credentialsUsageCounts)
-/// that may be updated after initialization. Updates to this property must be performed by external code that ensures proper synchronization.
+/// Encapsulates the claims of a document as defined in ISO 18013-5, along with associated metadata and state management for credential usage. 
+/// It serves as a base model for specific document types, providing common properties and functionality for handling claims, validity, and credential policies.
 open class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable, ObservableObject, Equatable {
     public let display: [DisplayMetadata]?
     public let issuerDisplay: [DisplayMetadata]?
@@ -14,8 +14,16 @@ open class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable, ObservableOb
     public let validFrom: Date?
     internal let _validUntil: Date?
     public var validUntil: Date? { if let uc = credentialsUsageCounts, uc.remaining <= 0 { return nil } else { return _validUntil } }
-    public let statusIdentifier: StatusIdentifier?
-    @Published public var credentialsUsageCounts: CredentialsUsageCounts?
+    public let statusList: StatusList?
+    private let credentialsUsageCountsLock: OSAllocatedUnfairLock<CredentialsUsageCounts?>
+    /// This may be updated after initialization. Access to this property is synchronized to prevent concurrent read/write data races.
+    public var credentialsUsageCounts: CredentialsUsageCounts? {
+        get { credentialsUsageCountsLock.withLock { $0 } }
+        set {
+            objectWillChange.send()
+            credentialsUsageCountsLock.withLock { $0 = newValue }
+        }
+    }
     public let credentialPolicy: CredentialPolicy
     public let secureAreaName: String?
 	public let id: String
@@ -40,9 +48,9 @@ open class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable, ObservableOb
         self.configurationIdentifier = configuration.configurationIdentifier
         self.validFrom = configuration.validFrom
         self._validUntil = configuration.validUntil
-        self.statusIdentifier = configuration.statusIdentifier
+        self.statusList = configuration.statusList
         self.secureAreaName = configuration.secureAreaName
-        self.credentialsUsageCounts = configuration.credentialsUsageCounts
+        self.credentialsUsageCountsLock = OSAllocatedUnfairLock(initialState: configuration.credentialsUsageCounts)
         self.credentialPolicy = configuration.credentialPolicy
         self.modifiedAt = configuration.modifiedAt
         self.ageOverXX = configuration.ageOverXX
@@ -63,9 +71,9 @@ open class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable, ObservableOb
     self.configurationIdentifier = configuration.configurationIdentifier
     self.validFrom = configuration.validFrom
     self._validUntil = configuration.validUntil
-    self.statusIdentifier = configuration.statusIdentifier
+    self.statusList = configuration.statusList
     self.secureAreaName = configuration.secureAreaName
-    self.credentialsUsageCounts = configuration.credentialsUsageCounts
+    self.credentialsUsageCountsLock = OSAllocatedUnfairLock(initialState: configuration.credentialsUsageCounts)
     self.credentialPolicy = configuration.credentialPolicy
     self.docType = configuration.docType
         self.docDataFormat = .cbor
@@ -107,7 +115,7 @@ extension DocClaimsModel {
             configurationIdentifier: nil,
             validFrom: nil,
             validUntil: nil,
-            statusIdentifier: nil,
+            statusList: nil,
             credentialsUsageCounts: nil,
             credentialPolicy: .oneTimeUse,
             secureAreaName: nil,

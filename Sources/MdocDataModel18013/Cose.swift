@@ -77,11 +77,13 @@ extension Cose {
 		public enum Headers : Int {
 			case keyId = 4
 			case algorithm = 1
+            case typ = 16
 		}
 
-		public let rawHeader : CBOR?
-		public let keyId : [UInt8]?
-		public let algorithm : UInt64?
+		public let rawHeader: CBOR?
+		public let keyId: [UInt8]?
+		public let algorithm: UInt64?
+        public let type: String?
 
 		// MARK: - Initializers
 		/// Initialize from CBOR
@@ -89,16 +91,18 @@ extension Cose {
 		public init?(fromBytestring cbor: CBOR){
 			guard let cborMap = cbor.decodeBytestring()?.asMap(),
 				  let alg = cborMap[Headers.algorithm]?.asUInt64() else {
-				self.init(alg: nil, isNegativeAlg: nil, keyId: nil, rawHeader: cbor)
+                self.init(alg: nil, isNegativeAlg: nil, keyId: nil, type: nil, rawHeader: cbor)
 				return
 			}
-			self.init(alg: alg, isNegativeAlg: nil, keyId: cborMap[Headers.keyId]?.asBytes(), rawHeader: cbor)
+            let type = cborMap[Headers.typ]?.asString()
+            self.init(alg: alg, isNegativeAlg: nil, keyId: cborMap[Headers.keyId]?.asBytes(), type: type, rawHeader: cbor)
 		}
 
-		public init?(alg: UInt64?, isNegativeAlg: Bool?, keyId: [UInt8]?, rawHeader : CBOR? = nil){
+        public init?(alg: UInt64?, isNegativeAlg: Bool?, keyId: [UInt8]?, type: String? = nil, rawHeader : CBOR? = nil){
 			guard alg != nil || rawHeader != nil else { return nil }
 			self.algorithm = alg
 			self.keyId = keyId
+            self.type = type
 			func algCbor() -> CBOR { isNegativeAlg! ? .negativeInt(alg!) : .unsignedInt(alg!) }
 			self.rawHeader = rawHeader ?? .byteString(CBOR.map([.unsignedInt(UInt64(Headers.algorithm.rawValue)) : algCbor()]).encode())
 		}

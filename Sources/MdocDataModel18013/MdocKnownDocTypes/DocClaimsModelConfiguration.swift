@@ -14,7 +14,7 @@ public struct DocClaimsModelConfiguration {
     public let configurationIdentifier: String?
     public let validFrom: Date?
     public let validUntil: Date?
-    public let statusIdentifier: StatusIdentifier?
+    public let statusList: StatusList?
     public let credentialsUsageCounts: CredentialsUsageCounts?
     public let credentialPolicy: CredentialPolicy
     public let secureAreaName: String?
@@ -36,7 +36,7 @@ public struct DocClaimsModelConfiguration {
         configurationIdentifier: String?,
         validFrom: Date?,
         validUntil: Date?,
-        statusIdentifier: StatusIdentifier?,
+        statusList: StatusList?,
         credentialsUsageCounts: CredentialsUsageCounts?,
         credentialPolicy: CredentialPolicy,
         secureAreaName: String?,
@@ -57,7 +57,7 @@ public struct DocClaimsModelConfiguration {
         self.configurationIdentifier = configurationIdentifier
         self.validFrom = validFrom
         self.validUntil = validUntil
-        self.statusIdentifier = statusIdentifier
+        self.statusList = statusList
         self.credentialsUsageCounts = credentialsUsageCounts
         self.credentialPolicy = credentialPolicy
         self.secureAreaName = secureAreaName

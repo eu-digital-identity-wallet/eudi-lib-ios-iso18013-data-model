@@ -14,7 +14,7 @@ let package = Package(
             targets: ["MdocDataModel18013"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/niscy-eudiw/SwiftCBOR.git", from: "0.6.4"),
+        .package(url: "https://github.com/niscy-eudiw/SwiftCBOR.git", from: "0.6.5"),
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "5.0.1"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.10.1"),
 		.package(url: "https://github.com/eu-digital-identity-wallet/SwiftCopyableMacro.git", from: "0.0.5"),
@@ -32,7 +32,11 @@ let package = Package(
                 .product(name: "SwiftyJSON", package: "SwiftyJSON"),
                 .product(name: "Logging", package: "swift-log"),
 				.product(name: "Copyable", package: "SwiftCopyableMacro"),
-                ]
+                ],
+             swiftSettings: [
+                .enableUpcomingFeature("InferIsolatedConformances"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault")
+            ]
             ),
         .testTarget(
             name: "MdocDataModel18013Tests",

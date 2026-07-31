@@ -20,9 +20,9 @@ import SwiftCBOR
 /// Reader authentication structure encoded as Cose Sign1
 public struct ReaderAuth: Sendable {
 	/// encoded data
-    let coseSign1: Cose
+    public let coseSign1: Cose
 	/// one or more certificates
-	let x5chain: [[UInt8]]
+	public let x5chain: [[UInt8]]
 }
 
 extension ReaderAuth: CBORDecodable {

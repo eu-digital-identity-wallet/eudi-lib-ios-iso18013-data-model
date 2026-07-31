@@ -22,18 +22,18 @@ import SwiftCBOR
 public struct IssuerAuth: Sendable {
 	public let mso: MobileSecurityObject
 	public let msoRawData: [UInt8]
-    public let statusIdentifier: StatusIdentifier?
+    public let statusList: StatusList?
 	public let verifyAlgorithm: Cose.VerifyAlgorithm
 	public let signature: Data
 	public let x5chain: [[UInt8]]
 
-	public init(mso: MobileSecurityObject, msoRawData: [UInt8], verifyAlgorithm: Cose.VerifyAlgorithm, signature: Data, x5chain: [[UInt8]], statusIdentifier: StatusIdentifier?) {
+	public init(mso: MobileSecurityObject, msoRawData: [UInt8], verifyAlgorithm: Cose.VerifyAlgorithm, signature: Data, x5chain: [[UInt8]], statusList: StatusList?) {
 		self.mso = mso
 		self.msoRawData = msoRawData
 		self.verifyAlgorithm = verifyAlgorithm
 		self.signature = signature
 		self.x5chain = x5chain
-        self.statusIdentifier = statusIdentifier
+        self.statusList = statusList
 	}
 }
 
@@ -52,7 +52,7 @@ extension IssuerAuth: CBORDecodable {
 		msoRawData = msoBytes
 		verifyAlgorithm = verificationAlgorithm
 		signature = cose.signature
-		statusIdentifier = StatusIdentifier(data: msoBytes)
+		statusList = StatusList(data: msoBytes)
 
 		guard let unprotectedHeader = cose.unprotectedHeader?.rawHeader,
 			  case let .map(unprotectedHeaderMap) = unprotectedHeader
