@@ -16,12 +16,15 @@ limitations under the License.
 
 import Foundation
 
-/// A logger for transactions.
-///
-/// Implementations of this protocol should log transactions to some persistent storage.
-/// The storage can be a file, a database, or any other storage medium.
-public protocol TransactionLogger: Actor {
-    /// Stores or updates an entry by `transactionIdentifier`.
-    /// Repeated calls for the same identifier replace the previous snapshot.
-    func log(transaction: TransactionEntry) async throws
+/// A pseudonym. Used by pseudonym transaction types.
+public struct Pseudonym: Codable, Equatable, Sendable {
+    public init(value: String, alias: String? = nil) {
+        self.value = value
+        self.alias = alias
+    }
+
+    /// The pseudonym value.
+    public let value: String
+    /// An optional friendly name.
+    public let alias: String?
 }

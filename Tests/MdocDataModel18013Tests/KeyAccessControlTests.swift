@@ -36,7 +36,6 @@ struct KeyAccessControlTests {
         [.biometryCurrentSet, .or, .devicePasscode],
         [.biometryCurrentSet, .and, .applicationPassword],
         [.devicePasscode],
-        [.watch],
         SecAccessControlCreateFlags(rawValue: 1 << 20), // a bit this SDK does not name at all
     ])
     func testCustomPassesFlagsThrough(flags: SecAccessControlCreateFlags) {

@@ -1,0 +1,386 @@
+{
+	"TransactionLog": [
+		{
+			"transactionType": "CredentialIssuance",
+			"transactionIdentifier": "f354973e-88e2-47cc-a0e2-e70ae6716b7b",
+			"time": "2026-06-16T16:45:02Z",
+			"transactionResult": "Completed",
+			"credentialNumberRequested": 2,
+			"credentialNumberIssued": 2,
+			"credentialIdentifier": [
+				"eu.europa.ec.eudi.pid.1",
+				"urn:eudi:pid:1"
+			],
+			"isUserTriggered": true,
+			"interactingPartyName": {
+				"lang": "en",
+				"content": "Digital Credentials Issuer"
+			}
+		},
+		{
+			"transactionType": "CredentialIssuance",
+			"transactionIdentifier": "deferred:_7BEDJeslLXf",
+			"time": "2026-06-16T16:46:05Z",
+			"transactionResult": "Completed",
+			"credentialNumberRequested": 1,
+			"credentialNumberIssued": 1,
+			"credentialIdentifier": [
+				"eu.europa.ec.eudi.pid.1"
+			],
+			"interactingPartyName": {
+				"lang": "en",
+				"content": "Digital Credentials Issuer"
+			}
+		},
+		{
+			"transactionType": "CredentialIssuance",
+			"transactionIdentifier": "044ea0a1-d658-4de6-8159-de4acac9bc30",
+			"time": "2026-06-16T16:46:44Z",
+			"transactionResult": "Completed",
+			"credentialNumberRequested": 1,
+			"credentialNumberIssued": 1,
+			"credentialIdentifier": [
+				"org.iso.18013.5.1.mDL"
+			],
+			"isUserTriggered": true,
+			"interactingPartyName": {
+				"lang": "en",
+				"content": "Digital Credentials Issuer"
+			}
+		},
+		{
+			"transactionType": "CredentialIssuance",
+			"transactionIdentifier": "fd99f516-5536-43fa-8eb2-d03c95a1c73a",
+			"time": "2026-06-16T16:47:52Z",
+			"transactionResult": "Completed",
+			"credentialNumberRequested": 1,
+			"credentialNumberIssued": 1,
+			"credentialIdentifier": [
+				"org.iso.23220.2.photoid.1"
+			],
+			"isUserTriggered": true,
+			"interactingPartyName": {
+				"lang": "en",
+				"content": "Digital Credentials Issuer"
+			}
+		},
+		{
+			"transactionType": "CredentialIssuance",
+			"transactionIdentifier": "3c54f872-ef2e-482c-a459-c39a85182fb5",
+			"time": "2026-06-16T16:48:23Z",
+			"transactionResult": "Completed",
+			"credentialNumberRequested": 1,
+			"credentialNumberIssued": 1,
+			"credentialIdentifier": [
+				"org.iso.23220.2.photoid.1"
+			],
+			"isUserTriggered": true,
+			"interactingPartyName": {
+				"lang": "en",
+				"content": "Digital Credentials Issuer"
+			}
+		},
+		{
+			"transactionType": "CredentialDeletion",
+			"transactionIdentifier": "bb9feb2e-fb2f-47ba-a8a0-5287e3c35416",
+			"time": "2026-06-16T16:49:03Z",
+			"transactionResult": "Completed",
+			"credentialIdentifier": "org.iso.23220.2.photoid.1",
+			"credentialIssuerName": {
+				"lang": "en",
+				"content": "Digital Credentials Issuer"
+			}
+		},
+		{
+			"transactionType": "Presentation",
+			"transactionIdentifier": "a10e0c20-5653-4e5f-8ee7-dc69f0aef431",
+			"time": "2026-06-16T16:54:12Z",
+			"transactionResult": "Completed",
+			"listOfClaimsRequested": [
+				{
+					"credentialIdentifier": "eu.europa.ec.eudi.pid.1",
+					"claims": [
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"family_name"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"given_name"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"birth_date"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"issuing_authority"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"issuing_country"
+						]
+					]
+				},
+				{
+					"credentialIdentifier": "eu.europa.ec.eudi.pid.1",
+					"claims": [
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"family_name"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"given_name"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"birth_date"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"issuing_authority"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"issuing_country"
+						]
+					]
+				}
+			],
+			"listOfClaimsPresented": [
+				{
+					"credentialIdentifier": "eu.europa.ec.eudi.pid.1",
+					"claims": [
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"family_name"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"given_name"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"birth_date"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"issuing_authority"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"issuing_country"
+						]
+					]
+				}
+			],
+			"interactingPartyType": "ServiceProvider",
+			"interactingPartyName": {
+				"lang": "en",
+				"content": "EUDI Remote Verifier"
+			}
+		},
+		{
+			"transactionType": "Presentation",
+			"transactionIdentifier": "f89fc4b7-3ac9-4fc8-98c4-7750533b19d3",
+			"time": "2026-06-16T16:54:40Z",
+			"transactionResult": "Completed",
+			"listOfClaimsRequested": [
+				{
+					"credentialIdentifier": "eu.europa.ec.eudi.pid.1",
+					"claims": [
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"family_name"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"given_name"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"birth_date"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"issuing_authority"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"issuing_country"
+						]
+					]
+				},
+				{
+					"credentialIdentifier": "eu.europa.ec.eudi.pid.1",
+					"claims": [
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"family_name"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"given_name"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"birth_date"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"issuing_authority"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"issuing_country"
+						]
+					]
+				}
+			],
+			"listOfClaimsPresented": [
+				{
+					"credentialIdentifier": "eu.europa.ec.eudi.pid.1",
+					"claims": [
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"family_name"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"given_name"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"birth_date"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"issuing_authority"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"issuing_country"
+						]
+					]
+				}
+			],
+			"interactingPartyType": "ServiceProvider",
+			"interactingPartyName": {
+				"lang": "en",
+				"content": "EUDI Remote Verifier"
+			}
+		},
+		{
+			"transactionType": "SigningSealing",
+			"transactionIdentifier": "0ccc6d9d-612d-4255-a232-1fe52f74953a",
+			"time": "2026-06-16T16:54:49Z",
+			"transactionResult": "Completed",
+			"interactingPartyType": "ESigESealCreationProvider",
+			"signingTransactionIdentifier": "b2892ab5-4ecc-4ce3-a560-ef4a31469f6c",
+			"certificateIdentifier": "110487404804385887857364854113372412110212615551",
+			"dtbsr": "8P5HbYEKfAVPSz0qUcct8UWArsuXt48NrC3tJanD75s=",
+			"fileName": "dummy_1.pdf",
+			"fileSize": "58399",
+			"interactingPartyName": {
+				"lang": "en",
+				"content": "Wallet-Centric"
+			}
+		},
+		{
+			"transactionType": "Presentation",
+			"transactionIdentifier": "863ea656-3769-4cc1-9797-2a46b590516c",
+			"time": "2026-06-16T17:00:44Z",
+			"transactionResult": "Completed",
+			"listOfClaimsRequested": [
+				{
+					"credentialIdentifier": "eu.europa.ec.eudi.pid.1",
+					"claims": [
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"family_name"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"given_name"
+						]
+					]
+				},
+				{
+					"credentialIdentifier": "eu.europa.ec.eudi.pid.1",
+					"claims": [
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"family_name"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"given_name"
+						]
+					]
+				}
+			],
+			"listOfClaimsPresented": [
+				{
+					"credentialIdentifier": "eu.europa.ec.eudi.pid.1",
+					"claims": [
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"family_name"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"given_name"
+						]
+					]
+				}
+			],
+			"interactingPartyType": "ServiceProvider",
+			"interactingPartyName": {
+				"lang": "en",
+				"content": "EUDI Remote Verifier"
+			}
+		},
+		{
+			"transactionType": "Presentation",
+			"transactionIdentifier": "f7e57788-3d03-4f4e-9c58-2aeb4eaab913",
+			"time": "2026-06-16T17:01:09Z",
+			"transactionResult": "NotCompleted",
+			"reasonOfNoncompletion": "Presentation stopped before completion",
+			"listOfClaimsRequested": [
+				{
+					"credentialIdentifier": "eu.europa.ec.eudi.pid.1",
+					"claims": [
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"family_name"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"given_name"
+						]
+					]
+				},
+				{
+					"credentialIdentifier": "eu.europa.ec.eudi.pid.1",
+					"claims": [
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"family_name"
+						],
+						[
+							"eu.europa.ec.eudi.pid.1",
+							"given_name"
+						]
+					]
+				}
+			],
+			"listOfClaimsPresented": [],
+			"interactingPartyType": "ServiceProvider",
+			"interactingPartyName": {
+				"lang": "en",
+				"content": "EUDI Remote Verifier"
+			}
+		}
+	]
+}
