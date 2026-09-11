@@ -17,13 +17,8 @@ jobs:
     steps:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: latest
-      - uses: actions/checkout@v4
-      - name: Build
-        run: echo "swift build"
-      - name: Run tests
-        run: echo "swift test"
+          xcode-version: latest-stable
+      - uses: actions/checkout@v7
       - name: Run Fastlane tests
         run: fastlane tests
-
 
