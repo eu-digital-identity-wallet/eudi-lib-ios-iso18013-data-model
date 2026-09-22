@@ -18,40 +18,36 @@ limitations under the License.
 
 import Foundation
 
-/// A model representing the claims of a European Personal Identification (EuPid) document, conforming to the ISO 18013-5 standard. 
+/// A model representing the claims of a European Personal Identification (EuPid) document, conforming to the ISO 18013-5 standard.
 public final class EuPidModel: DocClaimsModel, @unchecked Sendable {
 	public static let euPidDocType: String = "eu.europa.ec.eudi.pid.1"
 
 	public let family_name: String?
 	public let given_name: String?
 	public let birth_date: String?
-	public let family_name_birth: String?
-	public let given_name_birth: String?
-	public let birth_place: String?
-	public let birth_country: String?
-	public let birth_state: String?
-	public let birth_city: String?
+	public let place_of_birth: [String: String]?
+	public let nationality: [String]?
+	public let portrait: [UInt8]?
 	public let resident_address: String?
+	public let resident_country: String?
+	public let resident_state: String?
 	public let resident_city: String?
 	public let resident_postal_code: String?
-	public let resident_state: String?
-	public let resident_country: String?
 	public let resident_street: String?
-	public let resident_house_number: String?
+	public let personal_administrative_number: String?
+	public let family_name_birth: String?
+	public let given_name_birth: String?
 	public let sex: UInt64?
-	public let nationality: [String]?
-	public let age_in_years: UInt64?
-	public let age_birth_year: UInt64?
+	public let email_address: String?
+	public let mobile_phone_number: String?
 	public let expiry_date: String?
 	public let issuing_authority: String?
-	public let issuance_date: String?
-	public let document_number: String?
-	public let personal_administrative_number: String?
 	public let issuing_country: String?
+	public let document_number: String?
 	public let issuing_jurisdiction: String?
-    public let email_address: String?
-    public let mobile_phone_number: String?
-    public let trust_anchor: String?
+	public let issuance_date: String?
+	public let trust_anchor: String?
+	public let attestation_legal_category: String?
 
 	public enum CodingKeys: String, CodingKey, CaseIterable {
         case credentialIssuerIdentifier
@@ -60,38 +56,34 @@ public final class EuPidModel: DocClaimsModel, @unchecked Sendable {
 		case family_name
 		case given_name
 		case birth_date
-		case family_name_birth
-		case given_name_birth
-		case birth_place
-		case birth_country
-		case birth_state
-		case birth_city
+		case place_of_birth
+		case nationality
+		case portrait
 		case resident_address
+		case resident_country
+		case resident_state
 		case resident_city
 		case resident_postal_code
-		case resident_state
-		case resident_country
 		case resident_street
-		case resident_house_number
+		case personal_administrative_number
+		case family_name_birth
+		case given_name_birth
 		case sex
-		case nationality
-		case age_in_years
-		case age_birth_year
+		case email_address
+		case mobile_phone_number
 		case expiry_date
 		case issuing_authority
-		case issuance_date
-		case document_number
-		case personal_administrative_number
 		case issuing_country
+		case document_number
 		case issuing_jurisdiction
-        case email_address
-        case mobile_phone_number
-        case trust_anchor
+		case issuance_date
+		case trust_anchor
+		case attestation_legal_category
 	}
 	static var mandatoryElementCodingKeys: [CodingKeys] {
-		[.family_name, .given_name, .birth_date, .birth_place, .nationality]
+		[.family_name, .given_name, .birth_date, .place_of_birth, .nationality, .portrait, .issuing_authority, .issuing_country]
 	}
-    public static var pidMandatoryElementKeys: [DataElementIdentifier] { ["age_over_18"] + mandatoryElementCodingKeys.map(\.rawValue) }
+	public static var pidMandatoryElementKeys: [DataElementIdentifier] { mandatoryElementCodingKeys.map(\.rawValue) }
 	public var mandatoryElementKeys: [DataElementIdentifier] { Self.pidMandatoryElementKeys }
 
 	public override init?(configuration: DocClaimsModelConfiguration, issuerSigned: IssuerSigned, displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) {
@@ -100,36 +92,32 @@ public final class EuPidModel: DocClaimsModel, @unchecked Sendable {
 		guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned) else { return nil }
 		func getValue<T>(key: EuPidModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems, string: key.rawValue) }
 
-        family_name = getValue(key: .family_name)
+		family_name = getValue(key: .family_name)
 		given_name = getValue(key: .given_name)
 		birth_date = getValue(key: .birth_date)
-		family_name_birth = getValue(key: .family_name_birth)
-		given_name_birth = getValue(key: .given_name_birth)
-		birth_place = getValue(key: .birth_place)
-		birth_country = getValue(key: .birth_country)
-		birth_state = getValue(key: .birth_state)
-		birth_city = getValue(key: .birth_city)
+		place_of_birth = Self.getPlaceOfBirth(from: nameSpaceItems)
+		nationality = getValue(key: .nationality)
+		portrait = getValue(key: .portrait)
 		resident_address = getValue(key: .resident_address)
+		resident_country = getValue(key: .resident_country)
+		resident_state = getValue(key: .resident_state)
 		resident_city = getValue(key: .resident_city)
 		resident_postal_code = getValue(key: .resident_postal_code)
-		resident_state = getValue(key: .resident_state)
-		resident_country = getValue(key: .resident_country)
 		resident_street = getValue(key: .resident_street)
-		resident_house_number = getValue(key: .resident_house_number)
+		personal_administrative_number = getValue(key: .personal_administrative_number)
+		family_name_birth = getValue(key: .family_name_birth)
+		given_name_birth = getValue(key: .given_name_birth)
 		sex = getValue(key: .sex)
-		nationality = getValue(key: .nationality)
-		age_in_years = getValue(key: .age_in_years)
-		age_birth_year = getValue(key: .age_birth_year)
+		email_address = getValue(key: .email_address)
+		mobile_phone_number = getValue(key: .mobile_phone_number)
 		expiry_date = getValue(key: .expiry_date)
 		issuing_authority = getValue(key: .issuing_authority)
-		issuance_date = getValue(key: .issuance_date)
-		document_number = getValue(key: .document_number)
-        personal_administrative_number = getValue(key: .personal_administrative_number)
 		issuing_country = getValue(key: .issuing_country)
+		document_number = getValue(key: .document_number)
 		issuing_jurisdiction = getValue(key: .issuing_jurisdiction)
-        email_address = getValue(key: .email_address)
-        mobile_phone_number = getValue(key: .mobile_phone_number)
-        trust_anchor = getValue(key: .trust_anchor)
+		issuance_date = getValue(key: .issuance_date)
+		trust_anchor = getValue(key: .trust_anchor)
+		attestation_legal_category = getValue(key: .attestation_legal_category)
 
 		let extracted = Self.extractClaimsAndAgeValues(from: nameSpaceItems, displayNames: displayNames, mandatory: mandatory)
         // Call superclass initializer
@@ -157,5 +145,24 @@ public final class EuPidModel: DocClaimsModel, @unchecked Sendable {
 				nameSpaces: extracted.nameSpaces
 			)
 		)
+	}
+
+	private static func getPlaceOfBirth(from nameSpaceItems: [NameSpace: [IssuerSignedItem]]) -> [String: String]? {
+		guard let item = nameSpaceItems.values
+			.lazy
+			.flatMap({ $0 })
+			.first(where: { $0.elementIdentifier == CodingKeys.place_of_birth.rawValue }),
+			case .map(let values) = item.elementValue
+		else { return nil }
+
+		let allowedKeys = Set(["country", "region", "locality"])
+		let placeOfBirth = values.reduce(into: [String: String]()) { result, entry in
+			guard case .utf8String(let key) = entry.key,
+				allowedKeys.contains(key),
+				case .utf8String(let value) = entry.value
+			else { return }
+			result[key] = value
+		}
+		return placeOfBirth.isEmpty ? nil : placeOfBirth
 	}
 }
