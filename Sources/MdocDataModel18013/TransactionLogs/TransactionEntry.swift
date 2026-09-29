@@ -250,7 +250,8 @@ public enum TransactionEntry: Codable, Equatable, Sendable {
             privacyPolicy: [Policy]? = nil,
             dpaName: MultiLangString? = nil,
             dpaCountry: MultiLangString? = nil,
-            dpaContact: [String]? = nil
+            dpaContact: [String]? = nil,
+            transactionalData: TransactionalData? = nil
         ) {
             self.transactionIdentifier = transactionIdentifier
             self.time = time
@@ -272,6 +273,7 @@ public enum TransactionEntry: Codable, Equatable, Sendable {
             self.dpaName = dpaName
             self.dpaCountry = dpaCountry
             self.dpaContact = dpaContact
+            self.transactionalData = transactionalData
         }
 
         public let transactionIdentifier: String
@@ -294,13 +296,15 @@ public enum TransactionEntry: Codable, Equatable, Sendable {
         public let dpaName: MultiLangString?
         public let dpaCountry: MultiLangString?
         public let dpaContact: [String]?
+        /// Transaction information retained with the user's decision, including declined requests.
+        public let transactionalData: TransactionalData?
 
         private enum CodingKeys: String, CodingKey {
             case transactionIdentifier, time, transactionResult, reasonOfNoncompletion
             case listOfClaimsRequested, listOfClaimsPresented
             case interactingPartyType, interactingPartyName, interactingPartyIdentifier, interactingPartyContact
             case isIntermediary, intermediaryIdentifier, intermediaryName, intermediaryContact
-            case registrarURL, purpose, privacyPolicy, dpaName, dpaCountry, dpaContact
+            case registrarURL, purpose, privacyPolicy, dpaName, dpaCountry, dpaContact, transactionalData
         }
 
         // Swift's Codable synthesis doesn't use decodeIfPresent for Optional property-wrapped
@@ -327,6 +331,7 @@ public enum TransactionEntry: Codable, Equatable, Sendable {
             dpaName = try container.decodeIfPresent(MultiLangString.self, forKey: .dpaName)
             dpaCountry = try container.decodeIfPresent(MultiLangString.self, forKey: .dpaCountry)
             dpaContact = try container.decodeIfPresent([String].self, forKey: .dpaContact)
+            transactionalData = try container.decodeIfPresent(TransactionalData.self, forKey: .transactionalData)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -351,6 +356,7 @@ public enum TransactionEntry: Codable, Equatable, Sendable {
             try container.encodeIfPresent(dpaName, forKey: .dpaName)
             try container.encodeIfPresent(dpaCountry, forKey: .dpaCountry)
             try container.encodeIfPresent(dpaContact, forKey: .dpaContact)
+            try container.encodeIfPresent(transactionalData, forKey: .transactionalData)
         }
     }
 
