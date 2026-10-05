@@ -46,15 +46,17 @@ extension Cose {
 
 	/// ECDSA Algorithm Values defined in
 	///
-	/// Table1 in rfc/rfc8152#section-16.2
+	/// RFC 8152, Section 8.1 and RFC 9864, Section 2.1.
+	/// Raw values use CBOR negative-integer encoding: the COSE value is -1 - rawValue.
 	public enum VerifyAlgorithm: UInt64, Sendable {
 		case es256 = 6 //-7 ECDSA w/ SHA-256
+		case esp256 = 8 //-9 ECDSA using P-256 w/ SHA-256
 		case es384 = 34 //-35 ECDSA w/ SHA-384
 		case es512 = 35//-36 ECDSA w/ SHA-512
 
         public var signingAlgorithm: SigningAlgorithm {
             switch self {
-            case .es256: return .ES256
+            case .es256, .esp256: return .ES256
             case .es384: return .ES384
             case .es512: return .ES512
             }
