@@ -71,6 +71,20 @@ struct MdocDataModel18013Tests {
         #expect(dps2[1].vehicleCategoryCode == "B");  #expect(dps2[1].issueDate == "2017-02-23");  #expect(dps2[1].expiryDate == "2024-10-20")
     }
 
+	@Test func coseESP256PreservesProtectedHeader() throws {
+		// A1 01 28 is the CBOR encoding of {1: -9}.
+		let protectedHeader = CBOR.byteString([0xA1, 0x01, 0x28])
+		let cbor = CBOR.array([protectedHeader, .map([:]), .byteString([0x01]), .byteString([0x02])])
+		let cose = try #require(Cose(type: .sign1, cbor: cbor))
+		#expect(cose.verifyAlgorithm == .esp256)
+		#expect(cose.verifyAlgorithm?.signingAlgorithm == .ES256)
+		#expect(cose.toCBOR(options: CBOROptions()) == cbor)
+		let signatureStruct = try #require(cose.signatureStruct)
+		#expect(try CBOR.decode(signatureStruct.bytes) == .array([
+			.utf8String("Signature1"), protectedHeader, .byteString([]), .byteString([0x01])
+		]))
+	}
+
 	@Test func decodeIssuerAuth() throws {
 		let ia = try IssuerAuth(data: AnnexdTestData.d52.bytes)
 		#expect(ia.mso.digestAlgorithm == "SHA-256")
