@@ -163,7 +163,7 @@ extension Cose {
 	///  - type: Cose message type
 	///  - cbor: CBOR representation of the cose message
 	public init?(type: CoseType, cbor: SwiftCBOR.CBOR) {
-		guard let coseList = cbor.asList(), let protectedHeader = CoseHeader(fromBytestring: coseList[0]),
+		guard let coseList = cbor.asList(), coseList.count == 4, let protectedHeader = CoseHeader(fromBytestring: coseList[0]),
 			  let signature = coseList[3].asBytes() else { return nil }
 
 		self.protectedHeader = protectedHeader
