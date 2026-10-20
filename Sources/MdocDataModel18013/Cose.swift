@@ -29,7 +29,7 @@ extension Cose {
 		case mac0 = "MAC0"
 		/// Idenntifies Cose Message Type from input data
 		static func from(data: Data) -> (CoseType, [CBOR])? {
-			guard let cose = try? MdocCBOR.decode(data.bytes)?.asCose() else {
+			guard let cose = try? CBOR.decode(data.bytes, options: CBOROptions(maximumDepth: CBOR.maximumDepth))?.asCose() else {
 				return nil
 			}
 

@@ -13,11 +13,11 @@ struct SecurityFinding7Tests {
             [0xbb, 0x7f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff],
             [0x9f, 0x81]
         ] {
-            #expect(throws: MdocValidationError.self) { try MdocCBOR.decode(bytes) }
+            #expect(throws: CBORError.self) { try CBOR.decode(bytes, options: CBOROptions(maximumDepth: CBOR.maximumDepth)) }
         }
-        #expect(try MdocCBOR.decode([0x82, 0, 1]) == .array([0, 1]))
-        #expect(try MdocCBOR.decode([0x9f, 0, 1, 0xff]) == .array([0, 1]))
-        #expect(try MdocCBOR.decode(Array(repeating: 0x81, count: 64) + [0]) != nil)
+        #expect(try CBOR.decode([0x82, 0, 1], options: CBOROptions(maximumDepth: CBOR.maximumDepth)) == .array([0, 1]))
+        #expect(try CBOR.decode([0x9f, 0, 1, 0xff], options: CBOROptions(maximumDepth: CBOR.maximumDepth)) == .array([0, 1]))
+        #expect(try CBOR.decode(Array(repeating: 0x81, count: 64) + [0], options: CBOROptions(maximumDepth: CBOR.maximumDepth)) != nil)
     }
     @Test func embeddedBytesUseSameBound() {
         let bytes = Array(repeating: UInt8(0x81), count: 66) + [0]

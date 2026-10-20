@@ -37,7 +37,7 @@ public struct ZkDocument: Sendable {
 
     /// Initializes a proof and its exact encoded public input without re-encoding it.
     public init(documentDataBytes: [UInt8], proof: Data) throws(MdocValidationError) {
-        guard let cbor = try? MdocCBOR.decode(documentDataBytes) else { throw .invalidCbor("ZkDocument documentData") }
+        guard let cbor = try? CBOR.decode(documentDataBytes, options: CBOROptions(maximumDepth: CBOR.maximumDepth)) else { throw .invalidCbor("ZkDocument documentData") }
         self.documentData = try ZkDocumentData(cbor: cbor)
         self.documentDataBytes = documentDataBytes
         self.proof = proof

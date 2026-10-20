@@ -74,7 +74,7 @@ public struct DeviceEngagement: Sendable {
 	}
 	/// initialize from cbor data
 	public init(data: [UInt8]) throws {
-		guard let obj = try? MdocCBOR.decode(data) else { throw MdocValidationError.invalidCbor("device engagement") }
+		guard let obj = try? CBOR.decode(data, options: CBOROptions(maximumDepth: CBOR.maximumDepth)) else { throw MdocValidationError.invalidCbor("device engagement") }
 		try self.init(cbor: obj)
 	}
 

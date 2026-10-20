@@ -153,12 +153,14 @@ extension CBOREncodable {
 
 extension CBORDecodable {
 	public init(data: [UInt8]) throws {
-		guard let obj = try MdocCBOR.decode(data) else { throw MdocValidationError.cborDecodingError }
+		guard let obj = try CBOR.decode(data, options: CBOROptions(maximumDepth: CBOR.maximumDepth)) else { throw MdocValidationError.cborDecodingError }
 		try self.init(cbor: obj)
 	}
 }
 
 extension CBOR {
+    static let maximumDepth = 64
+
 	public func decodeTaggedBytes() -> [UInt8]? {
 		guard case let CBOR.tagged(tag, encodedCbor) = self,
 			  tag == .encodedCBORDataItem,
@@ -261,7 +263,7 @@ extension CBOR {
 
 	public func decodeBytestring() -> CBOR? {
 		guard let bytestring = self.asBytes(),
-			  let decoded = try? MdocCBOR.decode(bytestring) else {
+			  let decoded = try? CBOR.decode(bytestring, options: CBOROptions(maximumDepth: CBOR.maximumDepth)) else {
 			return nil
 		}
 		return decoded
