@@ -76,7 +76,7 @@ extension ZkDocument: CBORDecodable {
             throw .invalidCbor("ZkDocument")
         }
         // Decode the nested CBOR
-        guard let decodedCBOR = try? CBOR.decode([UInt8](encodedBytes)) else { throw .invalidCbor("ZkDocument") }
+        guard let decodedCBOR = try? CBOR.decode([UInt8](encodedBytes), options: CBOROptions(maximumDepth: CBOR.maximumDepth)) else { throw .invalidCbor("ZkDocument") }
         let documentData = try ZkDocumentData(cbor: decodedCBOR)
         self.init(documentData: documentData, proof: Data(proofBytes))
     }

@@ -58,12 +58,12 @@ public struct MobileSecurityObject: Sendable {
 extension MobileSecurityObject: CBORDecodable {
 	public init(data: [UInt8]) throws(MdocValidationError) {
 		// MobileSecurityObjectBytes = #6.24(bstr .cbor MobileSecurityObject)
-		guard let obj = try? CBOR.decode(data) else { throw .invalidCbor("mobile security object") }
+		guard let obj = try? CBOR.decode(data, options: CBOROptions(maximumDepth: CBOR.maximumDepth)) else { throw .invalidCbor("mobile security object") }
 		guard case let CBOR.tagged(tag, encodedCbor) = obj,
 			  tag == .encodedCBORDataItem,
 			  case let .byteString(encodedBytes) = encodedCbor
 		else { throw .invalidCbor("mobile security object") }
-		guard let cbor = try? CBOR.decode(encodedBytes) else { throw .invalidCbor("mobile security object") }
+		guard let cbor = try? CBOR.decode(encodedBytes, options: CBOROptions(maximumDepth: CBOR.maximumDepth)) else { throw .invalidCbor("mobile security object") }
 		try self.init(cbor: cbor)
 	}
 
