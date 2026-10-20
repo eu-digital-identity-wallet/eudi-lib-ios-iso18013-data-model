@@ -26,9 +26,20 @@ import OrderedCollections
 public struct ZkDocument: Sendable {
     public let documentData: ZkDocumentData
     public let proof: Data
+    /// Exact encoded document data covered by the proof. Verifiers must use these bytes.
+    public let documentDataBytes: [UInt8]
 
     public init(documentData: ZkDocumentData, proof: Data) {
         self.documentData = documentData
+        self.proof = proof
+        self.documentDataBytes = documentData.toCBOR(options: CBOROptions()).encode()
+    }
+
+    /// Initializes a proof and its exact encoded public input without re-encoding it.
+    public init(documentDataBytes: [UInt8], proof: Data) throws(MdocValidationError) {
+        guard let cbor = try? CBOR.decode(documentDataBytes) else { throw .invalidCbor("ZkDocument documentData") }
+        self.documentData = try ZkDocumentData(cbor: cbor)
+        self.documentDataBytes = documentDataBytes
         self.proof = proof
     }
 }
@@ -45,9 +56,8 @@ extension ZkDocument: CBOREncodable {
         var map: OrderedDictionary<CBOR,CBOR> = [:]
         map[CBOR.utf8String("proof")] = CBOR.byteString([UInt8](proof))
 
-        // Encode documentData to CBOR bytes and wrap in tagged CBOR
-        let documentDataCBOR = documentData.toCBOR(options: options)
-        let encodedDocumentData = documentDataCBOR.encode()
+        // Retain the exact proof-covered encoding, including unknown fields and map order.
+        let encodedDocumentData = documentDataBytes
 		let taggedDocumentData = CBOR.tagged(.encodedCBORDataItem, CBOR.byteString([UInt8](encodedDocumentData)))
 		map[CBOR.utf8String("documentData")] = taggedDocumentData
         return CBOR.map(map)
@@ -75,10 +85,7 @@ extension ZkDocument: CBORDecodable {
         guard case let .tagged(tag, .byteString(encodedBytes)) = documentDataCBOR, tag == .encodedCBORDataItem else {
             throw .invalidCbor("ZkDocument")
         }
-        // Decode the nested CBOR
-        guard let decodedCBOR = try? CBOR.decode([UInt8](encodedBytes)) else { throw .invalidCbor("ZkDocument") }
-        let documentData = try ZkDocumentData(cbor: decodedCBOR)
-        self.init(documentData: documentData, proof: Data(proofBytes))
+        try self.init(documentDataBytes: encodedBytes, proof: Data(proofBytes))
     }
 }
 
