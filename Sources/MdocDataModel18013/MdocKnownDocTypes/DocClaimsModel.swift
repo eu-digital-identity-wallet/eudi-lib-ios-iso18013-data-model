@@ -79,7 +79,9 @@ open class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable, ObservableOb
         self.docDataFormat = .cbor
         self.hashingAlg = nil
 		if let nameSpaceItems = Self.getCborSignedItems(issuerSigned) {
-            let extracted = Self.extractClaimsAndAgeValues(from: nameSpaceItems, displayNames: displayNames, mandatory: mandatory)
+            let ageNamespace = configuration.docType == IsoMdlModel.isoDocType ? IsoMdlModel.isoNamespace :
+                (configuration.docType == EuPidModel.euPidDocType ? EuPidModel.euPidDocType : nil)
+            let extracted = Self.extractClaimsAndAgeValues(from: nameSpaceItems, displayNames: displayNames, mandatory: mandatory, ageNamespace: ageNamespace)
             self.nameSpaces = extracted.nameSpaces
             self.docClaims = extracted.docClaims
             self.ageOverXX = extracted.ageOverXX
@@ -90,11 +92,11 @@ open class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable, ObservableOb
         }
 	}
 
-    static func extractClaimsAndAgeValues(from nameSpaceItems: [NameSpace: [IssuerSignedItem]], displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?) -> (docClaims: [DocClaim], ageOverXX: [Int: Bool], nameSpaces: [NameSpace]) {
+    static func extractClaimsAndAgeValues(from nameSpaceItems: [NameSpace: [IssuerSignedItem]], displayNames: [NameSpace: [String: String]]?, mandatory: [NameSpace: [String: Bool]]?, ageNamespace: NameSpace? = nil) -> (docClaims: [DocClaim], ageOverXX: [Int: Bool], nameSpaces: [NameSpace]) {
         var docClaimsTemp = [DocClaim]()
         var ageOverXXtemp = [Int: Bool]()
         extractCborClaims(nameSpaceItems, &docClaimsTemp, displayNames, mandatory)
-        extractAgeOverValues(nameSpaceItems, &ageOverXXtemp)
+        extractAgeOverValues(nameSpaceItems, &ageOverXXtemp, namespace: ageNamespace)
         let nameSpaces = Array(nameSpaceItems.keys)
         return (docClaimsTemp, ageOverXXtemp, nameSpaces)
     }

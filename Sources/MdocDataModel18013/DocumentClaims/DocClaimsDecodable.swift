@@ -66,14 +66,20 @@ extension DocClaimsDecodable {
 	public static func getCborItemValue<T>(_ issuerSigned: IssuerSigned, _ s: String) -> T? {
 		let nameSpaceItems = Self.getCborSignedItems(issuerSigned)
 		guard let nameSpaceItems else { return nil }
+        let docType = issuerSigned.issuerAuth.mso.docType
+        if docType == IsoMdlModel.isoDocType {
+            return Self.getCborItemValue(nameSpaceItems.filter { $0.key == IsoMdlModel.isoNamespace }, string: s)
+        }
+        if docType == EuPidModel.euPidDocType {
+            return Self.getCborItemValue(nameSpaceItems.filter { $0.key == EuPidModel.euPidDocType }, string: s)
+        }
 		return Self.getCborItemValue(nameSpaceItems, string: s)
 	}
 
 	static func getCborItemValue<T>(_ nameSpaceItems: [NameSpace: [IssuerSignedItem]], string name: String) -> T? {
-		for (_,v) in nameSpaceItems {
-			if let item = v.first(where: { name == $0.elementIdentifier }) { return item.getTypedValue() }
-		}
-		return nil
+        let matches = nameSpaceItems.values.flatMap { $0 }.filter { $0.elementIdentifier == name }
+        guard matches.count == 1 else { return nil }
+        return matches[0].getTypedValue()
 	}
 
 	public static func getCborSignedItems(_ issuerSigned: IssuerSigned, _ ns: [NameSpace]? = nil) -> [String: [IssuerSignedItem]]? {
@@ -88,17 +94,30 @@ extension DocClaimsDecodable {
 	/// - Parameters:
 	///   - nameSpaces: A dictionary where the key is a `NameSpace` and the value is an array of `IssuerSignedItem`.
 	///   - ageOverXX: An inout parameter that is a dictionary where the key is an integer representing the age and the value is a boolean indicating whether the age condition is met.
-	public static func extractAgeOverValues(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ ageOverXX: inout [Int: Bool]) {
-		for (_, items) in nameSpaces {
+	public static func extractAgeOverValues(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ ageOverXX: inout [Int: Bool], namespace: NameSpace? = nil) {
+        let selected: [NameSpace: [IssuerSignedItem]]
+        if let namespace { selected = nameSpaces.filter { $0.key == namespace } }
+        else {
+            // An unqualified age has no safe meaning across multiple namespaces.
+            guard nameSpaces.count == 1 else { return }
+            selected = nameSpaces
+        }
+        var seen = Set<Int>()
+        var ambiguous = Set<Int>()
+		for (_, items) in selected {
 			for item in items {
 				let elementIdentifier = item.elementIdentifier
 				if !elementIdentifier.hasPrefix("age_over_") { continue }
 				if let age = Int(elementIdentifier.suffix(elementIdentifier.count - 9)) {
 					let b: Bool? = item.getTypedValue()
-					if let b { ageOverXX[age] = b }
+                    if let b {
+                        if !seen.insert(age).inserted { ambiguous.insert(age) }
+                        ageOverXX[age] = b
+                    }
 				}
 			}
 		}
+        for age in ambiguous { ageOverXX.removeValue(forKey: age) }
 	}
 
 	/// Determines if there are more than two age-over element identifiers in the provided list.

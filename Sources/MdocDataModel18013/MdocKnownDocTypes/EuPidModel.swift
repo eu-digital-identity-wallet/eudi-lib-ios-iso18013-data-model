@@ -90,12 +90,12 @@ public final class EuPidModel: DocClaimsModel, @unchecked Sendable {
 
         // Initialize properties specific to EuPidModel
 		guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned) else { return nil }
-		func getValue<T>(key: EuPidModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems, string: key.rawValue) }
+		func getValue<T>(key: EuPidModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems.filter { $0.key == Self.euPidDocType }, string: key.rawValue) }
 
 		family_name = getValue(key: .family_name)
 		given_name = getValue(key: .given_name)
 		birth_date = getValue(key: .birth_date)
-		place_of_birth = Self.getPlaceOfBirth(from: nameSpaceItems)
+		place_of_birth = Self.getPlaceOfBirth(from: nameSpaceItems.filter { $0.key == Self.euPidDocType })
 		nationality = getValue(key: .nationality)
 		portrait = getValue(key: .portrait)
 		resident_address = getValue(key: .resident_address)
@@ -119,7 +119,7 @@ public final class EuPidModel: DocClaimsModel, @unchecked Sendable {
 		trust_anchor = getValue(key: .trust_anchor)
 		attestation_legal_category = getValue(key: .attestation_legal_category)
 
-		let extracted = Self.extractClaimsAndAgeValues(from: nameSpaceItems, displayNames: displayNames, mandatory: mandatory)
+		let extracted = Self.extractClaimsAndAgeValues(from: nameSpaceItems, displayNames: displayNames, mandatory: mandatory, ageNamespace: Self.euPidDocType)
         // Call superclass initializer
 		super.init(
 			configuration: DocClaimsModelConfiguration(
