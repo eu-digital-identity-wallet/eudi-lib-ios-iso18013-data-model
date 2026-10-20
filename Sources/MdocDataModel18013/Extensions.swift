@@ -153,7 +153,7 @@ extension CBOREncodable {
 
 extension CBORDecodable {
 	public init(data: [UInt8]) throws {
-		guard let obj = try CBOR.decode(data) else { throw MdocValidationError.cborDecodingError }
+		guard let obj = try MdocCBOR.decode(data) else { throw MdocValidationError.cborDecodingError }
 		try self.init(cbor: obj)
 	}
 }
@@ -261,7 +261,7 @@ extension CBOR {
 
 	public func decodeBytestring() -> CBOR? {
 		guard let bytestring = self.asBytes(),
-			  let decoded = try? CBORDecoder(input: bytestring).decodeItem() else {
+			  let decoded = try? MdocCBOR.decode(bytestring) else {
 			return nil
 		}
 		return decoded
