@@ -70,7 +70,13 @@ extension DeviceRetrievalMethod: CBORDecodable {
 			self = .nfc(maxLenCommand: maxLenCommand, maxLenResponse: maxLenResponse)
         case 2:
             guard case let .map(options) = arr[2] else { throw .invalidCbor("device retrieval method") }
-            let psm: UInt16? = if case let .unsignedInt(rawPsm) = options[21] { UInt16(rawPsm) } else { nil }
+            let psm: UInt16?
+            if let psmValue = options[21] {
+                guard case let .unsignedInt(rawPsm) = psmValue, let value = UInt16(exactly: rawPsm) else {
+                    throw .invalidCbor("device retrieval method PSM")
+                }
+                psm = value
+            } else { psm = nil }
             if case let .boolean(isPeripheralServerMode) = options[0], isPeripheralServerMode,
                case let .byteString(uuidBytes) = options[10],
                let uuid = UUID(uuidBytes: uuidBytes)
