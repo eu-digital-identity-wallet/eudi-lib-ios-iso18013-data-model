@@ -14,7 +14,9 @@ struct SecurityFinding2Tests {
         let namespaces = [IsoMdlModel.isoNamespace: primary, "unrelated": other]
         let ambiguous: String? = DocClaimsModel.getCborItemValue(namespaces, string: "family_name")
         #expect(ambiguous == nil)
-        #expect(SimpleAgeAttest(namespaces: namespaces).ageOverXX.isEmpty)
+        let unqualified = DocClaimsModel.extractClaimsAndAgeValues(from: [IsoMdlModel.isoNamespace: primary], displayNames: nil, mandatory: nil)
+        #expect(unqualified.ageOverXX.isEmpty)
+        #expect(SimpleAgeAttest(namespaces: ["unrelated": other], namespace: IsoMdlModel.isoNamespace).ageOverXX.isEmpty)
         #expect(SimpleAgeAttest(namespaces: namespaces, namespace: IsoMdlModel.isoNamespace).ageOverXX[18] == true)
         let auth = try IssuerAuth(data: MdocDataModel18013Tests.AnnexdTestData.d52.bytes)
         let signed = IssuerSigned(issuerNameSpaces: IssuerNameSpaces(nameSpaces: namespaces), issuerAuth: auth)

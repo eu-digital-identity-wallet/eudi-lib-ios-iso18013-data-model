@@ -94,30 +94,17 @@ extension DocClaimsDecodable {
 	/// - Parameters:
 	///   - nameSpaces: A dictionary where the key is a `NameSpace` and the value is an array of `IssuerSignedItem`.
 	///   - ageOverXX: An inout parameter that is a dictionary where the key is an integer representing the age and the value is a boolean indicating whether the age condition is met.
-	public static func extractAgeOverValues(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ ageOverXX: inout [Int: Bool], namespace: NameSpace? = nil) {
-        let selected: [NameSpace: [IssuerSignedItem]]
-        if let namespace { selected = nameSpaces.filter { $0.key == namespace } }
-        else {
-            // An unqualified age has no safe meaning across multiple namespaces.
-            guard nameSpaces.count == 1 else { return }
-            selected = nameSpaces
+	///   - namespace: The known namespace containing the age-over values.
+	public static func extractAgeOverValues(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ ageOverXX: inout [Int: Bool], namespace: NameSpace) {
+        guard let items = nameSpaces[namespace] else { return }
+        for item in items {
+            let elementIdentifier = item.elementIdentifier
+            if !elementIdentifier.hasPrefix("age_over_") { continue }
+            if let age = Int(elementIdentifier.suffix(elementIdentifier.count - 9)) {
+                let b: Bool? = item.getTypedValue()
+                if let b { ageOverXX[age] = b }
+            }
         }
-        var seen = Set<Int>()
-        var ambiguous = Set<Int>()
-		for (_, items) in selected {
-			for item in items {
-				let elementIdentifier = item.elementIdentifier
-				if !elementIdentifier.hasPrefix("age_over_") { continue }
-				if let age = Int(elementIdentifier.suffix(elementIdentifier.count - 9)) {
-					let b: Bool? = item.getTypedValue()
-                    if let b {
-                        if !seen.insert(age).inserted { ambiguous.insert(age) }
-                        ageOverXX[age] = b
-                    }
-				}
-			}
-		}
-        for age in ambiguous { ageOverXX.removeValue(forKey: age) }
 	}
 
 	/// Determines if there are more than two age-over element identifiers in the provided list.

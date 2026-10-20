@@ -96,7 +96,9 @@ open class DocClaimsModel: DocClaimsDecodable, @unchecked Sendable, ObservableOb
         var docClaimsTemp = [DocClaim]()
         var ageOverXXtemp = [Int: Bool]()
         extractCborClaims(nameSpaceItems, &docClaimsTemp, displayNames, mandatory)
-        extractAgeOverValues(nameSpaceItems, &ageOverXXtemp, namespace: ageNamespace)
+        if let ageNamespace {
+            extractAgeOverValues(nameSpaceItems, &ageOverXXtemp, namespace: ageNamespace)
+        }
         let nameSpaces = Array(nameSpaceItems.keys)
         return (docClaimsTemp, ageOverXXtemp, nameSpaces)
     }
