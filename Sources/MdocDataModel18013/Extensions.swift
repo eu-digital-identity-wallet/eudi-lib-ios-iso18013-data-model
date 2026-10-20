@@ -87,6 +87,7 @@ extension String {
 
 extension UUID {
     init?(uuidBytes: [UInt8]) {
+        guard uuidBytes.count == 16 else { return nil }
         let nsUUIDString = UUID.ReferenceType(uuidBytes: uuidBytes).uuidString
         guard let uuid = UUID(uuidString: nsUUIDString) else { return nil }
         self = uuid

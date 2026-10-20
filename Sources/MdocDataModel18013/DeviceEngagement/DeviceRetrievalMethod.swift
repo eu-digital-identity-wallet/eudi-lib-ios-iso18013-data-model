@@ -60,7 +60,7 @@ extension DeviceRetrievalMethod: CBOREncodable {
 
 extension DeviceRetrievalMethod: CBORDecodable {
     public init(cbor: CBOR) throws(MdocValidationError) {
-        guard case let .array(arr) = cbor, arr.count >= 2 else { throw .invalidCbor("device retrieval method") }
+        guard case let .array(arr) = cbor, arr.count >= 3 else { throw .invalidCbor("device retrieval method") }
         guard case let .unsignedInt(type) = arr[0] else { throw .invalidCbor("device retrieval method") }
 		guard case let .unsignedInt(methodVersion) = arr[1], methodVersion == Self.version else { throw .invalidCbor("device retrieval method") }
         switch type {
