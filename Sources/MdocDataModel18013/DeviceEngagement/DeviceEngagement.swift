@@ -17,6 +17,7 @@ limitations under the License.
 //  DeviceEngagement.swift
 
 import Foundation
+import os
 import SwiftCBOR
 #if canImport(CryptoKit)
 import CryptoKit
@@ -51,6 +52,7 @@ public struct DeviceEngagement: Sendable {
 	// private key data for holder only
     public var privateKey: CoseKeyPrivate?
 	public var qrCoded: [UInt8]?
+	private var sessionEstablishmentClaim = OSAllocatedUnfairLock(initialState: false)
 
 
 	/// Generate device engagement
@@ -81,7 +83,18 @@ public struct DeviceEngagement: Sendable {
     public mutating func makePrivateKey(secureArea: any SecureArea, keyOptions: KeyOptions) async throws {
         privateKey = try await CoseKeyPrivate(secureArea: secureArea, keyOptions: keyOptions)
 		security = Security(deviceKey: try await privateKey!.key)
+		sessionEstablishmentClaim = OSAllocatedUnfairLock(initialState: false)
     }
+
+	/// Claims this engagement for a single session establishment, before asynchronous work.
+	/// Copies share the claim. Generating a fresh ephemeral key resets it.
+	public func claimSessionEstablishment() -> Bool {
+		sessionEstablishmentClaim.withLock { claimed in
+			guard !claimed else { return false }
+			claimed = true
+			return true
+		}
+	}
 
 	public var supportsCentralClientMode: Bool {
 		guard let deviceRetrievalMethods else { return false }
