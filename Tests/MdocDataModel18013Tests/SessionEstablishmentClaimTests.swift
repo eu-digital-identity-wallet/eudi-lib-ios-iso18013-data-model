@@ -44,4 +44,16 @@ struct SessionEstablishmentClaimTests {
         #expect(engagement.claimSessionEstablishment())
         #expect(!old.claimSessionEstablishment())
     }
+    @Test func terminationRevokesCopiesAndOnlyNewKeyResetsLifetime() async throws {
+        var engagement = try #require(DeviceEngagement(supportsCentralClientMode: true, supportsPeripheralServerMode: false))
+        let copy = engagement
+        engagement.invalidateSession()
+        #expect(copy.isSessionTerminated)
+        #expect(!copy.claimSessionEstablishment())
+        try await engagement.makePrivateKey(secureArea: InMemoryP256SecureArea(storage: DummySecureKeyStorage()), keyOptions: .init(curve: .P256))
+        #expect(!engagement.isSessionTerminated)
+        #expect(engagement.claimSessionEstablishment())
+        #expect(copy.isSessionTerminated)
+    }
+
 }
