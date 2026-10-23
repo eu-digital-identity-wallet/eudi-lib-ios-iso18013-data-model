@@ -43,7 +43,7 @@ extension DeviceSigned: CBORDecodable {
 		else { throw .missingField("DeviceSigned", Keys.nameSpaces.rawValue) }
 
 		let bs = nameSpacesBytes
-		guard let obj = try? CBOR.decode(bs) else { throw MdocValidationError.cborDecodingError }
+		guard let obj = try? CBOR.decode(bs, options: CBOROptions(maximumDepth: CBOR.maximumDepth)) else { throw MdocValidationError.cborDecodingError }
         nameSpaces = try DeviceNameSpaces(cbor: obj)
 		guard let cdu = m[Keys.deviceAuth] else { throw .missingField("DeviceSigned", Keys.deviceAuth.rawValue) }
 		deviceAuth = try DeviceAuth(cbor: cdu)

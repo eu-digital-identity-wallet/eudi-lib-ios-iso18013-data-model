@@ -141,7 +141,7 @@ extension ZkDocumentData: CBORDecodable {
         }
         // Parse ISO-8601 timestamp
         let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        formatter.formatOptions = timestampStr.contains(".") ? [.withInternetDateTime, .withFractionalSeconds] : [.withInternetDateTime]
         guard let timestamp = formatter.date(from: timestampStr) else { throw .invalidCbor("ZkDocumentData") }
         // Parse issuerSigned
         var issuerSigned: [String: [String: CBOR]] = [:]
