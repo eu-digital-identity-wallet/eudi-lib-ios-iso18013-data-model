@@ -114,7 +114,7 @@ public final class IsoMdlModel: DocClaimsModel, @unchecked Sendable {
 
         // Initialize properties specific to IsoMdlModel
         guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned) else { return nil }
-        func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems, string: key.rawValue) }
+        func getValue<T>(key: IsoMdlModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems.filter { $0.key == Self.isoNamespace }, string: key.rawValue) }
 
         exp = getValue(key: .exp)
         iat = getValue(key: .iat)
@@ -154,7 +154,7 @@ public final class IsoMdlModel: DocClaimsModel, @unchecked Sendable {
         webapiInfo = getValue(key: .webapiInfo)
         oidcInfo = getValue(key: .oidcInfo)
 
-		let extracted = Self.extractClaimsAndAgeValues(from: nameSpaceItems, displayNames: displayNames, mandatory: mandatory)
+		let extracted = Self.extractClaimsAndAgeValues(from: nameSpaceItems, displayNames: displayNames, mandatory: mandatory, ageNamespace: Self.isoNamespace)
         // Call superclass initializer
 		super.init(
 			configuration: DocClaimsModelConfiguration(
