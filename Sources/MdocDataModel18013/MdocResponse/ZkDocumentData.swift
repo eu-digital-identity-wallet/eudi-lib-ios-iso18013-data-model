@@ -186,17 +186,7 @@ extension ZkDocumentData: CBORDecodable {
         // Parse msoX5chain
         var msoX5chain: [[UInt8]]? = nil
         if let msoX5chainItem = cborMap[CBOR.utf8String("msoX5chain")] {
-            switch msoX5chainItem {
-            case .byteString(let certBytes): msoX5chain = [certBytes]
-            case .array(let certArray):
-                // Multiple certificates
-                var certs: [[UInt8]] = []
-                for certItem in certArray {
-                    if case let .byteString(certBytes) = certItem { certs.append(certBytes)}
-                }
-                msoX5chain = certs
-            default: throw .invalidCbor("ZkDocumentData")
-            }
+            msoX5chain = try CertificateChain.decode(msoX5chainItem)
         }
         let parsedZkSystemSpecId = zkSystemSpecId
         let parsedDocType = docType

@@ -59,18 +59,8 @@ extension IssuerAuth: CBORDecodable {
 		else { throw .invalidCbor("Issuer auth must contain a valid unprotected header") }
 
 		let x5chainHeaderKey = CBOR.unsignedInt(33)
-		if case let .byteString(certificateBytes) = unprotectedHeaderMap[x5chainHeaderKey] {
-			x5chain = [certificateBytes]
-		}
-		else if case let .array(certificateArray) = unprotectedHeaderMap[x5chainHeaderKey] {
-			x5chain = try certificateArray.map { certificateItem throws(MdocValidationError) in
-				if case let .byteString(certificateBytes) = certificateItem {
-					return certificateBytes
-				}
-				throw .invalidCbor("x5chain array elements must be byte strings")
-			}
-		}
-		else { throw .invalidCbor("Issuer auth must contain a valid x5chain") }
+        guard let chain = unprotectedHeaderMap[x5chainHeaderKey] else { throw .invalidCbor("Issuer auth must contain a valid x5chain") }
+        x5chain = try CertificateChain.decode(chain)
 	}
 }
 
