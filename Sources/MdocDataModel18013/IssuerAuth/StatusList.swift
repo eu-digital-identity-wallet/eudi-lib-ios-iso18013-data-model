@@ -52,9 +52,10 @@ extension StatusList {
 
         if case let .map(statusListMap) = statusMap[.utf8String("status_list")],
            case let .unsignedInt(statusIndex) = statusListMap[.utf8String("idx")],
+           let exactIndex = Int(exactly: statusIndex),
            case let .utf8String(statusUri) = statusListMap[.utf8String("uri")]
         {
-            idx = Int(statusIndex)
+            idx = exactIndex
             uri = statusUri
         } else { return nil }
     }

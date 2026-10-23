@@ -42,6 +42,9 @@ extension IssuerNameSpaces: CBORDecodable {
                 }
 				return try IssuerSignedItem(data: bs)
 			}
+            guard Set(items.map(\.elementIdentifier)).count == items.count else {
+                throw .invalidCbor("duplicate issuer element identifier in namespace '\(ns)'")
+            }
 			temp[ns] = items
 		}
 		guard temp.count > 0 else { throw .invalidCbor("document") }

@@ -141,7 +141,7 @@ extension ZkDocumentData: CBORDecodable {
         }
         // Parse ISO-8601 timestamp
         let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        formatter.formatOptions = timestampStr.contains(".") ? [.withInternetDateTime, .withFractionalSeconds] : [.withInternetDateTime]
         guard let timestamp = formatter.date(from: timestampStr) else { throw .invalidCbor("ZkDocumentData") }
         // Parse issuerSigned
         var issuerSigned: [String: [String: CBOR]] = [:]
@@ -157,6 +157,9 @@ extension ZkDocumentData: CBORDecodable {
                           case let .utf8String(elementId)? = itemMap[CBOR.utf8String("elementIdentifier")],
                           let elementValue = itemMap[CBOR.utf8String("elementValue")] else {
                         continue
+                    }
+                    guard dataElementsMap[elementId] == nil else {
+                        throw .invalidCbor("duplicate ZK element identifier in namespace")
                     }
                     dataElementsMap[elementId] = elementValue
                 }
@@ -177,6 +180,9 @@ extension ZkDocumentData: CBORDecodable {
                           case let .utf8String(elementId)? = itemMap[CBOR.utf8String("elementIdentifier")],
                           let elementValue = itemMap[CBOR.utf8String("elementValue")] else {
                         continue
+                    }
+                    guard dataElementsMap[elementId] == nil else {
+                        throw .invalidCbor("duplicate ZK element identifier in namespace")
                     }
                     dataElementsMap[elementId] = elementValue
                 }
