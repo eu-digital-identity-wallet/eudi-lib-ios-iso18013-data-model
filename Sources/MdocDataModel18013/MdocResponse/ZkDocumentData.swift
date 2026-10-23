@@ -158,6 +158,9 @@ extension ZkDocumentData: CBORDecodable {
                           let elementValue = itemMap[CBOR.utf8String("elementValue")] else {
                         continue
                     }
+                    guard dataElementsMap[elementId] == nil else {
+                        throw .invalidCbor("duplicate ZK element identifier in namespace")
+                    }
                     dataElementsMap[elementId] = elementValue
                 }
                 issuerSigned[namespaceName] = dataElementsMap
@@ -177,6 +180,9 @@ extension ZkDocumentData: CBORDecodable {
                           case let .utf8String(elementId)? = itemMap[CBOR.utf8String("elementIdentifier")],
                           let elementValue = itemMap[CBOR.utf8String("elementValue")] else {
                         continue
+                    }
+                    guard dataElementsMap[elementId] == nil else {
+                        throw .invalidCbor("duplicate ZK element identifier in namespace")
                     }
                     dataElementsMap[elementId] = elementValue
                 }
