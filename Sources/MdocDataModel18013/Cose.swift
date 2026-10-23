@@ -29,7 +29,7 @@ extension Cose {
 		case mac0 = "MAC0"
 		/// Idenntifies Cose Message Type from input data
 		static func from(data: Data) -> (CoseType, [CBOR])? {
-			guard let cose = try? CBORDecoder(input: data.bytes).decodeItem()?.asCose() else {
+			guard let cose = try? CBOR.decodeMdoc(data.bytes)?.asCose() else {
 				return nil
 			}
 
@@ -91,6 +91,10 @@ extension Cose {
 		/// Initialize from CBOR
 		/// - Parameter cbor: CBOR representation of the header
 		public init?(fromBytestring cbor: CBOR){
+			// An empty protected header is valid; a malformed nonempty one is not.
+			if case let .byteString(bytes) = cbor, !bytes.isEmpty, cbor.decodeBytestring() == nil {
+				return nil
+			}
 			guard let cborMap = cbor.decodeBytestring()?.asMap(),
 				  let alg = cborMap[Headers.algorithm]?.asUInt64() else {
                 self.init(alg: nil, isNegativeAlg: nil, keyId: nil, type: nil, rawHeader: cbor)
