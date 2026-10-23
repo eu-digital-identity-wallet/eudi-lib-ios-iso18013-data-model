@@ -50,6 +50,9 @@ extension Document: CBORDecodable {
 		docType = dt
 		guard let cis = cd[Keys.issuerSigned] else { throw .missingField("Document", Keys.issuerSigned.rawValue) }
 		issuerSigned = try IssuerSigned(cbor: cis)
+        guard docType == issuerSigned.issuerAuth.mso.docType else {
+            throw .invalidCbor("document docType does not match issuer-signed MSO docType")
+        }
 		guard let cds = cd[Keys.deviceSigned] else { throw .missingField("Document", Keys.deviceSigned.rawValue) }
 		deviceSigned = try DeviceSigned(cbor: cds)
 		if let ce = cd[Keys.errors] { errors = try Errors(cbor: ce) } else { errors = nil }
