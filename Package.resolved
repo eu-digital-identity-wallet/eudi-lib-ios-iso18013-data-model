@@ -1,13 +1,13 @@
 {
-  "originHash" : "0e399fc1b097f26ca472cb4dfba35e1680514cb2b17a95b3b7e735e9e77417e6",
+  "originHash" : "4d86cf08026ea28e921421cfc37d1559c6163b0da8197693d02ba2468d8e575a",
   "pins" : [
     {
       "identity" : "swift-collections",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-collections.git",
       "state" : {
-        "revision" : "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
-        "version" : "1.6.0"
+        "revision" : "844289ac455816e193f1dbbe014f3c4dbe429410",
+        "version" : "1.7.4"
       }
     },
     {
@@ -51,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/niscy-eudiw/SwiftCBOR.git",
       "state" : {
-        "revision" : "1b5c80d97c922653b7e2e7aff9f0cffb7dfcf017",
-        "version" : "0.6.7"
+        "revision" : "871d2949182eba99bcc8166d4582187c6d86f75c",
+        "version" : "0.6.8"
       }
     },
     {

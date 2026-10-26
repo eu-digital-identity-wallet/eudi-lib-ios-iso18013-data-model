@@ -106,7 +106,7 @@ extension IssuerSignedItem {
 
 extension IssuerSignedItem: CBORDecodable {
 	public init(data: [UInt8]) throws(MdocValidationError) {
-        guard let cbor = try? CBOR.decode(data, options: CBOROptions(maximumDepth: CBOR.maximumDepth)) else { throw .invalidCbor("issuer signed item") }
+        guard let cbor = try? CBOR.decodeMdoc(data) else { throw .invalidCbor("issuer signed item") }
         try self.init(cbor: cbor)
         rawData = data
     }

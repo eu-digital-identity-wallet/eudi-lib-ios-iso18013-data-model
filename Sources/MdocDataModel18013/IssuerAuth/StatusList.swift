@@ -39,22 +39,23 @@ public struct StatusList: Codable, Sendable {
 
 extension StatusList {
     public init?(data msoRawData: [UInt8]) {
-		guard let obj = try? CBOR.decode(msoRawData, options: CBOROptions(maximumDepth: CBOR.maximumDepth)) else { return nil }
+		guard let obj = try? CBOR.decodeMdoc(msoRawData) else { return nil }
         guard case let CBOR.tagged(tag, encodedCbor) = obj,
               tag == .encodedCBORDataItem,
               case let .byteString(encodedBytes) = encodedCbor
         else { return nil }
 
-        guard let cbor = try? CBOR.decode(encodedBytes, options: CBOROptions(maximumDepth: CBOR.maximumDepth)),
+        guard let cbor = try? CBOR.decodeMdoc(encodedBytes),
               case let .map(msoMap) = cbor,
               case let .map(statusMap) = msoMap[.utf8String("status")]
         else { return nil }
 
         if case let .map(statusListMap) = statusMap[.utf8String("status_list")],
            case let .unsignedInt(statusIndex) = statusListMap[.utf8String("idx")],
+           let exactIndex = Int(exactly: statusIndex),
            case let .utf8String(statusUri) = statusListMap[.utf8String("uri")]
         {
-            idx = Int(statusIndex)
+            idx = exactIndex
             uri = statusUri
         } else { return nil }
     }

@@ -43,7 +43,7 @@ extension DeviceSigned: CBORDecodable {
 		else { throw .missingField("DeviceSigned", Keys.nameSpaces.rawValue) }
 
 		let bs = nameSpacesBytes
-		guard let obj = try? CBOR.decode(bs, options: CBOROptions(maximumDepth: CBOR.maximumDepth)) else { throw MdocValidationError.cborDecodingError }
+		guard let obj = try? CBOR.decodeMdoc(bs) else { throw MdocValidationError.cborDecodingError }
         nameSpaces = try DeviceNameSpaces(cbor: obj)
 		guard let cdu = m[Keys.deviceAuth] else { throw .missingField("DeviceSigned", Keys.deviceAuth.rawValue) }
 		deviceAuth = try DeviceAuth(cbor: cdu)
@@ -63,7 +63,7 @@ extension DeviceSigned: CBOREncodable {
 public struct DeviceNameSpaces: Sendable {
 	public let deviceNameSpaces: OrderedDictionary<NameSpace, DeviceSignedItems>
 	public subscript(ns: NameSpace) -> DeviceSignedItems? { deviceNameSpaces[ns] }
-    
+
     public init(deviceNameSpaces: OrderedDictionary<NameSpace, DeviceSignedItems>) {
         self.deviceNameSpaces = deviceNameSpaces
     }
@@ -93,7 +93,7 @@ extension DeviceNameSpaces: CBOREncodable {
 public struct DeviceSignedItems: Sendable {
 	public let deviceSignedItems: OrderedDictionary<DataElementIdentifier, DataElementValue>
 	public subscript(ei: DataElementIdentifier) -> DataElementValue? { deviceSignedItems[ei] }
-    
+
     public init(deviceSignedItems: OrderedDictionary<DataElementIdentifier, DataElementValue>) {
         self.deviceSignedItems = deviceSignedItems
     }

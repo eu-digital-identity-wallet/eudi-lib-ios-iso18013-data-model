@@ -87,6 +87,7 @@ extension String {
 
 extension UUID {
     init?(uuidBytes: [UInt8]) {
+        guard uuidBytes.count == 16 else { return nil }
         let nsUUIDString = UUID.ReferenceType(uuidBytes: uuidBytes).uuidString
         guard let uuid = UUID(uuidString: nsUUIDString) else { return nil }
         self = uuid
@@ -153,7 +154,7 @@ extension CBOREncodable {
 
 extension CBORDecodable {
 	public init(data: [UInt8]) throws {
-		guard let obj = try CBOR.decode(data, options: CBOROptions(maximumDepth: CBOR.maximumDepth)) else { throw MdocValidationError.cborDecodingError }
+		guard let obj = try CBOR.decodeMdoc(data) else { throw MdocValidationError.cborDecodingError }
 		try self.init(cbor: obj)
 	}
 }
@@ -263,7 +264,7 @@ extension CBOR {
 
 	public func decodeBytestring() -> CBOR? {
 		guard let bytestring = self.asBytes(),
-			  let decoded = try? CBOR.decode(bytestring, options: CBOROptions(maximumDepth: CBOR.maximumDepth)) else {
+			  let decoded = try? CBOR.decodeMdoc(bytestring) else {
 			return nil
 		}
 		return decoded

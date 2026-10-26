@@ -29,7 +29,7 @@ extension Cose {
 		case mac0 = "MAC0"
 		/// Idenntifies Cose Message Type from input data
 		static func from(data: Data) -> (CoseType, [CBOR])? {
-			guard let cose = try? CBOR.decode(data.bytes, options: CBOROptions(maximumDepth: CBOR.maximumDepth))?.asCose() else {
+			guard let cose = try? CBOR.decodeMdoc(data.bytes)?.asCose() else {
 				return nil
 			}
 
@@ -91,6 +91,10 @@ extension Cose {
 		/// Initialize from CBOR
 		/// - Parameter cbor: CBOR representation of the header
 		public init?(fromBytestring cbor: CBOR){
+			// An empty protected header is valid; a malformed nonempty one is not.
+			if case let .byteString(bytes) = cbor, !bytes.isEmpty, cbor.decodeBytestring() == nil {
+				return nil
+			}
 			guard let cborMap = cbor.decodeBytestring()?.asMap(),
 				  let alg = cborMap[Headers.algorithm]?.asUInt64() else {
                 self.init(alg: nil, isNegativeAlg: nil, keyId: nil, type: nil, rawHeader: cbor)
@@ -163,7 +167,7 @@ extension Cose {
 	///  - type: Cose message type
 	///  - cbor: CBOR representation of the cose message
 	public init?(type: CoseType, cbor: SwiftCBOR.CBOR) {
-		guard let coseList = cbor.asList(), let protectedHeader = CoseHeader(fromBytestring: coseList[0]),
+		guard let coseList = cbor.asList(), coseList.count == 4, let protectedHeader = CoseHeader(fromBytestring: coseList[0]),
 			  let signature = coseList[3].asBytes() else { return nil }
 
 		self.protectedHeader = protectedHeader
