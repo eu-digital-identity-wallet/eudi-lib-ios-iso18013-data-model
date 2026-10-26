@@ -68,7 +68,7 @@ struct SignUpResponse: Codable, Sendable {
 	/// - Parameter data: Data from file or memory
 	/// - Returns:  separate json serialized signup response objects for each doc.type
 	public static func decomposeCBORSignupResponse(data: Data) -> [(docType: String, jsonData: Data, drData: Data, issData: Data, pkData: Data)]? {
-		guard let sr = data.decodeJSON(type: MdocDataModel18013.SignUpResponse.self), let drs = decomposeCBORDeviceResponse(data: data) else { return nil }
+		guard let sr = data.decodeJSON(type: SignUpResponse.self), let drs = decomposeCBORDeviceResponse(data: data) else { return nil }
 		return drs.compactMap { sr0 -> (docType: String, jsonData: Data, drData: Data, issData: Data, pkData: Data)? in
 			let drData = Data(CBOR.encode(sr0.dr.toCBOR(options: CBOROptions())))
 			let issData = Data(CBOR.encode(sr0.iss.toCBOR(options: CBOROptions())))
