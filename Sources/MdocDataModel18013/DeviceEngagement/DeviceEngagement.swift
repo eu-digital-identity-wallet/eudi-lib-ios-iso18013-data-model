@@ -17,6 +17,7 @@ limitations under the License.
 //  DeviceEngagement.swift
 
 import Foundation
+import os
 import SwiftCBOR
 #if canImport(CryptoKit)
 import CryptoKit
@@ -51,6 +52,11 @@ public struct DeviceEngagement: Sendable {
 	// private key data for holder only
     public var privateKey: CoseKeyPrivate?
 	public var qrCoded: [UInt8]?
+	private struct SessionLifetime: Sendable {
+        var claimed = false
+        var terminated = false
+    }
+    private var sessionEstablishmentClaim = OSAllocatedUnfairLock(initialState: SessionLifetime())
 
 
 	/// Generate device engagement
@@ -81,6 +87,27 @@ public struct DeviceEngagement: Sendable {
     public mutating func makePrivateKey(secureArea: any SecureArea, keyOptions: KeyOptions) async throws {
         privateKey = try await CoseKeyPrivate(secureArea: secureArea, keyOptions: keyOptions)
 		security = Security(deviceKey: try await privateKey!.key)
+		sessionEstablishmentClaim = OSAllocatedUnfairLock(initialState: SessionLifetime())
+    }
+
+	/// Claims this engagement for a single session establishment, before asynchronous work.
+	/// Copies share the claim. Generating a fresh ephemeral key resets it.
+	public func claimSessionEstablishment() -> Bool {
+		sessionEstablishmentClaim.withLock { lifetime in
+			guard !lifetime.claimed, !lifetime.terminated else { return false }
+			lifetime.claimed = true
+			return true
+		}
+	}
+
+    /// Revokes this engagement and all existing copies, including in-flight session operations.
+    /// A fresh ephemeral key is required before the engagement can be used again.
+    public func invalidateSession() {
+        sessionEstablishmentClaim.withLock { $0.terminated = true }
+    }
+
+    public var isSessionTerminated: Bool {
+        sessionEstablishmentClaim.withLock { $0.terminated }
     }
 
 	public var supportsCentralClientMode: Bool {
