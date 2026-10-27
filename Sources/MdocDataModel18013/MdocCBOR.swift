@@ -19,7 +19,8 @@ extension CBOR {
     /// Decode one complete mdoc CBOR item, including maps nested inside it.
     static func decodeMdoc(_ bytes: [UInt8]) throws -> CBOR? {
         let stream = MdocCBORInputStream(bytes)
-        let decoder = CBORDecoder(stream: stream, options: CBOROptions(rejectDuplicateMapKeys: true))
+        let decoder = CBORDecoder(stream: stream,
+            options: CBOROptions(maximumDepth: CBOR.maximumDepth, rejectDuplicateMapKeys: true))
         let item = try decoder.decodeItem()
         guard stream.remaining.isEmpty else { throw MdocValidationError.cborDecodingError }
         return item

@@ -160,6 +160,8 @@ extension CBORDecodable {
 }
 
 extension CBOR {
+    static let maximumDepth = 64
+
 	public func decodeTaggedBytes() -> [UInt8]? {
 		guard case let CBOR.tagged(tag, encodedCbor) = self,
 			  tag == .encodedCBORDataItem,
