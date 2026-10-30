@@ -24,18 +24,18 @@ import OrderedCollections
 ///   - zkSystemSpecId: The ZK system spec Id from the verifier used to create the proof.
 ///   - docType: The doc type of doc being represented.
 ///   - timestamp: The timestamp the proof was generated at.
-///   - issuerSigned: Issuer signed name spaces and values.
+///   - issuerSigned: Issuer signed name spaces and values in insertion order.
 ///   - deviceSigned: Devices signed name spaces and values.
 ///   - msoX5chain: The issuers certificate chain.
 public struct ZkDocumentData: Sendable {
     public let zkSystemSpecId: String
     public let docType: String
     public let timestamp: Date
-    public let issuerSigned: [String: [String: CBOR]]
+    public let issuerSigned: OrderedDictionary<String, OrderedDictionary<String, CBOR>>
     public let deviceSigned: [String: [String: CBOR]]
     public let msoX5chain: [[UInt8]]?
 
-    public init(zkSystemSpecId: String, docType: String, timestamp: Date, issuerSigned: [String: [String: CBOR]], deviceSigned: [String: [String: CBOR]], msoX5chain: [[UInt8]]?) {
+    public init(zkSystemSpecId: String, docType: String, timestamp: Date, issuerSigned: OrderedDictionary<String, OrderedDictionary<String, CBOR>>, deviceSigned: [String: [String: CBOR]], msoX5chain: [[UInt8]]?) {
         self.zkSystemSpecId = zkSystemSpecId
         self.docType = docType
         self.timestamp = timestamp
@@ -144,14 +144,14 @@ extension ZkDocumentData: CBORDecodable {
         formatter.formatOptions = timestampStr.contains(".") ? [.withInternetDateTime, .withFractionalSeconds] : [.withInternetDateTime]
         guard let timestamp = formatter.date(from: timestampStr) else { throw .invalidCbor("ZkDocumentData") }
         // Parse issuerSigned
-        var issuerSigned: [String: [String: CBOR]] = [:]
+        var issuerSigned: OrderedDictionary<String, OrderedDictionary<String, CBOR>> = [:]
         if case let .map(issuerSignedMap)? = cborMap[CBOR.utf8String("issuerSigned")] {
             for (namespaceItem, dataElementsItem) in issuerSignedMap {
                 guard case let .utf8String(namespaceName) = namespaceItem,
                       case let .array(dataElementsArray) = dataElementsItem else {
                     continue
                 }
-                var dataElementsMap: [String: CBOR] = [:]
+                var dataElementsMap: OrderedDictionary<String, CBOR> = [:]
                 for zkSignedItem in dataElementsArray {
                     guard case let .map(itemMap) = zkSignedItem,
                           case let .utf8String(elementId)? = itemMap[CBOR.utf8String("elementIdentifier")],

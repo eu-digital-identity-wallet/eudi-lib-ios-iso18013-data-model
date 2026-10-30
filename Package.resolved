@@ -1,5 +1,5 @@
 {
-  "originHash" : "4d86cf08026ea28e921421cfc37d1559c6163b0da8197693d02ba2468d8e575a",
+  "originHash" : "77dcb677ce712db589635ac21fdc68168cb42a572426f793b5c9c76d1a639b05",
   "pins" : [
     {
       "identity" : "swift-collections",
@@ -51,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/niscy-eudiw/SwiftCBOR.git",
       "state" : {
-        "revision" : "871d2949182eba99bcc8166d4582187c6d86f75c",
-        "version" : "0.6.8"
+        "revision" : "89360f74e895effa3b65e5e2f2c1e359160f8b69",
+        "version" : "0.7.0"
       }
     },
     {
