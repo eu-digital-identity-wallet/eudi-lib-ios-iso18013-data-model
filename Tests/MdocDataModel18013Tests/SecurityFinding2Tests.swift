@@ -35,4 +35,46 @@ struct SecurityFinding2Tests {
         #expect(pid.family_name == "primary")
         #expect(pid.ageOverXX[18] == true)
     }
+
+    @Test(arguments: ["com.example.custom", IsoMdlModel.isoDocType, EuPidModel.euPidDocType])
+    func publicNamespaceOverridesAndCustomDocumentFallback(docType: String) throws {
+        let defaultNamespace = docType == IsoMdlModel.isoDocType ? IsoMdlModel.isoNamespace : docType
+        func item(_ value: String) throws -> IssuerSignedItem {
+            try IssuerSignedItem(cbor: [
+                "digestID": 0,
+                "random": .byteString([1]),
+                "elementIdentifier": "family_name",
+                "elementValue": .utf8String(value)
+            ])
+        }
+        let fixtureAuth = try IssuerAuth(data: MdocDataModel18013Tests.AnnexdTestData.d52.bytes)
+        let fixtureMso = fixtureAuth.mso
+        let mso = MobileSecurityObject(
+            version: fixtureMso.version,
+            digestAlgorithm: fixtureMso.digestAlgorithm,
+            valueDigests: fixtureMso.valueDigests,
+            deviceKey: fixtureMso.deviceKeyInfo.deviceKey,
+            docType: docType,
+            validityInfo: fixtureMso.validityInfo
+        )
+        // These in-memory fixtures exercise claim lookup, not signature verification.
+        let auth = IssuerAuth(
+            mso: mso, msoRawData: fixtureAuth.msoRawData,
+            verifyAlgorithm: fixtureAuth.verifyAlgorithm, signature: fixtureAuth.signature,
+            x5chain: fixtureAuth.x5chain, statusList: fixtureAuth.statusList
+        )
+        let signed = IssuerSigned(
+            issuerNameSpaces: IssuerNameSpaces(nameSpaces: [
+                defaultNamespace: [try item("primary")],
+                "override": [try item("selected")]
+            ]),
+            issuerAuth: auth
+        )
+
+        let defaultValue: String? = DocClaimsModel.getCborItemValue(signed, "family_name")
+        #expect(defaultValue == (docType == "com.example.custom" ? nil : "primary"))
+        let selectedValue: String? = DocClaimsModel.getCborItemValue(signed, namespace: "override", "family_name")
+        #expect(selectedValue == "selected")
+    }
+
 }
