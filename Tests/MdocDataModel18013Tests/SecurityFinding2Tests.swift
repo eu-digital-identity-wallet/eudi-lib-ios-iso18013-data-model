@@ -12,8 +12,10 @@ struct SecurityFinding2Tests {
         let primary = try [item("family_name", "primary"), item("age_over_18", true)]
         let other = try [item("family_name", "other"), item("age_over_18", false)]
         let namespaces = [IsoMdlModel.isoNamespace: primary, "unrelated": other]
-        let ambiguous: String? = DocClaimsModel.getCborItemValue(namespaces, string: "family_name")
-        #expect(ambiguous == nil)
+        let qualified: String? = DocClaimsModel.getCborItemValue(namespaces, namespace: IsoMdlModel.isoNamespace, string: "family_name")
+        #expect(qualified == "primary")
+        let missing: String? = DocClaimsModel.getCborItemValue(namespaces, namespace: "missing", string: "family_name")
+        #expect(missing == nil)
         let unqualified = DocClaimsModel.extractClaimsAndAgeValues(from: [IsoMdlModel.isoNamespace: primary], displayNames: nil, mandatory: nil)
         #expect(unqualified.ageOverXX.isEmpty)
         #expect(SimpleAgeAttest(namespaces: ["unrelated": other], namespace: IsoMdlModel.isoNamespace).ageOverXX.isEmpty)
