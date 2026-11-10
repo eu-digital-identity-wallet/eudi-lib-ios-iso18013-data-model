@@ -90,12 +90,12 @@ public final class EuPidModel: DocClaimsModel, @unchecked Sendable {
 
         // Initialize properties specific to EuPidModel
 		guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned) else { return nil }
-		func getValue<T>(key: EuPidModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems.filter { $0.key == Self.euPidDocType }, string: key.rawValue) }
+		func getValue<T>(key: EuPidModel.CodingKeys) -> T? { Self.getCborItemValue(nameSpaceItems, namespace: Self.euPidDocType, string: key.rawValue) }
 
 		family_name = getValue(key: .family_name)
 		given_name = getValue(key: .given_name)
 		birth_date = getValue(key: .birth_date)
-		place_of_birth = Self.getPlaceOfBirth(from: nameSpaceItems.filter { $0.key == Self.euPidDocType })
+		place_of_birth = Self.getPlaceOfBirth(from: nameSpaceItems, namespace: Self.euPidDocType)
 		nationality = getValue(key: .nationality)
 		portrait = getValue(key: .portrait)
 		resident_address = getValue(key: .resident_address)
@@ -147,11 +147,8 @@ public final class EuPidModel: DocClaimsModel, @unchecked Sendable {
 		)
 	}
 
-	private static func getPlaceOfBirth(from nameSpaceItems: [NameSpace: [IssuerSignedItem]]) -> [String: String]? {
-		guard let item = nameSpaceItems.values
-			.lazy
-			.flatMap({ $0 })
-			.first(where: { $0.elementIdentifier == CodingKeys.place_of_birth.rawValue }),
+	private static func getPlaceOfBirth(from nameSpaceItems: [NameSpace: [IssuerSignedItem]], namespace: NameSpace) -> [String: String]? {
+		guard let item = nameSpaceItems[namespace]?.first(where: { $0.elementIdentifier == CodingKeys.place_of_birth.rawValue }),
 			case .map(let values) = item.elementValue
 		else { return nil }
 

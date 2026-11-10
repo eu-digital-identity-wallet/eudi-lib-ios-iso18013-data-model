@@ -63,24 +63,18 @@ public protocol DocClaimsDecodable: AgeAttesting, Identifiable, Sendable {
 /// Methods to extract CBOR values.
 extension DocClaimsDecodable {
 
-	public static func getCborItemValue<T>(_ issuerSigned: IssuerSigned, _ s: String) -> T? {
-		let nameSpaceItems = Self.getCborSignedItems(issuerSigned)
-		guard let nameSpaceItems else { return nil }
-        let docType = issuerSigned.issuerAuth.mso.docType
-        if docType == IsoMdlModel.isoDocType {
-            return Self.getCborItemValue(nameSpaceItems.filter { $0.key == IsoMdlModel.isoNamespace }, string: s)
-        }
-        if docType == EuPidModel.euPidDocType {
-            return Self.getCborItemValue(nameSpaceItems.filter { $0.key == EuPidModel.euPidDocType }, string: s)
-        }
-		return Self.getCborItemValue(nameSpaceItems, string: s)
-	}
+    /// Extracts a claim from the explicitly supplied namespace.
+    public static func getCborItemValue<T>(_ issuerSigned: IssuerSigned, namespace: NameSpace, _ name: String) -> T? {
+        guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned) else { return nil }
+        return Self.getCborItemValue(nameSpaceItems, namespace: namespace, string: name)
+    }
 
-	static func getCborItemValue<T>(_ nameSpaceItems: [NameSpace: [IssuerSignedItem]], string name: String) -> T? {
-        let matches = nameSpaceItems.values.flatMap { $0 }.filter { $0.elementIdentifier == name }
+    static func getCborItemValue<T>(_ nameSpaceItems: [NameSpace: [IssuerSignedItem]], namespace: NameSpace, string name: String) -> T? {
+        guard let items = nameSpaceItems[namespace] else { return nil }
+        let matches = items.filter { $0.elementIdentifier == name }
         guard matches.count == 1 else { return nil }
         return matches[0].getTypedValue()
-	}
+    }
 
 	public static func getCborSignedItems(_ issuerSigned: IssuerSigned, _ ns: [NameSpace]? = nil) -> [String: [IssuerSignedItem]]? {
 		guard var nameSpaces = issuerSigned.issuerNameSpaces?.nameSpaces else { return nil }
