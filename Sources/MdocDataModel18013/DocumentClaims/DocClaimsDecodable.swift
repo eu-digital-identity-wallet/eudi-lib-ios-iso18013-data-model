@@ -63,21 +63,10 @@ public protocol DocClaimsDecodable: AgeAttesting, Identifiable, Sendable {
 /// Methods to extract CBOR values.
 extension DocClaimsDecodable {
 
-    /// Uses the supplied namespace, or the standard namespace for mDL and PID documents.
-    /// Other document types require an explicit namespace.
-    public static func getCborItemValue<T>(_ issuerSigned: IssuerSigned, namespace: NameSpace? = nil, _ name: String) -> T? {
+    /// Extracts a claim from the explicitly supplied namespace.
+    public static func getCborItemValue<T>(_ issuerSigned: IssuerSigned, namespace: NameSpace, _ name: String) -> T? {
         guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned) else { return nil }
-        let resolvedNamespace: NameSpace
-        if let namespace {
-            resolvedNamespace = namespace
-        } else {
-            switch issuerSigned.issuerAuth.mso.docType {
-            case IsoMdlModel.isoDocType: resolvedNamespace = IsoMdlModel.isoNamespace
-            case EuPidModel.euPidDocType: resolvedNamespace = EuPidModel.euPidDocType
-            default: return nil
-            }
-        }
-        return Self.getCborItemValue(nameSpaceItems, namespace: resolvedNamespace, string: name)
+        return Self.getCborItemValue(nameSpaceItems, namespace: namespace, string: name)
     }
 
     static func getCborItemValue<T>(_ nameSpaceItems: [NameSpace: [IssuerSignedItem]], namespace: NameSpace, string name: String) -> T? {

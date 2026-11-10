@@ -23,7 +23,7 @@ struct SecurityFinding2Tests {
         let auth = try IssuerAuth(data: MdocDataModel18013Tests.AnnexdTestData.d52.bytes)
         let signed = IssuerSigned(issuerNameSpaces: IssuerNameSpaces(nameSpaces: namespaces), issuerAuth: auth)
         let foreignOnly = IssuerSigned(issuerNameSpaces: IssuerNameSpaces(nameSpaces: ["unrelated": other]), issuerAuth: auth)
-        let foreignName: String? = IsoMdlModel.getCborItemValue(foreignOnly, "family_name")
+        let foreignName: String? = IsoMdlModel.getCborItemValue(foreignOnly, namespace: IsoMdlModel.isoNamespace, "family_name")
         #expect(foreignName == nil)
         let config = DocClaimsModelConfiguration(id: "id", docType: IsoMdlModel.isoDocType, displayName: nil, display: nil, credentialIssuerIdentifier: nil, configurationIdentifier: nil, validFrom: nil, validUntil: nil, statusList: nil, credentialsUsageCounts: nil, credentialPolicy: .rotateUse, secureAreaName: nil, modifiedAt: nil, docClaims: [], docDataFormat: .cbor, hashingAlg: nil)
         let model = try #require(IsoMdlModel(configuration: config, issuerSigned: signed, displayNames: nil, mandatory: nil))
@@ -37,8 +37,8 @@ struct SecurityFinding2Tests {
     }
 
     @Test(arguments: ["com.example.custom", IsoMdlModel.isoDocType, EuPidModel.euPidDocType])
-    func publicNamespaceOverridesAndCustomDocumentFallback(docType: String) throws {
-        let defaultNamespace = docType == IsoMdlModel.isoDocType ? IsoMdlModel.isoNamespace : docType
+    func publicNamespaceSelectionForKnownAndCustomDocuments(docType: String) throws {
+        let primaryNamespace = docType == IsoMdlModel.isoDocType ? IsoMdlModel.isoNamespace : docType
         func item(_ value: String) throws -> IssuerSignedItem {
             try IssuerSignedItem(cbor: [
                 "digestID": 0,
@@ -65,14 +65,16 @@ struct SecurityFinding2Tests {
         )
         let signed = IssuerSigned(
             issuerNameSpaces: IssuerNameSpaces(nameSpaces: [
-                defaultNamespace: [try item("primary")],
+                primaryNamespace: [try item("primary")],
                 "override": [try item("selected")]
             ]),
             issuerAuth: auth
         )
 
-        let defaultValue: String? = DocClaimsModel.getCborItemValue(signed, "family_name")
-        #expect(defaultValue == (docType == "com.example.custom" ? nil : "primary"))
+        let primaryValue: String? = DocClaimsModel.getCborItemValue(signed, namespace: primaryNamespace, "family_name")
+        #expect(primaryValue == "primary")
+        let missingValue: String? = DocClaimsModel.getCborItemValue(signed, namespace: "missing", "family_name")
+        #expect(missingValue == nil)
         let selectedValue: String? = DocClaimsModel.getCborItemValue(signed, namespace: "override", "family_name")
         #expect(selectedValue == "selected")
     }
