@@ -40,7 +40,12 @@ public struct IssuerSignedItem: Sendable {
 }
 
 extension CBOR: @retroactive CustomStringConvertible {
-	public var description: String {
+    public var description: String { "CBOR(<redacted>)" }
+}
+
+extension CBOR {
+    /// Formats claim values for intentional display. May contain personal data; do not log.
+    public var displayString: String {
         switch self {
         case .utf8String(let str): return str
 		case .tagged(let tag, .utf8String(let str)):
@@ -55,7 +60,12 @@ extension CBOR: @retroactive CustomStringConvertible {
 }
 
 extension CBOR: @retroactive CustomDebugStringConvertible {
-	public var debugDescription: String {
+    public var debugDescription: String { description }
+}
+
+extension CBOR {
+    /// Recursively formats values for intentional detailed display. May contain personal data; do not log.
+    public var detailedDisplayString: String {
 				switch self {
 				case .utf8String(let str): return "'\(str)'"
 		case .byteString(let bs): return "ByteString \(bs.count)"
@@ -63,8 +73,8 @@ extension CBOR: @retroactive CustomDebugStringConvertible {
 		case .tagged(let tag, .byteString(let bs)): return "tag \(tag.rawValue) 'ByteString \(bs.count)'"
 				case .unsignedInt(let i): return String(i)
 				case .boolean(let b): return String(b)
-		case .array(let a): return "[\(a.reduce("", { $0 + ($0.count > 0 ? "," : "") + " \($1.debugDescription)" }))]"
-		case .map(let map): return "{\(map.reduce("", { $0 + ($0.count > 0 ? "," : "") + " \($1.key.debugDescription): \($1.value.debugDescription)" }))}"
+		case .array(let a): return "[\(a.reduce("", { $0 + ($0.count > 0 ? "," : "") + " \($1.detailedDisplayString)" }))]"
+		case .map(let map): return "{\(map.reduce("", { $0 + ($0.count > 0 ? "," : "") + " \($1.key.detailedDisplayString): \($1.value.detailedDisplayString)" }))}"
 		case .null: return "Null"
 		case .simple(let n): return String(n)
 				default: return "Other"
@@ -93,15 +103,19 @@ extension CBOR {
 }
 
 extension IssuerSignedItem: CustomStringConvertible {
-	public var description: String { elementValue.description }
+	public var description: String { "IssuerSignedItem(<redacted>)" }
 }
 
 extension IssuerSignedItem: CustomDebugStringConvertible {
-	public var debugDescription: String { elementValue.debugDescription }
+	public var debugDescription: String { description }
 }
 
 extension IssuerSignedItem {
-	public var mdocDataValue: DocDataValue? { elementValue.mdocDataValue }
+    /// Formats the claim for intentional display. May contain personal data; do not log.
+    public var displayString: String { elementValue.displayString }
+    /// Formats nested claim values for intentional display. May contain personal data; do not log.
+    public var detailedDisplayString: String { elementValue.detailedDisplayString }
+    public var mdocDataValue: DocDataValue? { elementValue.mdocDataValue }
 }
 
 extension IssuerSignedItem: CBORDecodable {

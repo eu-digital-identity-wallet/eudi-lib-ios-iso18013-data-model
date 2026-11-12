@@ -82,6 +82,12 @@ Data = {
  "elementValue" : DataElementValue 
 }
 
+## Claim display and diagnostic privacy
+
+`CBOR`, `IssuerSignedItem`, `DocClaim`, and `DocDataValue` return redacted type summaries from `description` and `debugDescription`. Consumers that previously used those properties for UI rendering should use `displayString` instead. `CBOR`, `IssuerSignedItem`, and `DocDataValue` also provide `detailedDisplayString` for intentional detailed rendering, preserving their former debug formatting.
+
+The display APIs and explicit value accessors contain personal data and must not be sent to logs or crash-report metadata. Redacted descriptions do not redact direct property access, reflection-based field inspection, or memory dumps. Built-in claim extraction uses the explicit display APIs so wallet display values remain unchanged.
+
 ## Dependencies (to other libs)
 
 * A CBOR implementation for Swift [SwiftCBOR](https://github.com/niscy-eudiw/SwiftCBOR)

@@ -54,9 +54,12 @@ public struct DocClaim: Equatable, Identifiable, CustomStringConvertible, Custom
     /// The children of the claim.
 	public var children: [DocClaim]?
     /// Description of the claim.
-	public var description: String { "\(name): \(stringValue)" }
+	public var description: String { "DocClaim(<redacted>)" }
     /// Debug description of the claim.
-	public var debugDescription: String { "\(order). \t\(name): \(stringValue)" }
+	public var debugDescription: String { "DocClaim(<redacted>)" }
+
+    /// The claim value for intentional display. May contain personal data; do not log.
+    public var displayString: String { stringValue }
 
     public var id: String { path.map({ if $0.isEmpty { String(order) } else { $0 } }).joined(separator: ".") }
     /// Adds a child to the claim.

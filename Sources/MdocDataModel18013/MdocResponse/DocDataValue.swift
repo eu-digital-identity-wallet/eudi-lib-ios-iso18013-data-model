@@ -64,7 +64,11 @@ public enum DocDataValue: Sendable, Equatable, CustomStringConvertible, CustomDe
         }
     }
 
-    public var description: String {
+    public var description: String { "DocDataValue(<redacted>)" }
+    public var debugDescription: String { description }
+
+    /// Formats the value for intentional display. May contain personal data; do not log.
+    public var displayString: String {
         switch self {
         case .boolean(let b): String(b)
         case .integer(let i): String(i)
@@ -77,10 +81,11 @@ public enum DocDataValue: Sendable, Equatable, CustomStringConvertible, CustomDe
         }
     }
 
-    public var debugDescription: String {
+    /// Formats the value, including base64-encoded bytes, for intentional display. Do not log.
+    public var detailedDisplayString: String {
         switch self {
         case .bytes(let b): base64 ?? "Bytes \(b.count)"
-        default: description
+        default: displayString
         }
     }
 }
