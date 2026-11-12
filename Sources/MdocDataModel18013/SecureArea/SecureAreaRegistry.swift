@@ -23,7 +23,7 @@ public final class SecureAreaRegistry:  Sendable {
         case secureEnclave = "SecureEnclave"
         case software = "Software"
     }
-    private init() {}
+    init() {}
 
     public static let shared = SecureAreaRegistry()
     private let secureAreasLock = OSAllocatedUnfairLock<[String: any SecureArea]>(uncheckedState: [:])
@@ -34,12 +34,16 @@ public final class SecureAreaRegistry:  Sendable {
         }
     }
 
-    public func get(name: String?) -> SecureArea {
-        secureAreasLock.withLockUnchecked { secureAreas in
+    /// Throws when no secure area has been registered.
+    public func get(name: String?) throws -> SecureArea {
+        try secureAreasLock.withLockUnchecked { secureAreas in
             if let name, let sa = secureAreas[name] { return sa }
             if let sa = secureAreas[DeviceSecureArea.secureEnclave.rawValue] { return sa }
             if let sa = secureAreas[DeviceSecureArea.software.rawValue] { return sa }
-            return secureAreas.first!.value
+            guard let sa = secureAreas.first?.value else {
+                throw NSError(domain: "SecureAreaRegistry", code: -1, userInfo: [NSLocalizedDescriptionKey: "No secure area has been registered"])
+            }
+            return sa
         }
     }
 

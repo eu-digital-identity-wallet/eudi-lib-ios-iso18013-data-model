@@ -120,8 +120,12 @@ public enum CoseEcCurve: UInt64, Codable, Sendable {
 
      /// The name of the curve according to [JSON Web Key Elliptic Curve](https://www.iana.org/assignments/jose/jose.xhtml#web-key-elliptic-curve)
     public var jwkName: String {
-        guard let name = CoseEcCurve.coseToJwk[self] else { fatalError("No JWK entry for \(self)") }
-        return name
+        get throws {
+            guard let name = CoseEcCurve.coseToJwk[self] else {
+                throw NSError(domain: "EcCurve", code: -1, userInfo: [NSLocalizedDescriptionKey: "No JWK entry for \(self)"])
+            }
+            return name
+        }
     }
 
     /// The default signing algorithm for the curve.

@@ -22,7 +22,15 @@ import SwiftCBOR
 ///  The DrivingPrivileges structure can be an empty array.
 public struct DrivingPrivileges: Codable, Sendable {
 	public let drivingPrivileges: [DrivingPrivilege]
-	public subscript(i: Int) -> DrivingPrivilege { drivingPrivileges[i] }
+    /// Throws if the index is outside the available driving privileges.
+    public subscript(i: Int) -> DrivingPrivilege {
+        get throws {
+            guard drivingPrivileges.indices.contains(i) else {
+                throw NSError(domain: "DrivingPrivileges", code: -1, userInfo: [NSLocalizedDescriptionKey: "Driving privilege index is out of bounds"])
+            }
+            return drivingPrivileges[i]
+        }
+    }
 }
 
 extension DrivingPrivileges: CBORDecodable {

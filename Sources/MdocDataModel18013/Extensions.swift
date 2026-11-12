@@ -21,9 +21,15 @@ import SwiftCBOR
 import OrderedCollections
 
 extension String {
-	public var hex_decimal: Int {
-		return Int(self, radix: 16)!
-	}
+    /// Throws if the string is not a hexadecimal integer representable as `Int`.
+    public var hex_decimal: Int {
+        get throws {
+            guard let value = Int(self, radix: 16) else {
+                throw NSError(domain: "HexDecoding", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid or overflowing hexadecimal integer"])
+            }
+            return value
+        }
+    }
 
 	subscript (bounds: CountableClosedRange<Int>) -> String {
 		let start = index(startIndex, offsetBy: bounds.lowerBound)
@@ -37,14 +43,16 @@ extension String {
 		return String(self[start..<end])
 	}
 
-	public var byteArray: [UInt8] {
-		var res = [UInt8]()
-		for offset in stride(from: 0, to: count, by: 2) {
-			let byte = self[offset..<offset+2].hex_decimal
-			res.append(UInt8(byte))
-		}
-		return res
-	}
+    /// Decodes pairs of hexadecimal digits, throwing for malformed or odd-length input.
+    public var byteArray: [UInt8] {
+        get throws {
+            guard utf8.allSatisfy({ (48...57).contains($0) || (65...70).contains($0) || (97...102).contains($0) }),
+                  let bytes = toBytes() else {
+                throw NSError(domain: "HexDecoding", code: -1, userInfo: [NSLocalizedDescriptionKey: "Expected an even number of hexadecimal digits"])
+            }
+            return bytes
+        }
+    }
 
 	var fullDateEncoded: CBOR {
 		CBOR.tagged(CBOR.Tag(rawValue: 1004), .utf8String(self))

@@ -62,13 +62,13 @@ struct MdocDataModel18013Tests {
     @Test func decodeDrivingPrivileges() throws {
         //test decoding according to test data
         let dps = try DrivingPrivileges(data: AnnexdTestData.d21.bytes)
-        #expect(dps[0].vehicleCategoryCode == "A");  #expect(dps[0].issueDate == "2018-08-09");  #expect(dps[0].expiryDate == "2024-10-20")
-        #expect(dps[1].vehicleCategoryCode == "B");  #expect(dps[1].issueDate == "2017-02-23");  #expect(dps[1].expiryDate == "2024-10-20")
+        #expect(try dps[0].vehicleCategoryCode == "A");  #expect(try dps[0].issueDate == "2018-08-09");  #expect(try dps[0].expiryDate == "2024-10-20")
+        #expect(try dps[1].vehicleCategoryCode == "B");  #expect(try dps[1].issueDate == "2017-02-23");  #expect(try dps[1].expiryDate == "2024-10-20")
         // test encoding
         let cborDps = dps.toCBOR(options: CBOROptions())
         let dps2 = try DrivingPrivileges(cbor: cborDps)
-        #expect(dps2[0].vehicleCategoryCode == "A");  #expect(dps2[0].issueDate == "2018-08-09");  #expect(dps2[0].expiryDate == "2024-10-20")
-        #expect(dps2[1].vehicleCategoryCode == "B");  #expect(dps2[1].issueDate == "2017-02-23");  #expect(dps2[1].expiryDate == "2024-10-20")
+        #expect(try dps2[0].vehicleCategoryCode == "A");  #expect(try dps2[0].issueDate == "2018-08-09");  #expect(try dps2[0].expiryDate == "2024-10-20")
+        #expect(try dps2[1].vehicleCategoryCode == "B");  #expect(try dps2[1].issueDate == "2017-02-23");  #expect(try dps2[1].expiryDate == "2024-10-20")
     }
 
 	@Test func coseESP256PreservesProtectedHeader() throws {
