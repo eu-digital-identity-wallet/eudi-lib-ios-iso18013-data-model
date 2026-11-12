@@ -44,8 +44,8 @@ extension DeviceRetrievalMethod: CBOREncodable {
         case .ble(let peripheralServerMode, let uuid, let psm):
             Self.appendTypeAndVersion(&cborArr, type: 2)
             let modeSpecificOptionKey: CBOR = .unsignedInt(peripheralServerMode ? 10 : 11)
-            let compactUuidString = uuid.uuidString.replacingOccurrences(of: "-", with: "")
-            let compactUuidBytes = compactUuidString.byteArray
+            var uuidBytes = uuid.uuid
+            let compactUuidBytes = withUnsafeBytes(of: &uuidBytes) { Array($0) }
             var options: CBOR = [
                 0: .boolean(peripheralServerMode),
                 1: .boolean(!peripheralServerMode),

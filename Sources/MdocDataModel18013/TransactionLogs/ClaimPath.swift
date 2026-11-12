@@ -27,7 +27,7 @@ public struct ClaimPath: Equatable, Hashable, Sendable {
   /// The list of elements representing the path.
   public let value: [ClaimPathElement]
 
-  /// Initializes a `ClaimPath` ensuring it is not empty.
+  /// Initializes a `ClaimPath`. Empty paths are allowed; accessing their head throws.
   /// - Parameter value: An array of `ClaimPathElement` representing the path.
   public init(_ value: [ClaimPathElement]) {
     self.value = value
@@ -82,8 +82,12 @@ public struct ClaimPath: Equatable, Hashable, Sendable {
   }
 
   /// Retrieves the first element of the claim path.
-  public func head() -> ClaimPathElement {
-    return value.first!
+  /// - Throws: An `NSError` if the path is empty.
+  public func head() throws -> ClaimPathElement {
+    guard let first = value.first else {
+      throw NSError(domain: "ClaimPath", code: -1, userInfo: [NSLocalizedDescriptionKey: "Cannot retrieve the head of an empty claim path"])
+    }
+    return first
   }
 
   /// Retrieves the tail of the claim path (all elements except the first).
@@ -94,8 +98,8 @@ public struct ClaimPath: Equatable, Hashable, Sendable {
   }
 
   /// Retrieves the head element.
-  public func component1() -> ClaimPathElement {
-    return head()
+  public func component1() throws -> ClaimPathElement {
+    return try head()
   }
 
   /// Retrieves the tail path.
