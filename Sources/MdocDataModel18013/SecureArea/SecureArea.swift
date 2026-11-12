@@ -68,7 +68,7 @@ extension SecureArea {
     public static var name: String { String(describing: Self.self).replacingOccurrences(of: "SecureArea", with: "") }
     // by default do nothing. For secure enclave or keychain keys, the system will handle unlocking
     public func unlockKey(id: String) async throws -> Data? {
-        logger.info("Unlocking key with id: \(id)")
+        logger.debug("Using default secure-area key unlock")
         return nil
     }
     public func defaultSigningAlgorithm(ecCurve: CoseEcCurve) -> SigningAlgorithm { ecCurve.defaultSigningAlgorithm }

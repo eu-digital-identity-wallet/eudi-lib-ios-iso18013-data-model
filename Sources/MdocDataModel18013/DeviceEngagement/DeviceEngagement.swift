@@ -153,7 +153,6 @@ extension DeviceEngagement: CBOREncodable {
 		if let sro = serverRetrievalOptions { res[3] = sro.toCBOR(options: options) }
 		if let oi = originInfos { res[5] = .array(oi.map {$0.toCBOR(options: CBOROptions()) }) }
 		if let rfus = self.rfus { for (i,r) in rfus.enumerated() { res[.negativeInt(UInt64(i))] = .utf8String(r) } }
-		logger.debug("DE: \(res.encode().toHexString())")
 		return res
 	}
 }
