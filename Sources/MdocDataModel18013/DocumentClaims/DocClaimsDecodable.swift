@@ -129,7 +129,7 @@ extension DocClaimsDecodable {
 	///   - labels: A dictionary where the key is the elementIdentifier and the value is a string representing the label.
 	/// - Returns: A `DocClaim` object containing the extracted display string or image.
     public static func extractCborClaim(_ name: String, _ path: [String], _ cborValue: CBOR, _ bDebugDisplay: Bool, _ namespace: NameSpace, _ order: Int, _ displayNames: [String:String]? = nil, _ mandatory: [String:Bool]? = nil) -> DocClaim {
-		var stringValue = bDebugDisplay ? cborValue.debugDescription : cborValue.description
+		var stringValue = bDebugDisplay ? cborValue.detailedDisplayString : cborValue.displayString
 		let dt = cborValue.mdocDataValue ?? .string(stringValue)
 		if name == "sex", let isex = Int(stringValue), isex <= 2 { stringValue = NSLocalizedString(isex == 1 ? "male" : "female", comment: "") }
         let isMandatory = mandatory?[name] ?? true
