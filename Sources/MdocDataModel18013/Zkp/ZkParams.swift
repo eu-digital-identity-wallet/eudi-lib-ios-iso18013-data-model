@@ -29,7 +29,11 @@ public enum ZkParam: CBORDecodable, CBOREncodable, Sendable, Equatable {
     public init(cbor: CBOR) throws(MdocValidationError) {
         switch cbor {
         case let .unsignedInt(value):
-            self = .intParam(Int64(value))
+            guard let exactValue = Int64(exactly: value) else { throw .invalidCbor("ZkParam integer") }
+            self = .intParam(exactValue)
+        case let .negativeInt(value):
+            guard let magnitude = Int64(exactly: value) else { throw .invalidCbor("ZkParam integer") }
+            self = .intParam(-1 - magnitude)
         case let .double(value):
             self = .doubleParam(value)
         case let .boolean(value):
@@ -43,7 +47,7 @@ public enum ZkParam: CBORDecodable, CBOREncodable, Sendable, Equatable {
     public func toCBOR(options: CBOROptions) -> CBOR {
         switch self {
         case .intParam(let value):
-            return .unsignedInt(UInt64(value))
+            return value >= 0 ? .unsignedInt(UInt64(value)) : .negativeInt(UInt64(-(value + 1)))
         case .doubleParam(let value):
             return .double(value)
         case .boolParam(let value):

@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "MdocDataModel18013",
     defaultLocalization: "en",
-	platforms: [.macOS(.v14), .iOS(.v16), .tvOS(.v16), .watchOS(.v10)],
+	platforms: [.macOS(.v15), .iOS(.v17), .tvOS(.v17), .watchOS(.v10)],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
@@ -14,7 +14,7 @@ let package = Package(
             targets: ["MdocDataModel18013"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/niscy-eudiw/SwiftCBOR.git", from: "0.6.5"),
+        .package(url: "https://github.com/niscy-eudiw/SwiftCBOR.git", from: "0.7.0"),
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "5.0.1"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.10.1"),
 		.package(url: "https://github.com/eu-digital-identity-wallet/SwiftCopyableMacro.git", from: "0.0.5"),

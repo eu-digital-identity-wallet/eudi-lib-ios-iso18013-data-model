@@ -18,20 +18,18 @@ import Foundation
 
 public struct KeyBatchInfo: Codable, Sendable {
     
-    public init(secureAreaName: String?, crv: CoseEcCurve, usedCounts: [Int], credentialPolicy: CredentialPolicy, keyPurpose: [KeyPurpose]? = nil, attestation: KeyAttestation? = nil) {
-        self.secureAreaName = secureAreaName
-        self.crv = crv
+    public init(keyOptions: KeyOptions?, usedCounts: [Int], credentialPolicy: CredentialPolicy, keyPurpose: [KeyPurpose]? = nil, attestation: KeyAttestation? = nil) {
+        self.keyOptions = keyOptions
         self.usedCounts = usedCounts
         self.credentialPolicy = credentialPolicy
         self.keyPurpose = keyPurpose
         self.attestation = attestation
     }
-    /// public key data
-    public var crv: CoseEcCurve
+    /// Options used to create the keys.
+    public var keyOptions: KeyOptions?
     /// Tasks for which key can be used.
     public var keyPurpose: [KeyPurpose]? = KeyPurpose.allCases
     public var attestation: KeyAttestation?
-    public let secureAreaName: String?
     public var usedCounts: [Int]
     public let credentialPolicy: CredentialPolicy
 
@@ -47,8 +45,7 @@ public struct KeyBatchInfo: Codable, Sendable {
     }
     
     public init(previous: KeyBatchInfo, keyIndex: Int) {
-        self.secureAreaName = previous.secureAreaName
-        self.crv = previous.crv
+        self.keyOptions = previous.keyOptions
         self.credentialPolicy = previous.credentialPolicy
         var newUsedCounts = previous.usedCounts
         newUsedCounts[keyIndex] = previous.usedCounts[keyIndex] + 1

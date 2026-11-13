@@ -16,5 +16,10 @@ limitations under the License.
 
 import Foundation
 import Logging
-// abstract logger. By default writes to console
-let logger = Logger(label: "MdocDataModel18013")
+// Task-local overrides allow isolated log capture without changing global logging configuration.
+enum MdocLogging {
+    @TaskLocal static var logger = Logger(label: "MdocDataModel18013")
+}
+
+// Abstract logger. By default writes to console.
+var logger: Logger { MdocLogging.logger }

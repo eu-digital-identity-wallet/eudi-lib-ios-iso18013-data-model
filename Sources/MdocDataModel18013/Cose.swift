@@ -29,7 +29,7 @@ extension Cose {
 		case mac0 = "MAC0"
 		/// Idenntifies Cose Message Type from input data
 		static func from(data: Data) -> (CoseType, [CBOR])? {
-			guard let cose = try? CBORDecoder(input: data.bytes).decodeItem()?.asCose() else {
+			guard let cose = try? CBOR.decodeMdoc(data.bytes)?.asCose() else {
 				return nil
 			}
 
@@ -46,15 +46,17 @@ extension Cose {
 
 	/// ECDSA Algorithm Values defined in
 	///
-	/// Table1 in rfc/rfc8152#section-16.2
+	/// RFC 8152, Section 8.1 and RFC 9864, Section 2.1.
+	/// Raw values use CBOR negative-integer encoding: the COSE value is -1 - rawValue.
 	public enum VerifyAlgorithm: UInt64, Sendable {
 		case es256 = 6 //-7 ECDSA w/ SHA-256
+		case esp256 = 8 //-9 ECDSA using P-256 w/ SHA-256
 		case es384 = 34 //-35 ECDSA w/ SHA-384
 		case es512 = 35//-36 ECDSA w/ SHA-512
 
         public var signingAlgorithm: SigningAlgorithm {
             switch self {
-            case .es256: return .ES256
+            case .es256, .esp256: return .ES256
             case .es384: return .ES384
             case .es512: return .ES512
             }
@@ -89,6 +91,10 @@ extension Cose {
 		/// Initialize from CBOR
 		/// - Parameter cbor: CBOR representation of the header
 		public init?(fromBytestring cbor: CBOR){
+			// An empty protected header is valid; a malformed nonempty one is not.
+			if case let .byteString(bytes) = cbor, !bytes.isEmpty, cbor.decodeBytestring() == nil {
+				return nil
+			}
 			guard let cborMap = cbor.decodeBytestring()?.asMap(),
 				  let alg = cborMap[Headers.algorithm]?.asUInt64() else {
                 self.init(alg: nil, isNegativeAlg: nil, keyId: nil, type: nil, rawHeader: cbor)
@@ -161,7 +167,7 @@ extension Cose {
 	///  - type: Cose message type
 	///  - cbor: CBOR representation of the cose message
 	public init?(type: CoseType, cbor: SwiftCBOR.CBOR) {
-		guard let coseList = cbor.asList(), let protectedHeader = CoseHeader(fromBytestring: coseList[0]),
+		guard let coseList = cbor.asList(), coseList.count == 4, let protectedHeader = CoseHeader(fromBytestring: coseList[0]),
 			  let signature = coseList[3].asBytes() else { return nil }
 
 		self.protectedHeader = protectedHeader

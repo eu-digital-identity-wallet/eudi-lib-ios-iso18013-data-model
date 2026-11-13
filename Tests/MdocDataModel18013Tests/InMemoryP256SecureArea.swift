@@ -66,20 +66,30 @@ public actor InMemoryP256SecureArea: SecureArea {
      }
 
     public func signature(id: String, index: Int, algorithm: MdocDataModel18013.SigningAlgorithm, dataToSign: Data, unlockData: Data?) throws -> Data {
+        try signature(
+            id: id,
+            index: index,
+            algorithm: algorithm,
+            dataToSign: dataToSign,
+            unlockData: unlockData,
+            authenticationContext: ThreadSafeAuthContext()
+        )
+    }
+
+    public func signature(id: String, index: Int, algorithm: MdocDataModel18013.SigningAlgorithm, dataToSign: Data, unlockData: Data?, authenticationContext: ThreadSafeAuthContext) throws -> Data {
         let signature = try key.signature(for: dataToSign)
         return signature.rawRepresentation
     }
 
-    public func keyAgreement(id: String, index: Int, publicKey: MdocDataModel18013.CoseKey, unlockData: Data?) throws -> SharedSecret {
+    public func keyAgreement(id: String, index: Int, publicKey: MdocDataModel18013.CoseKey, unlockData: Data?, authenticationContext: ThreadSafeAuthContext) throws -> SharedSecret {
         let puk256 = try P256.KeyAgreement.PublicKey(x963Representation: publicKey.x963Representation)
         let prk256 = try P256.KeyAgreement.PrivateKey(x963Representation: key.x963Representation)
         let sharedSecret = try prk256.sharedSecretFromKeyAgreement(with: puk256)
         return sharedSecret
-
     }
 
     public func getKeyBatchInfo(id: String) throws -> MdocDataModel18013.KeyBatchInfo {
-        KeyBatchInfo(secureAreaName: Self.name, crv: .P256, usedCounts: [0], credentialPolicy: .rotateUse)
+        KeyBatchInfo(keyOptions: KeyOptions(curve: .P256, secureAreaName: Self.name), usedCounts: [0], credentialPolicy: .rotateUse)
     }
 }
 
@@ -89,6 +99,10 @@ public actor DummySecureKeyStorage: MdocDataModel18013.SecureKeyStorage {
     }
 
     public func readKeyData(id: String, index: Int) throws -> [String : Data] {
+        [:]
+    }
+
+    public func readKeyData(id: String, index: Int, authenticationContext: ThreadSafeAuthContext) throws -> [String : Data] {
         [:]
     }
 

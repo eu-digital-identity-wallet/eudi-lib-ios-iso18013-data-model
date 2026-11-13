@@ -44,8 +44,8 @@ extension DeviceRetrievalMethod: CBOREncodable {
         case .ble(let peripheralServerMode, let uuid, let psm):
             Self.appendTypeAndVersion(&cborArr, type: 2)
             let modeSpecificOptionKey: CBOR = .unsignedInt(peripheralServerMode ? 10 : 11)
-            let compactUuidString = uuid.uuidString.replacingOccurrences(of: "-", with: "")
-            let compactUuidBytes = compactUuidString.byteArray
+            var uuidBytes = uuid.uuid
+            let compactUuidBytes = withUnsafeBytes(of: &uuidBytes) { Array($0) }
             var options: CBOR = [
                 0: .boolean(peripheralServerMode),
                 1: .boolean(!peripheralServerMode),
@@ -60,7 +60,7 @@ extension DeviceRetrievalMethod: CBOREncodable {
 
 extension DeviceRetrievalMethod: CBORDecodable {
     public init(cbor: CBOR) throws(MdocValidationError) {
-        guard case let .array(arr) = cbor, arr.count >= 2 else { throw .invalidCbor("device retrieval method") }
+        guard case let .array(arr) = cbor, arr.count >= 3 else { throw .invalidCbor("device retrieval method") }
         guard case let .unsignedInt(type) = arr[0] else { throw .invalidCbor("device retrieval method") }
 		guard case let .unsignedInt(methodVersion) = arr[1], methodVersion == Self.version else { throw .invalidCbor("device retrieval method") }
         switch type {
@@ -70,7 +70,13 @@ extension DeviceRetrievalMethod: CBORDecodable {
 			self = .nfc(maxLenCommand: maxLenCommand, maxLenResponse: maxLenResponse)
         case 2:
             guard case let .map(options) = arr[2] else { throw .invalidCbor("device retrieval method") }
-            let psm: UInt16? = if case let .unsignedInt(rawPsm) = options[21] { UInt16(rawPsm) } else { nil }
+            let psm: UInt16?
+            if case let .unsignedInt(rawPsm) = options[21] {
+                guard let value = UInt16(exactly: rawPsm) else { throw .invalidCbor("device retrieval method") }
+                psm = value
+            } else {
+                psm = nil
+            }
             if case let .boolean(isPeripheralServerMode) = options[0], isPeripheralServerMode,
                case let .byteString(uuidBytes) = options[10],
                let uuid = UUID(uuidBytes: uuidBytes)

@@ -1,0 +1,92 @@
+{
+  "TransactionLog": [  
+   {
+      "interactingPartyIdentifier": {
+          "type": "http://data.europa.eu/eudi/id/EUID",
+          "identifier": "PLKRS.0000123456"
+      },
+      "interactingPartyType": "ServiceProvider",
+      "interactingPartyName": "ABC Services",
+      "interactingPartyContact": ["PL", "info@serviceprovider.com","0048221234567","https://www.serviceprovider.com/info/"],
+      "isIntermediary": "FALSE",
+      "registrarURL": "https://www.registrar.pl/registrationinfo/serviceprovider/",
+      "purpose": [
+        {
+          "lang": "pl-PL",
+          "content": "Gromadzimy Twoje imię, nazwisko, adres oraz dane europejskiej karty zdrowia, aby móc zrealizować usługę zgodnie z Twoim zamówieniem"
+        }
+      ],
+      "privacyPolicy": {
+        "type": "http://data.europa.eu/eudi/policy/privacy-policy",
+        "policyURI": "https://www.serviceprovider.com/policy/"
+        },
+      "dpaName": "Urząd Ochrony Danych Osobowych",
+      "dpaCountry": "PL",
+      "dpaContact": ["kancelaria@uodo.gov.pl"],
+      "listOfClaimsRequested": [
+        {
+          "credentialIdentifier": "urn:eudi:pid:de:1",
+          "claims":["name","address"]
+        },
+        {
+          "credentialIdentifier": "urn:eu.europa.ec.eudi:ehic:1",
+          "claims":["credential_holder","starting_date","ending_date","document_id"]
+        }
+      ],
+     "listOfClaimsPresented": [
+        {
+          "credentialIdentifier": "urn:eudi:pid:de:1",
+          "claims":["name"]
+        },
+        {
+          "credentialIdentifier": "urn:eu.europa.ec.eudi:ehic:1",
+          "claims":["starting_date","ending_date"]
+        }
+      ],
+      "transactionIdentifier": "346354209358604",
+      "time": "2025-07-29T09:11:20",
+      "transactionType": "Presentation",
+      "transactionResult": "Completed"    
+    },
+    {
+      "interactingPartyIdentifier": {
+        "type": "http://data.europa.eu/eudi/id/LEI",
+        "identifier": "111100AAAA9999999955"
+        },
+      "interactingPartyType": "ServiceProvider",
+      "interactingPartyName": "Signing Service Provider",
+      "interactingPartyContact": ["FR", "info@signingservice.fr","003312345678","https://www.signingservice.fr/contact/"],
+      "isIntermediary": "FALSE",
+      "registrarURL": "https://www.registrar.fr/registrations/signingserviceprovider/",
+      "purpose": [
+        {
+          "lang": "en-EN",
+          "content": "We collect your name to process registration to our service"
+        },
+        {
+          "lang": "fr-FR",
+          "content": "Nous collectons votre nom pour traiter l'inscription à notre service",
+        }
+      ],
+      "privacyPolicy": {
+        "type": "http://data.europa.eu/eudi/policy/privacy-policy",
+        "policyURI": "https://www.signingservice.fr/privacypolicy/"
+        },
+      "dpaName": "CNIL",
+      "dpaCountry": "FR",
+      "dpaContact": ["0153732222"],
+     "listOfClaimsRequested": [
+        {
+          "credentialIdentifier": "urn:eudi:pid:de:1",
+          "claims":["firstname", "familyname"]
+        }
+      ],
+      "listOfClaimsPresented": [],
+      "transactionIdentifier": "0923485829345892458",
+      "time": "2025-08-01T22:45:31",
+      "transactionType": "Presentation",
+      "transactionResult": "NotCompleted",
+      "reasonOfNoncompletion": "session interrupted"
+    }
+  ]
+}

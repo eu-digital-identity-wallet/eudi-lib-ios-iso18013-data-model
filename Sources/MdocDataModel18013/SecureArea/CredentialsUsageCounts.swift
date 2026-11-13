@@ -24,6 +24,8 @@ public struct CredentialsUsageCounts: Codable, Sendable, Hashable {
     public init(total: Int, remaining: Int) throws {
         self.total = total
         self.remaining = remaining
-		if total < remaining { fatalError("Total count cannot be less than remaining count") }
+        if total < remaining {
+            throw NSError(domain: "CredentialsUsageCounts", code: -1, userInfo: [NSLocalizedDescriptionKey: "Total count cannot be less than remaining count"])
+        }
     }
 }

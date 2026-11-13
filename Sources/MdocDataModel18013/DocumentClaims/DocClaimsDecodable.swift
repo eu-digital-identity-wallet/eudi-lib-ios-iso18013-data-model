@@ -63,18 +63,18 @@ public protocol DocClaimsDecodable: AgeAttesting, Identifiable, Sendable {
 /// Methods to extract CBOR values.
 extension DocClaimsDecodable {
 
-	public static func getCborItemValue<T>(_ issuerSigned: IssuerSigned, _ s: String) -> T? {
-		let nameSpaceItems = Self.getCborSignedItems(issuerSigned)
-		guard let nameSpaceItems else { return nil }
-		return Self.getCborItemValue(nameSpaceItems, string: s)
-	}
+    /// Extracts a claim from the explicitly supplied namespace.
+    public static func getCborItemValue<T>(_ issuerSigned: IssuerSigned, namespace: NameSpace, _ name: String) -> T? {
+        guard let nameSpaceItems = Self.getCborSignedItems(issuerSigned) else { return nil }
+        return Self.getCborItemValue(nameSpaceItems, namespace: namespace, string: name)
+    }
 
-	static func getCborItemValue<T>(_ nameSpaceItems: [NameSpace: [IssuerSignedItem]], string name: String) -> T? {
-		for (_,v) in nameSpaceItems {
-			if let item = v.first(where: { name == $0.elementIdentifier }) { return item.getTypedValue() }
-		}
-		return nil
-	}
+    static func getCborItemValue<T>(_ nameSpaceItems: [NameSpace: [IssuerSignedItem]], namespace: NameSpace, string name: String) -> T? {
+        guard let items = nameSpaceItems[namespace] else { return nil }
+        let matches = items.filter { $0.elementIdentifier == name }
+        guard matches.count == 1 else { return nil }
+        return matches[0].getTypedValue()
+    }
 
 	public static func getCborSignedItems(_ issuerSigned: IssuerSigned, _ ns: [NameSpace]? = nil) -> [String: [IssuerSignedItem]]? {
 		guard var nameSpaces = issuerSigned.issuerNameSpaces?.nameSpaces else { return nil }
@@ -88,17 +88,17 @@ extension DocClaimsDecodable {
 	/// - Parameters:
 	///   - nameSpaces: A dictionary where the key is a `NameSpace` and the value is an array of `IssuerSignedItem`.
 	///   - ageOverXX: An inout parameter that is a dictionary where the key is an integer representing the age and the value is a boolean indicating whether the age condition is met.
-	public static func extractAgeOverValues(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ ageOverXX: inout [Int: Bool]) {
-		for (_, items) in nameSpaces {
-			for item in items {
-				let elementIdentifier = item.elementIdentifier
-				if !elementIdentifier.hasPrefix("age_over_") { continue }
-				if let age = Int(elementIdentifier.suffix(elementIdentifier.count - 9)) {
-					let b: Bool? = item.getTypedValue()
-					if let b { ageOverXX[age] = b }
-				}
-			}
-		}
+	///   - namespace: The known namespace containing the age-over values.
+	public static func extractAgeOverValues(_ nameSpaces: [NameSpace: [IssuerSignedItem]], _ ageOverXX: inout [Int: Bool], namespace: NameSpace) {
+        guard let items = nameSpaces[namespace] else { return }
+        for item in items {
+            let elementIdentifier = item.elementIdentifier
+            if !elementIdentifier.hasPrefix("age_over_") { continue }
+            if let age = Int(elementIdentifier.suffix(elementIdentifier.count - 9)) {
+                let b: Bool? = item.getTypedValue()
+                if let b { ageOverXX[age] = b }
+            }
+        }
 	}
 
 	/// Determines if there are more than two age-over element identifiers in the provided list.
@@ -129,7 +129,7 @@ extension DocClaimsDecodable {
 	///   - labels: A dictionary where the key is the elementIdentifier and the value is a string representing the label.
 	/// - Returns: A `DocClaim` object containing the extracted display string or image.
     public static func extractCborClaim(_ name: String, _ path: [String], _ cborValue: CBOR, _ bDebugDisplay: Bool, _ namespace: NameSpace, _ order: Int, _ displayNames: [String:String]? = nil, _ mandatory: [String:Bool]? = nil) -> DocClaim {
-		var stringValue = bDebugDisplay ? cborValue.debugDescription : cborValue.description
+		var stringValue = bDebugDisplay ? cborValue.detailedDisplayString : cborValue.displayString
 		let dt = cborValue.mdocDataValue ?? .string(stringValue)
 		if name == "sex", let isex = Int(stringValue), isex <= 2 { stringValue = NSLocalizedString(isex == 1 ? "male" : "female", comment: "") }
         let isMandatory = mandatory?[name] ?? true

@@ -46,11 +46,13 @@ public protocol SecureArea: Actor {
     /// delete key info
     func deleteKeyInfo(id: String) async throws
     /// compute signature, return raw representation
-    func signature(id: String, index: Int, algorithm: SigningAlgorithm, dataToSign: Data, unlockData: Data?) async throws -> Data
+    /// compute signature using a reusable local authentication context when supported
+    func signature(id: String, index: Int, algorithm: SigningAlgorithm, dataToSign: Data, unlockData: Data?, authenticationContext: ThreadSafeAuthContext) async throws -> Data
     /// make key-agreement (shared secret) with other public key (used for encryption and mac computations)
-    func keyAgreement(id: String, index: Int, publicKey: CoseKey, unlockData: Data?) async throws -> SharedSecret
+    /// uses a reusable local authentication context when the private key requires user presence
+    func keyAgreement(id: String, index: Int, publicKey: CoseKey, unlockData: Data?, authenticationContext: ThreadSafeAuthContext) async throws -> SharedSecret
     /// returns information about the key with the given id and the curve of the key
-    func getInfoAndCurve(id: String) async throws -> ([String:Data], CoseEcCurve) 
+    func getInfoAndCurve(id: String) async throws -> ([String:Data], CoseEcCurve)
     /// returns information about the key with the given id
     func getKeyBatchInfo(id: String) async throws -> KeyBatchInfo
     /// return the storage instance
@@ -66,7 +68,7 @@ extension SecureArea {
     public static var name: String { String(describing: Self.self).replacingOccurrences(of: "SecureArea", with: "") }
     // by default do nothing. For secure enclave or keychain keys, the system will handle unlocking
     public func unlockKey(id: String) async throws -> Data? {
-        logger.info("Unlocking key with id: \(id)")
+        logger.debug("Using default secure-area key unlock")
         return nil
     }
     public func defaultSigningAlgorithm(ecCurve: CoseEcCurve) -> SigningAlgorithm { ecCurve.defaultSigningAlgorithm }

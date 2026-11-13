@@ -78,11 +78,13 @@ extension UseCase: CBORDecodable {
                 guard case let .utf8String(controllerId) = key else { throw .invalidCbor("UseCase") }
                 guard case let .negativeInt(code) = value else {
                     if case let .unsignedInt(code) = value {
-                        hints[controllerId] = Int(code)
+                        guard let exactCode = Int(exactly: code) else { throw .invalidCbor("UseCase purpose code") }
+                        hints[controllerId] = exactCode
                     } else { throw .invalidCbor("UseCase") }
                     continue
                 }
-                hints[controllerId] = -Int(code) - 1
+                guard let exactCode = Int(exactly: code) else { throw .invalidCbor("UseCase purpose code") }
+                hints[controllerId] = -1 - exactCode
             }
             purposeHints = hints.isEmpty ? nil : hints
         } else {
@@ -116,7 +118,7 @@ extension UseCase: CBOREncodable {
         if let purposeHints {
             var hintsMap = OrderedDictionary<CBOR, CBOR>()
             for (controllerId, code) in purposeHints {
-                let encodedCode: CBOR = code >= 0 ? .unsignedInt(UInt64(code)) : .negativeInt(UInt64(-code - 1))
+                let encodedCode: CBOR = code >= 0 ? .unsignedInt(UInt64(code)) : .negativeInt(UInt64(-(code + 1)))
                 hintsMap[.utf8String(controllerId)] = encodedCode
             }
             map[.utf8String(Keys.purposeHints.rawValue)] = .map(hintsMap)

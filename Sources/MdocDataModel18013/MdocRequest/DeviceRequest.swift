@@ -63,7 +63,7 @@ extension DeviceRequest: CBORDecodable {
         // Decode deviceRequestInfo from tag 24 (bstr .cbor DeviceRequestInfo)
         if let deviceReqInfoValue = m[Keys.deviceRequestInfo] {
             guard case let .tagged(.encodedCBORDataItem, .byteString(bytes)) = deviceReqInfoValue,
-                  let decoded = try? CBOR.decode(bytes) else { throw .invalidCbor("DeviceRequest") }
+                  let decoded = try? CBOR.decodeMdoc(bytes) else { throw .invalidCbor("DeviceRequest") }
             deviceRequestInfo = try DeviceRequestInfo(cbor: decoded)
         } else { deviceRequestInfo = nil }
         if case let .array(ra) = m[Keys.readerAuthAll] {

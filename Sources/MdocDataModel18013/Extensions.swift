@@ -21,9 +21,15 @@ import SwiftCBOR
 import OrderedCollections
 
 extension String {
-	public var hex_decimal: Int {
-		return Int(self, radix: 16)!
-	}
+    /// Throws if the string is not a hexadecimal integer representable as `Int`.
+    public var hex_decimal: Int {
+        get throws {
+            guard let value = Int(self, radix: 16) else {
+                throw NSError(domain: "HexDecoding", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid or overflowing hexadecimal integer"])
+            }
+            return value
+        }
+    }
 
 	subscript (bounds: CountableClosedRange<Int>) -> String {
 		let start = index(startIndex, offsetBy: bounds.lowerBound)
@@ -37,25 +43,28 @@ extension String {
 		return String(self[start..<end])
 	}
 
-	public var byteArray: [UInt8] {
-		var res = [UInt8]()
-		for offset in stride(from: 0, to: count, by: 2) {
-			let byte = self[offset..<offset+2].hex_decimal
-			res.append(UInt8(byte))
-		}
-		return res
-	}
+    /// Decodes pairs of hexadecimal digits, throwing for malformed or odd-length input.
+    public var byteArray: [UInt8] {
+        get throws {
+            guard utf8.allSatisfy({ (48...57).contains($0) || (65...70).contains($0) || (97...102).contains($0) }),
+                  let bytes = toBytes() else {
+                throw NSError(domain: "HexDecoding", code: -1, userInfo: [NSLocalizedDescriptionKey: "Expected an even number of hexadecimal digits"])
+            }
+            return bytes
+        }
+    }
 
 	var fullDateEncoded: CBOR {
 		CBOR.tagged(CBOR.Tag(rawValue: 1004), .utf8String(self))
 	}
 
     public func convertToLocalDate() -> Date? {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = contains(".") ? "yyyy-MM-dd'T'HH:mm:ss.SSSZ" : "yyyy-MM-dd'T'HH:mm:ssZ"
-        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0) // UTC timezone
+        let formatter = ISO8601DateFormatter()
+        if contains(".") {
+            formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        }
         // Parse the string to Date (UTC)
-        guard let date = dateFormatter.date(from: self) else {
+        guard let date = formatter.date(from: self) else {
             return nil
         }
         // The Date object itself doesn't have a timezone - it's just a point in time
@@ -86,6 +95,7 @@ extension String {
 
 extension UUID {
     init?(uuidBytes: [UInt8]) {
+        guard uuidBytes.count == 16 else { return nil }
         let nsUUIDString = UUID.ReferenceType(uuidBytes: uuidBytes).uuidString
         guard let uuid = UUID(uuidString: nsUUIDString) else { return nil }
         self = uuid
@@ -152,12 +162,14 @@ extension CBOREncodable {
 
 extension CBORDecodable {
 	public init(data: [UInt8]) throws {
-		guard let obj = try CBOR.decode(data) else { throw MdocValidationError.cborDecodingError }
+		guard let obj = try CBOR.decodeMdoc(data) else { throw MdocValidationError.cborDecodingError }
 		try self.init(cbor: obj)
 	}
 }
 
 extension CBOR {
+    static let maximumDepth = 64
+
 	public func decodeTaggedBytes() -> [UInt8]? {
 		guard case let CBOR.tagged(tag, encodedCbor) = self,
 			  tag == .encodedCBORDataItem,
@@ -260,7 +272,7 @@ extension CBOR {
 
 	public func decodeBytestring() -> CBOR? {
 		guard let bytestring = self.asBytes(),
-			  let decoded = try? CBORDecoder(input: bytestring).decodeItem() else {
+			  let decoded = try? CBOR.decodeMdoc(bytestring) else {
 			return nil
 		}
 		return decoded

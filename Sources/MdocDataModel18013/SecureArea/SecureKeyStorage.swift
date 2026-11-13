@@ -19,8 +19,8 @@ import Foundation
 public protocol SecureKeyStorage: Actor {
     // read key public info
     func readKeyInfo(id: String) async throws -> [String: Data]
-    // read key sensitive info (may trigger biometric or password checks)
-    func readKeyData(id: String, index: Int) async throws -> [String: Data]
+    // read key sensitive info using a reusable thread-safe local authentication context
+    func readKeyData(id: String, index: Int, authenticationContext: ThreadSafeAuthContext) async throws -> [String: Data]
     // save key public info
     func writeKeyInfo(id: String, dict: [String: Data]) async throws
     // save key data batch info
@@ -28,5 +28,5 @@ public protocol SecureKeyStorage: Actor {
     // delete key data
     func deleteKeyBatch(id: String, startIndex: Int, batchSize: Int) async throws
     // delete key info
-    func deleteKeyInfo(id: String) async throws 
+    func deleteKeyInfo(id: String) async throws
 }

@@ -21,6 +21,7 @@ import Foundation
 /// Implementations of this protocol should log transactions to some persistent storage.
 /// The storage can be a file, a database, or any other storage medium.
 public protocol TransactionLogger: Actor {
-    ///  Logs a transaction.
-    func log(transaction: TransactionLog) async throws
+    /// Stores or updates an entry by `transactionIdentifier`.
+    /// Repeated calls for the same identifier replace the previous snapshot.
+    func log(transaction: TransactionEntry) async throws
 }

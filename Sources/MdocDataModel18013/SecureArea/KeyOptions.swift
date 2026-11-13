@@ -17,7 +17,7 @@ limitations under the License.
 import Foundation
 
 /// Key options
-public struct KeyOptions: Codable, Sendable {
+public struct KeyOptions: Codable, Sendable, Equatable {
     public init(curve: CoseEcCurve = .P256, secureAreaName: String? = nil, accessProtection: KeyAccessProtection? = nil, accessControl: KeyAccessControl? = nil, keyPurposes: [KeyPurpose]? = KeyPurpose.allCases, additionalOptions: Data? = nil) {
         self.curve = curve
         self.secureAreaName = secureAreaName
@@ -76,25 +76,47 @@ public enum KeyAccessProtection: Int, Codable, CaseIterable, Sendable {
         }
     }
 }
+/// Codable conformance for the native flags, so ``KeyAccessControl`` can synthesise its own.
+extension SecAccessControlCreateFlags: @retroactive Codable {}
+
 /// Key access control settings
 ///
 /// Using these settings you can check for the presence of the authorized user at the very last minute before retrieving login credentials from the keychain. This helps secure the private key even if the user hands the device in an unlocked state to someone else.
-public struct KeyAccessControl: OptionSet, Codable, Sendable {
-    public init(rawValue: Int) {
-        self.rawValue = rawValue
-    }
-    public let rawValue: Int
-
+///
+/// The named cases are mutually exclusive user authentication constraints. Use ``custom(_:)`` to pass any other
+/// combination of keychain flags through verbatim, for example a biometry constraint with a passcode fallback:
+/// `.custom([.biometryCurrentSet, .or, .devicePasscode])`.
+public enum KeyAccessControl: Codable, Equatable, Sendable {
+    // no access control
+    case empty
     /// Require user presence policy using biometry or Passcode
-    public static let requireUserPresence = KeyAccessControl(rawValue: 1 << 0)
-    /// Require application provided password for additional data encryption key generation
-    public static let requireApplicationPassword = KeyAccessControl(rawValue: 1 << 1)
+    case requireUserPresence
+    /// Require any enrolled biometry, without allowing passcode fallback
+    case requireBiometryAny
+    /// Require current biometry set without allowing passcode fallback or newly enrolled biometrics
+    case requireBiometryCurrentSet
+    /// Native keychain flags, used as given
+    case custom(SecAccessControlCreateFlags)
 
+    /// Creates the case matching the given native flags, falling back to ``custom(_:)`` for anything else
+    public init(flags: SecAccessControlCreateFlags) {
+        switch flags {
+        case SecAccessControlCreateFlags.userPresence: self = .requireUserPresence
+        case SecAccessControlCreateFlags.biometryAny: self = .requireBiometryAny
+        case SecAccessControlCreateFlags.biometryCurrentSet: self = .requireBiometryCurrentSet
+        default: self = .custom(flags)
+        }
+    }
+
+    /// flags to use for the kSecAttrAccessControl attribute
     public var flags: SecAccessControlCreateFlags {
-        var result: SecAccessControlCreateFlags = []
-        if contains(.requireUserPresence) { result.insert(.userPresence) }
-        if contains(.requireApplicationPassword) { result.insert(.applicationPassword) }
-        return result
+        switch self {
+        case .empty: []
+        case .requireUserPresence: SecAccessControlCreateFlags.userPresence
+        case .requireBiometryAny: SecAccessControlCreateFlags.biometryAny
+        case .requireBiometryCurrentSet: SecAccessControlCreateFlags.biometryCurrentSet
+        case .custom(let flags): flags
+        }
     }
 }
 #endif

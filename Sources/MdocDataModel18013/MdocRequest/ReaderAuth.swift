@@ -35,18 +35,8 @@ extension ReaderAuth: CBORDecodable {
         else { throw .invalidCbor("reader authentication") }
 
         let x5chainHeaderKey = CBOR.unsignedInt(33)
-        if case let .byteString(certificateBytes) = unprotectedHeaderMap[x5chainHeaderKey] {
-            x5chain = [certificateBytes]
-        }
-        else if case let .array(certificateArray) = unprotectedHeaderMap[x5chainHeaderKey] {
-            x5chain = certificateArray.compactMap { certificateEntry in
-                if case let .byteString(certificateBytes) = certificateEntry {
-                    return certificateBytes
-                }
-                return nil
-            }
-        }
-		else { throw .invalidCbor("reader authentication") }
+        guard let chain = unprotectedHeaderMap[x5chainHeaderKey] else { throw .invalidCbor("reader authentication x5chain") }
+        x5chain = try CertificateChain.decode(chain)
     }
 }
 

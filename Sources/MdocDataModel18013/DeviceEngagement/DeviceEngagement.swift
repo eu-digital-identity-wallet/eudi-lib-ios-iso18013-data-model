@@ -17,6 +17,7 @@ limitations under the License.
 //  DeviceEngagement.swift
 
 import Foundation
+import os
 import SwiftCBOR
 #if canImport(CryptoKit)
 import CryptoKit
@@ -51,6 +52,11 @@ public struct DeviceEngagement: Sendable {
 	// private key data for holder only
     public var privateKey: CoseKeyPrivate?
 	public var qrCoded: [UInt8]?
+	private struct SessionLifetime: Sendable {
+        var claimed = false
+        var terminated = false
+    }
+    private var sessionEstablishmentClaim = OSAllocatedUnfairLock(initialState: SessionLifetime())
 
 
 	/// Generate device engagement
@@ -74,13 +80,34 @@ public struct DeviceEngagement: Sendable {
 	}
 	/// initialize from cbor data
 	public init(data: [UInt8]) throws {
-		guard let obj = try? CBOR.decode(data) else { throw MdocValidationError.invalidCbor("device engagement") }
+		guard let obj = try? CBOR.decodeMdoc(data) else { throw MdocValidationError.invalidCbor("device engagement") }
 		try self.init(cbor: obj)
 	}
 
     public mutating func makePrivateKey(secureArea: any SecureArea, keyOptions: KeyOptions) async throws {
         privateKey = try await CoseKeyPrivate(secureArea: secureArea, keyOptions: keyOptions)
 		security = Security(deviceKey: try await privateKey!.key)
+		sessionEstablishmentClaim = OSAllocatedUnfairLock(initialState: SessionLifetime())
+    }
+
+	/// Claims this engagement for a single session establishment, before asynchronous work.
+	/// Copies share the claim. Generating a fresh ephemeral key resets it.
+	public func claimSessionEstablishment() -> Bool {
+		sessionEstablishmentClaim.withLock { lifetime in
+			guard !lifetime.claimed, !lifetime.terminated else { return false }
+			lifetime.claimed = true
+			return true
+		}
+	}
+
+    /// Revokes this engagement and all existing copies, including in-flight session operations.
+    /// A fresh ephemeral key is required before the engagement can be used again.
+    public func invalidateSession() {
+        sessionEstablishmentClaim.withLock { $0.terminated = true }
+    }
+
+    public var isSessionTerminated: Bool {
+        sessionEstablishmentClaim.withLock { $0.terminated }
     }
 
 	public var supportsCentralClientMode: Bool {
@@ -126,7 +153,6 @@ extension DeviceEngagement: CBOREncodable {
 		if let sro = serverRetrievalOptions { res[3] = sro.toCBOR(options: options) }
 		if let oi = originInfos { res[5] = .array(oi.map {$0.toCBOR(options: CBOROptions()) }) }
 		if let rfus = self.rfus { for (i,r) in rfus.enumerated() { res[.negativeInt(UInt64(i))] = .utf8String(r) } }
-		logger.debug("DE: \(res.encode().toHexString())")
 		return res
 	}
 }
