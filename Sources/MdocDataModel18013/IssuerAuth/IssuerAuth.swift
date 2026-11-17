@@ -26,14 +26,17 @@ public struct IssuerAuth: Sendable {
 	public let verifyAlgorithm: Cose.VerifyAlgorithm
 	public let signature: Data
 	public let x5chain: [[UInt8]]
+	/// The protected header bytes as the issuer encoded them. The signature covers these bytes (RFC 9052, section 4.4).
+	public let protectedHeaderBytes: [UInt8]?
 
-	public init(mso: MobileSecurityObject, msoRawData: [UInt8], verifyAlgorithm: Cose.VerifyAlgorithm, signature: Data, x5chain: [[UInt8]], statusList: StatusList?) {
+	public init(mso: MobileSecurityObject, msoRawData: [UInt8], verifyAlgorithm: Cose.VerifyAlgorithm, signature: Data, x5chain: [[UInt8]], statusList: StatusList?, protectedHeaderBytes: [UInt8]? = nil) {
 		self.mso = mso
 		self.msoRawData = msoRawData
 		self.verifyAlgorithm = verifyAlgorithm
 		self.signature = signature
 		self.x5chain = x5chain
         self.statusList = statusList
+		self.protectedHeaderBytes = protectedHeaderBytes
 	}
 }
 
@@ -53,6 +56,7 @@ extension IssuerAuth: CBORDecodable {
 		verifyAlgorithm = verificationAlgorithm
 		signature = cose.signature
 		statusList = StatusList(data: msoBytes)
+		protectedHeaderBytes = cose.protectedHeader.rawHeader?.asBytes()
 
 		guard let unprotectedHeader = cose.unprotectedHeader?.rawHeader,
 			  case let .map(unprotectedHeaderMap) = unprotectedHeader
@@ -80,7 +84,8 @@ extension IssuerAuth: CBOREncodable {
 			unprotectedHeaderCbor: unprotectedHeaderCbor,
 			signature: signature
 		)
-		return cose.toCBOR(options: options)
+		guard let protectedHeaderBytes, let protectedHeader = Cose.CoseHeader(fromBytestring: .byteString(protectedHeaderBytes)) else { return cose.toCBOR(options: options) }
+		return Cose(type: cose.type, protectedHeader: protectedHeader, unprotectedHeader: cose.unprotectedHeader, payload: cose.payload, signature: cose.signature).toCBOR(options: options)
 	}
 }
 
